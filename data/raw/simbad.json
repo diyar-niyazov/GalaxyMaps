@@ -1,0 +1,3537 @@
+{
+ "retrieved": "2026-10-03",
+ "endpoint": "https://simbad.cds.unistra.fr/simbad/sim-tap/sync",
+ "objects": {
+  "proxima-centauri": {
+   "basic": {
+    "query_id": "NAME Proxima Centauri",
+    "main_id": "NAME Proxima Centauri",
+    "otype": "PM*",
+    "ra": "217.42894222160578",
+    "dec": "-62.67949018907555",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "768.0665",
+    "plx_err": "0.0499",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "M5.5Ve",
+    "rvz_redshift": "-6.863912763754865E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "11.13"
+   },
+   "distances": [
+    {
+     "query_id": "NAME Proxima Centauri",
+     "dist": "1.3019",
+     "plus_err": "",
+     "minus_err": "-5.0",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    },
+    {
+     "query_id": "NAME Proxima Centauri",
+     "dist": "1.3012",
+     "plus_err": "3.0E-4",
+     "minus_err": "-3.0E-4",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "NAME Proxima Centauri",
+     "dist": "1.3019",
+     "plus_err": "",
+     "minus_err": "-5.0",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "alpha-centauri-a": {
+   "basic": {
+    "query_id": "* alf Cen A",
+    "main_id": "* alf Cen A",
+    "otype": "PM*",
+    "ra": "219.90205833170774",
+    "dec": "-60.83399268831004",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "742.12",
+    "plx_err": "1.4",
+    "plx_bibcode": "1997A&A...323L..49P",
+    "sp_type": "G2V",
+    "rvz_redshift": "-5.087390172275885E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.01"
+   },
+   "distances": []
+  },
+  "alpha-centauri-b": {
+   "basic": {
+    "query_id": "* alf Cen B",
+    "main_id": "* alf Cen B",
+    "otype": "PM*",
+    "ra": "219.89609628987276",
+    "dec": "-60.83752756558407",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "742.12",
+    "plx_err": "1.4",
+    "plx_bibcode": "1997A&A...323L..49P",
+    "sp_type": "K1V",
+    "rvz_redshift": "-7.5335948788946E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "1.33"
+   },
+   "distances": []
+  },
+  "barnards-star": {
+   "basic": {
+    "query_id": "NAME Barnard's star",
+    "main_id": "NAME Barnard's star",
+    "otype": "BY*",
+    "ra": "269.4520769586187",
+    "dec": "4.693364966576667",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "546.9759",
+    "plx_err": "0.0401",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "M4V",
+    "rvz_redshift": "-3.6721999996314203E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "9.511"
+   },
+   "distances": [
+    {
+     "query_id": "NAME Barnard's star",
+     "dist": "1.82",
+     "plus_err": "0.01",
+     "minus_err": "-0.01",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2010MNRAS.403.1949K"
+    },
+    {
+     "query_id": "NAME Barnard's star",
+     "dist": "1.8266",
+     "plus_err": "0.001",
+     "minus_err": "-0.001",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "NAME Barnard's star",
+     "dist": "1.8282",
+     "plus_err": "1.0E-4",
+     "minus_err": "-1.0E-4",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "wolf-359": {
+   "basic": {
+    "query_id": "Wolf  359",
+    "main_id": "Wolf  359",
+    "otype": "PM*",
+    "ra": "164.1205036259475",
+    "dec": "7.014723134801666",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "415.1794",
+    "plx_err": "0.0684",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "dM6",
+    "rvz_redshift": "6.528062421029546E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "13.507"
+   },
+   "distances": [
+    {
+     "query_id": "Wolf  359",
+     "dist": "2.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2014AJ....147...20N"
+    },
+    {
+     "query_id": "Wolf  359",
+     "dist": "2.4086",
+     "plus_err": "3.0E-4",
+     "minus_err": "-3.0E-4",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "sirius": {
+   "basic": {
+    "query_id": "* alf CMa",
+    "main_id": "* alf CMa",
+    "otype": "SB*",
+    "ra": "101.28715533333335",
+    "dec": "-16.71611586111111",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "379.21",
+    "plx_err": "1.58",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "A0mA1Va",
+    "rvz_redshift": "-1.834585695059676E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "-1.46"
+   },
+   "distances": []
+  },
+  "luytens-star": {
+   "basic": {
+    "query_id": "GJ 273",
+    "main_id": "BD+05  1668",
+    "otype": "PM*",
+    "ra": "111.85207903566794",
+    "dec": "5.225789303071388",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "264.1269",
+    "plx_err": "0.0413",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "M3.5V",
+    "rvz_redshift": "6.124424330700151E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "9.872"
+   },
+   "distances": [
+    {
+     "query_id": "GJ 273",
+     "dist": "3.8",
+     "plus_err": "0.02",
+     "minus_err": "-0.02",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2010MNRAS.403.1949K"
+    },
+    {
+     "query_id": "GJ 273",
+     "dist": "3.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2014AJ....147...20N"
+    },
+    {
+     "query_id": "GJ 273",
+     "dist": "3.786",
+     "plus_err": "5.0E-4",
+     "minus_err": "-5.0E-4",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "epsilon-eridani": {
+   "basic": {
+    "query_id": "* eps Eri",
+    "main_id": "* eps Eri",
+    "otype": "BY*",
+    "ra": "53.23268537982792",
+    "dec": "-9.458260970518056",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "310.5773",
+    "plx_err": "0.1355",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "K2V",
+    "rvz_redshift": "5.4625948226583176E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "3.73"
+   },
+   "distances": [
+    {
+     "query_id": "* eps Eri",
+     "dist": "3.2028",
+     "plus_err": "0.0047",
+     "minus_err": "-0.0047",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "* eps Eri",
+     "dist": "3.2198",
+     "plus_err": "0.0014",
+     "minus_err": "-0.0014",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "61-cygni": {
+   "basic": {
+    "query_id": "*  61 Cyg A",
+    "main_id": "*  61 Cyg A",
+    "otype": "BY*",
+    "ra": "316.7247482895925",
+    "dec": "38.74941731943694",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "285.9949",
+    "plx_err": "0.0599",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "K5V",
+    "rvz_redshift": "-2.1952779123446398E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "5.21"
+   },
+   "distances": [
+    {
+     "query_id": "*  61 Cyg A",
+     "dist": "3.482",
+     "plus_err": "0.018",
+     "minus_err": "-0.018",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2009ApJ...694.1085V"
+    },
+    {
+     "query_id": "*  61 Cyg A",
+     "dist": "3.4972",
+     "plus_err": "0.0012",
+     "minus_err": "-0.0012",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "*  61 Cyg A",
+     "dist": "3.4965",
+     "plus_err": "7.0E-4",
+     "minus_err": "-7.0E-4",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "procyon": {
+   "basic": {
+    "query_id": "* alf CMi",
+    "main_id": "* alf CMi",
+    "otype": "SB*",
+    "ra": "114.82549790798149",
+    "dec": "5.224987557059477",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "284.56",
+    "plx_err": "1.26",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "F5IV-V+DQZ",
+    "rvz_redshift": "-1.5027883549456611E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.37"
+   },
+   "distances": []
+  },
+  "ross-128": {
+   "basic": {
+    "query_id": "Ross  128",
+    "main_id": "Ross  128",
+    "otype": "PM*",
+    "ra": "176.93498861725834",
+    "dec": "0.8045556493308333",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "296.3053",
+    "plx_err": "0.0302",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "dM4",
+    "rvz_redshift": "-1.0226552246928033E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "11.153"
+   },
+   "distances": [
+    {
+     "query_id": "Ross  128",
+     "dist": "3.36",
+     "plus_err": "0.03",
+     "minus_err": "-0.03",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2010MNRAS.403.1949K"
+    },
+    {
+     "query_id": "Ross  128",
+     "dist": "3.3748",
+     "plus_err": "7.0E-4",
+     "minus_err": "-7.0E-4",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "Ross  128",
+     "dist": "3.3749",
+     "plus_err": "3.0E-4",
+     "minus_err": "-3.0E-4",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "tau-ceti": {
+   "basic": {
+    "query_id": "* tau Cet",
+    "main_id": "* tau Cet",
+    "otype": "PM*",
+    "ra": "26.01701307163417",
+    "dec": "-15.93747989102139",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "273.8097",
+    "plx_err": "0.1701",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "G8V",
+    "rvz_redshift": "-5.536010050966045E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "3.5"
+   },
+   "distances": [
+    {
+     "query_id": "* tau Cet",
+     "dist": "3.6033",
+     "plus_err": "0.0067",
+     "minus_err": "-0.0067",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "* tau Cet",
+     "dist": "3.6521",
+     "plus_err": "0.0022",
+     "minus_err": "-0.0022",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "teegardens-star": {
+   "basic": {
+    "query_id": "NAME Teegarden's Star",
+    "main_id": "NAME Teegarden's Star",
+    "otype": "LM*",
+    "ra": "43.253715805170415",
+    "dec": "16.881286719482496",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "260.9884",
+    "plx_err": "0.0934",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "dM6",
+    "rvz_redshift": "2.1016746515600815E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "15.14"
+   },
+   "distances": [
+    {
+     "query_id": "NAME Teegarden's Star",
+     "dist": "3.84",
+     "plus_err": "0.04",
+     "minus_err": "-0.04",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2009AJ....137....1F"
+    },
+    {
+     "query_id": "NAME Teegarden's Star",
+     "dist": "3.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2014AJ....147...20N"
+    },
+    {
+     "query_id": "NAME Teegarden's Star",
+     "dist": "3.8312",
+     "plus_err": "0.0039",
+     "minus_err": "-0.0039",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "NAME Teegarden's Star",
+     "dist": "3.8315",
+     "plus_err": "0.0013",
+     "minus_err": "-0.0013",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    },
+    {
+     "query_id": "NAME Teegarden's Star",
+     "dist": "3.8316",
+     "plus_err": "0.0014",
+     "minus_err": "-0.0014",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "gliese-581": {
+   "basic": {
+    "query_id": "GJ 581",
+    "main_id": "BD-07  4003",
+    "otype": "BY*",
+    "ra": "229.86177891146036",
+    "dec": "-7.722274860407221",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "158.7183",
+    "plx_err": "0.0301",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "M3V",
+    "rvz_redshift": "-3.082084743399882E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "10.56"
+   },
+   "distances": [
+    {
+     "query_id": "GJ 581",
+     "dist": "6.21",
+     "plus_err": "0.1",
+     "minus_err": "-0.1",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2010MNRAS.403.1949K"
+    },
+    {
+     "query_id": "GJ 581",
+     "dist": "6.2992",
+     "plus_err": "0.002",
+     "minus_err": "-0.002",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "GJ 581",
+     "dist": "6.3004",
+     "plus_err": "0.0011",
+     "minus_err": "-0.0011",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "altair": {
+   "basic": {
+    "query_id": "* alf Aql",
+    "main_id": "* alf Aql",
+    "otype": "dS*",
+    "ra": "297.69582729638694",
+    "dec": "8.868321196436963",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "194.95",
+    "plx_err": "0.57",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "A7Vn",
+    "rvz_redshift": "-8.872411333848973E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.76"
+   },
+   "distances": []
+  },
+  "vega": {
+   "basic": {
+    "query_id": "* alf Lyr",
+    "main_id": "* alf Lyr",
+    "otype": "dS*",
+    "ra": "279.234734787025",
+    "dec": "38.783688956244",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "130.23",
+    "plx_err": "0.36",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "A0V",
+    "rvz_redshift": "-4.503013899492814E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.03"
+   },
+   "distances": []
+  },
+  "fomalhaut": {
+   "basic": {
+    "query_id": "* alf PsA",
+    "main_id": "* alf PsA",
+    "otype": "PM*",
+    "ra": "344.4126927211701",
+    "dec": "-29.622237033389442",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "129.81",
+    "plx_err": "0.47",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "A4V",
+    "rvz_redshift": "2.168190124041125E-5",
+    "galdim_majaxis": "0.212",
+    "galdim_minaxis": "0.0",
+    "vmag": "1.16"
+   },
+   "distances": []
+  },
+  "trappist-1": {
+   "basic": {
+    "query_id": "TRAPPIST-1",
+    "main_id": "TRAPPIST-1",
+    "otype": "LM*",
+    "ra": "346.62236872857875",
+    "dec": "-5.041399250518334",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "80.2123",
+    "plx_err": "0.0716",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "M7.5e",
+    "rvz_redshift": "-1.734486311121275E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "18.798"
+   },
+   "distances": [
+    {
+     "query_id": "TRAPPIST-1",
+     "dist": "12.1",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2006AJ....132.1234C"
+    },
+    {
+     "query_id": "TRAPPIST-1",
+     "dist": "12.1",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2007AJ....133..971A"
+    },
+    {
+     "query_id": "TRAPPIST-1",
+     "dist": "11.9",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2007AJ....133.2825R"
+    },
+    {
+     "query_id": "TRAPPIST-1",
+     "dist": "12.4299",
+     "plus_err": "0.0187",
+     "minus_err": "-0.0187",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "TRAPPIST-1",
+     "dist": "12.4669",
+     "plus_err": "0.0111",
+     "minus_err": "-0.0111",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "pollux": {
+   "basic": {
+    "query_id": "* bet Gem",
+    "main_id": "* bet Gem",
+    "otype": "PM*",
+    "ra": "116.32895777437875",
+    "dec": "28.02619889009357",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "96.54",
+    "plx_err": "0.27",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "K0IIIb",
+    "rvz_redshift": "1.1311222440024693E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "1.14"
+   },
+   "distances": []
+  },
+  "arcturus": {
+   "basic": {
+    "query_id": "* alf Boo",
+    "main_id": "* alf Boo",
+    "otype": "RG*",
+    "ra": "213.915300294925",
+    "dec": "19.1824091615312",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "88.83",
+    "plx_err": "0.54",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "K1.5IIIFe-0.5",
+    "rvz_redshift": "-1.744191442776266E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "-0.05"
+   },
+   "distances": []
+  },
+  "capella": {
+   "basic": {
+    "query_id": "* alf Aur",
+    "main_id": "* alf Aur",
+    "otype": "SB*",
+    "ra": "79.17232794433404",
+    "dec": "45.99799146983673",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "76.2",
+    "plx_err": "0.46",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "G3III:",
+    "rvz_redshift": "9.737210005122954E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.08"
+   },
+   "distances": [
+    {
+     "query_id": "* alf Aur",
+     "dist": "13.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2010A&ARv..18...67T"
+    }
+   ]
+  },
+  "castor": {
+   "basic": {
+    "query_id": "* alf Gem",
+    "main_id": "* alf Gem",
+    "otype": "**",
+    "ra": "113.64947163976585",
+    "dec": "31.88828221646326",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "64.12",
+    "plx_err": "3.75",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "A1V+A2Vm",
+    "rvz_redshift": "-3.7458546319313335E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "1.58"
+   },
+   "distances": []
+  },
+  "51-pegasi": {
+   "basic": {
+    "query_id": "*  51 Peg",
+    "main_id": "*  51 Peg",
+    "otype": "PM*",
+    "ra": "344.36658535524",
+    "dec": "20.768832511140005",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "64.4048",
+    "plx_err": "0.0771",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "G2IV",
+    "rvz_redshift": "-1.1053436371311065E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "5.46"
+   },
+   "distances": [
+    {
+     "query_id": "*  51 Peg",
+     "dist": "15.361",
+     "plus_err": "0.179",
+     "minus_err": "-0.179",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2009ApJ...694.1085V"
+    },
+    {
+     "query_id": "*  51 Peg",
+     "dist": "15.4682",
+     "plus_err": "0.0294",
+     "minus_err": "-0.0294",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "*  51 Peg",
+     "dist": "15.527",
+     "plus_err": "0.0186",
+     "minus_err": "-0.0186",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "lhs-1140": {
+   "basic": {
+    "query_id": "LHS  1140",
+    "main_id": "G 268-38",
+    "otype": "PM*",
+    "ra": "11.247212140629582",
+    "dec": "-15.271539677775003",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "66.8287",
+    "plx_err": "0.0479",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "M4.5V",
+    "rvz_redshift": "-4.44597699134075E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "14.15"
+   },
+   "distances": [
+    {
+     "query_id": "LHS  1140",
+     "dist": "14.9926",
+     "plus_err": "0.0151",
+     "minus_err": "-0.0151",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "LHS  1140",
+     "dist": "14.9636",
+     "plus_err": "0.0107",
+     "minus_err": "-0.0107",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "hd-189733": {
+   "basic": {
+    "query_id": "HD 189733",
+    "main_id": "HD 189733",
+    "otype": "BY*",
+    "ra": "300.18213726402",
+    "dec": "22.71085365096",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "50.5668",
+    "plx_err": "0.0162",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "K2V",
+    "rvz_redshift": "-7.728650219696043E-6",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "7.648"
+   },
+   "distances": [
+    {
+     "query_id": "HD 189733",
+     "dist": "19.253",
+     "plus_err": "0.322",
+     "minus_err": "-0.322",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2009ApJ...694.1085V"
+    },
+    {
+     "query_id": "HD 189733",
+     "dist": "19.45",
+     "plus_err": "0.26",
+     "minus_err": "-0.26",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2010MNRAS.403.1949K"
+    },
+    {
+     "query_id": "HD 189733",
+     "dist": "19.776",
+     "plus_err": "0.0063",
+     "minus_err": "-0.0063",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    },
+    {
+     "query_id": "HD 189733",
+     "dist": "19.7752",
+     "plus_err": "0.0126",
+     "minus_err": "-0.0126",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    }
+   ]
+  },
+  "aldebaran": {
+   "basic": {
+    "query_id": "* alf Tau",
+    "main_id": "* alf Tau",
+    "otype": "LP?",
+    "ra": "68.9801627900154",
+    "dec": "16.5093023507718",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "48.94",
+    "plx_err": "0.77",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "K5+III",
+    "rvz_redshift": "1.814686619432404E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.86"
+   },
+   "distances": []
+  },
+  "regulus": {
+   "basic": {
+    "query_id": "* alf Leo",
+    "main_id": "* alf Leo",
+    "otype": "PM*",
+    "ra": "152.09296243828146",
+    "dec": "11.967208776100023",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "41.13",
+    "plx_err": "0.35",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "B8IVn",
+    "rvz_redshift": "2.4000699292425764E-6",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "1.4"
+   },
+   "distances": [
+    {
+     "query_id": "* alf Leo",
+     "dist": "23.759",
+     "plus_err": "0.446",
+     "minus_err": "-0.446",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2009ApJ...694.1085V"
+    }
+   ]
+  },
+  "mizar": {
+   "basic": {
+    "query_id": "* zet UMa",
+    "main_id": "* zet UMa",
+    "otype": "**",
+    "ra": "200.98141866666666",
+    "dec": "54.92535197222222",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "38.01",
+    "plx_err": "1.71",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "",
+    "rvz_redshift": "-2.104767290478371E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": ""
+   },
+   "distances": []
+  },
+  "algol": {
+   "basic": {
+    "query_id": "* bet Per",
+    "main_id": "* bet Per",
+    "otype": "SB*",
+    "ra": "47.04221855625",
+    "dec": "40.95564667027778",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "36.27",
+    "plx_err": "1.4",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "B8V",
+    "rvz_redshift": "1.3342652821268786E-5",
+    "galdim_majaxis": "0.0167",
+    "galdim_minaxis": "0.0",
+    "vmag": "2.12"
+   },
+   "distances": []
+  },
+  "dubhe": {
+   "basic": {
+    "query_id": "* alf UMa",
+    "main_id": "* alf UMa",
+    "otype": "SB*",
+    "ra": "165.9319646738126",
+    "dec": "61.751034687818226",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "26.54",
+    "plx_err": "0.48",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "G9III+A7.5",
+    "rvz_redshift": "-3.135453339531136E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "1.79"
+   },
+   "distances": []
+  },
+  "k2-18": {
+   "basic": {
+    "query_id": "K2-18",
+    "main_id": "K2-18",
+    "otype": "PM*",
+    "ra": "172.56049060233",
+    "dec": "7.588404263470001",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "26.2469",
+    "plx_err": "0.0266",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "dM2.5",
+    "rvz_redshift": "1.0940908308221253E-6",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "13.5"
+   },
+   "distances": [
+    {
+     "query_id": "K2-18",
+     "dist": "38.1",
+     "plus_err": "0.0386",
+     "minus_err": "-0.0386",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    },
+    {
+     "query_id": "K2-18",
+     "dist": "38.0683",
+     "plus_err": "0.0791",
+     "minus_err": "-0.0791",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    }
+   ]
+  },
+  "achernar": {
+   "basic": {
+    "query_id": "* alf Eri",
+    "main_id": "* alf Eri",
+    "otype": "Be*",
+    "ra": "24.428522833333336",
+    "dec": "-57.236752805555554",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "23.39",
+    "plx_err": "0.57",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "B6Vpe",
+    "rvz_redshift": "2.8253277987166925E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.46"
+   },
+   "distances": []
+  },
+  "hd-209458": {
+   "basic": {
+    "query_id": "HD 209458",
+    "main_id": "HD 209458",
+    "otype": "*",
+    "ra": "330.79488644388",
+    "dec": "18.88431927594",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "20.7694",
+    "plx_err": "0.0266",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "F9V",
+    "rvz_redshift": "-4.917614540844717E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "7.63"
+   },
+   "distances": [
+    {
+     "query_id": "HD 209458",
+     "dist": "48.3688",
+     "plus_err": "0.123",
+     "minus_err": "-0.123",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "HD 209458",
+     "dist": "48.148",
+     "plus_err": "0.0617",
+     "minus_err": "-0.0617",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "spica": {
+   "basic": {
+    "query_id": "* alf Vir",
+    "main_id": "* alf Vir",
+    "otype": "bC*",
+    "ra": "201.2982473615632",
+    "dec": "-11.161319485111932",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "13.06",
+    "plx_err": "0.7",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "B1V",
+    "rvz_redshift": "-1.104091060011303E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.97"
+   },
+   "distances": [
+    {
+     "query_id": "* alf Vir",
+     "dist": "93.0",
+     "plus_err": "20.0",
+     "minus_err": "-20.0",
+     "unit": "pc",
+     "method": "CaIIHK",
+     "bibcode": "2009A&A...507..833M"
+    }
+   ]
+  },
+  "bellatrix": {
+   "basic": {
+    "query_id": "* gam Ori",
+    "main_id": "* gam Ori",
+    "otype": "*",
+    "ra": "81.28276355652378",
+    "dec": "6.3497032644440665",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "12.92",
+    "plx_err": "0.52",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "B2III",
+    "rvz_redshift": "5.774161192562133E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "1.64"
+   },
+   "distances": [
+    {
+     "query_id": "* gam Ori",
+     "dist": "121.0",
+     "plus_err": "9.0",
+     "minus_err": "-9.0",
+     "unit": "pc",
+     "method": "CaIIHK",
+     "bibcode": "2009A&A...507..833M"
+    }
+   ]
+  },
+  "thuban": {
+   "basic": {
+    "query_id": "* alf Dra",
+    "main_id": "* alf Dra",
+    "otype": "SB*",
+    "ra": "211.09732332021125",
+    "dec": "64.3758696175675",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "12.5156",
+    "plx_err": "0.2033",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "A0III",
+    "rvz_redshift": "-2.0347202802750708E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "3.68"
+   },
+   "distances": [
+    {
+     "query_id": "* alf Dra",
+     "dist": "82.0863",
+     "plus_err": "2.1367",
+     "minus_err": "-2.1367",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "* alf Dra",
+     "dist": "79.9003",
+     "plus_err": "1.2978",
+     "minus_err": "-1.2978",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "mira": {
+   "basic": {
+    "query_id": "* omi Cet",
+    "main_id": "* omi Cet",
+    "otype": "Mi*",
+    "ra": "34.83663375759996",
+    "dec": "-2.9776376730729166",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "10.91",
+    "plx_err": "1.22",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "M5/6IIIe",
+    "rvz_redshift": "2.1183563761884017E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "6.53"
+   },
+   "distances": []
+  },
+  "canopus": {
+   "basic": {
+    "query_id": "* alf Car",
+    "main_id": "* alf Car",
+    "otype": "*",
+    "ra": "95.98795782918306",
+    "dec": "-52.69566138386201",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "10.55",
+    "plx_err": "0.56",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "A9II",
+    "rvz_redshift": "6.771580404030253E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "-0.74"
+   },
+   "distances": []
+  },
+  "polaris": {
+   "basic": {
+    "query_id": "* alf UMi",
+    "main_id": "* alf UMi",
+    "otype": "cC*",
+    "ra": "37.954560670189856",
+    "dec": "89.26410896994187",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "7.54",
+    "plx_err": "0.11",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "F8Ib",
+    "rvz_redshift": "-5.476972457008067E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "2.02"
+   },
+   "distances": []
+  },
+  "betelgeuse": {
+   "basic": {
+    "query_id": "* alf Ori",
+    "main_id": "* alf Ori",
+    "otype": "s*r",
+    "ra": "88.79293899077537",
+    "dec": "7.407063995272694",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "6.55",
+    "plx_err": "0.83",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "M1-M2Ia-Iab",
+    "rvz_redshift": "7.308656408078207E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.42"
+   },
+   "distances": []
+  },
+  "antares": {
+   "basic": {
+    "query_id": "* alf Sco",
+    "main_id": "* alf Sco",
+    "otype": "s*r",
+    "ra": "247.3519154198264",
+    "dec": "-26.432002611950832",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "5.89",
+    "plx_err": "1.0",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "M1.5Iab+B2Vn",
+    "rvz_redshift": "-1.1674675182926642E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.91"
+   },
+   "distances": []
+  },
+  "kepler-186": {
+   "basic": {
+    "query_id": "Kepler-186",
+    "main_id": "Kepler-186",
+    "otype": "Er*",
+    "ra": "298.65272297812",
+    "dec": "43.95500720009",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "5.6336",
+    "plx_err": "0.0169",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "M1V",
+    "rvz_redshift": "-2.0686839046935024E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "15.29"
+   },
+   "distances": [
+    {
+     "query_id": "Kepler-186",
+     "dist": "178.508",
+     "plus_err": "0.7775",
+     "minus_err": "-0.7775",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "Kepler-186",
+     "dist": "177.506",
+     "plus_err": "0.5325",
+     "minus_err": "-0.5325",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    },
+    {
+     "query_id": "Kepler-186",
+     "dist": "177.506",
+     "plus_err": "0.5324",
+     "minus_err": "-0.5324",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "kepler-22": {
+   "basic": {
+    "query_id": "Kepler-22",
+    "main_id": "Kepler-22",
+    "otype": "PM*",
+    "ra": "289.21745928205",
+    "dec": "47.884430180049996",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "5.0627",
+    "plx_err": "0.011",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "G5",
+    "rvz_redshift": "-1.207224550747732E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "11.813"
+   },
+   "distances": [
+    {
+     "query_id": "Kepler-22",
+     "dist": "195.741",
+     "plus_err": "0.9272",
+     "minus_err": "-0.9272",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "Kepler-22",
+     "dist": "197.523",
+     "plus_err": "0.4292",
+     "minus_err": "-0.4292",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    },
+    {
+     "query_id": "Kepler-22",
+     "dist": "197.523",
+     "plus_err": "0.4291",
+     "minus_err": "-0.4291",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "rigel": {
+   "basic": {
+    "query_id": "* bet Ori",
+    "main_id": "* bet Ori",
+    "otype": "s*b",
+    "ra": "78.63446706693006",
+    "dec": "-8.201638364722209",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "3.78",
+    "plx_err": "0.34",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "B8Ia",
+    "rvz_redshift": "5.9376171710257E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "0.13"
+   },
+   "distances": []
+  },
+  "tabbys-star": {
+   "basic": {
+    "query_id": "KIC 8462852",
+    "main_id": "TYC 3162-665-1",
+    "otype": "*",
+    "ra": "301.5643860504275",
+    "dec": "44.4568863525439",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "2.2545",
+    "plx_err": "0.0099",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "F3V",
+    "rvz_redshift": "",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "12.01"
+   },
+   "distances": [
+    {
+     "query_id": "KIC 8462852",
+     "dist": "450.755",
+     "plus_err": "4.9373",
+     "minus_err": "-4.9373",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "KIC 8462852",
+     "dist": "443.557",
+     "plus_err": "1.9477",
+     "minus_err": "-1.9477",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "kepler-452": {
+   "basic": {
+    "query_id": "Kepler-452",
+    "main_id": "Kepler-452",
+    "otype": "*",
+    "ra": "296.00369196865",
+    "dec": "44.27754762146999",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "1.8053",
+    "plx_err": "0.0103",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "G4V",
+    "rvz_redshift": "-1.4172134158052518E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": ""
+   },
+   "distances": [
+    {
+     "query_id": "Kepler-452",
+     "dist": "560.601",
+     "plus_err": "5.3112",
+     "minus_err": "-5.3112",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "Kepler-452",
+     "dist": "553.925",
+     "plus_err": "3.1604",
+     "minus_err": "-3.1604",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    }
+   ]
+  },
+  "alnilam": {
+   "basic": {
+    "query_id": "* eps Ori",
+    "main_id": "* eps Ori",
+    "otype": "s*b",
+    "ra": "84.05338894077023",
+    "dec": "-1.2019191358333312",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "1.65",
+    "plx_err": "0.45",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "B0Ia",
+    "rvz_redshift": "9.106714460149767E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "1.69"
+   },
+   "distances": [
+    {
+     "query_id": "* eps Ori",
+     "dist": "366.0",
+     "plus_err": "70.0",
+     "minus_err": "-70.0",
+     "unit": "pc",
+     "method": "CaIIHK",
+     "bibcode": "2009A&A...507..833M"
+    }
+   ]
+  },
+  "deneb": {
+   "basic": {
+    "query_id": "* alf Cyg",
+    "main_id": "* alf Cyg",
+    "otype": "sg*",
+    "ra": "310.35797975307673",
+    "dec": "45.280338806527574",
+    "coo_bibcode": "2007A&A...474..653V",
+    "plx_value": "2.31",
+    "plx_err": "0.32",
+    "plx_bibcode": "2007A&A...474..653V",
+    "sp_type": "A2Ia",
+    "rvz_redshift": "-1.6344507093202232E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "1.25"
+   },
+   "distances": []
+  },
+  "vy-canis-majoris": {
+   "basic": {
+    "query_id": "V* VY CMa",
+    "main_id": "V* VY CMa",
+    "otype": "s*r",
+    "ra": "110.74302556341208",
+    "dec": "-25.76755399738722",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "0.4192",
+    "plx_err": "0.4079",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "M5Iae",
+    "rvz_redshift": "1.8724705736472558E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "8.691"
+   },
+   "distances": []
+  },
+  "eta-carinae": {
+   "basic": {
+    "query_id": "* eta Car",
+    "main_id": "* eta Car",
+    "otype": "s*b",
+    "ra": "161.26477419999998",
+    "dec": "-59.684430899999995",
+    "coo_bibcode": "2012yCat.1322....0Z",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "LBV",
+    "rvz_redshift": "-8.338754705805584E-5",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "6.48"
+   },
+   "distances": []
+  },
+  "hyades": {
+   "basic": {
+    "query_id": "Cl Melotte   25",
+    "main_id": "Cl Melotte   25",
+    "otype": "OpC",
+    "ra": "67.44708333333334",
+    "dec": "16.948055555555555",
+    "coo_bibcode": "2021A&A...647A..19T",
+    "plx_value": "21.052",
+    "plx_err": "0.065",
+    "plx_bibcode": "2018A&A...616A..10G",
+    "sp_type": "",
+    "rvz_redshift": "1.2666230861690941E-4",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": ""
+   },
+   "distances": [
+    {
+     "query_id": "Cl Melotte   25",
+     "dist": "47.1",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2021MNRAS.502.2582A"
+    },
+    {
+     "query_id": "Cl Melotte   25",
+     "dist": "47.0",
+     "plus_err": "0.0",
+     "minus_err": "-0.0",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2021MNRAS.504..356D"
+    },
+    {
+     "query_id": "Cl Melotte   25",
+     "dist": "45.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2017AstBu..72..257L"
+    },
+    {
+     "query_id": "Cl Melotte   25",
+     "dist": "47.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2021A&A...651A.104P"
+    },
+    {
+     "query_id": "Cl Melotte   25",
+     "dist": "0.048",
+     "plus_err": "0.006",
+     "minus_err": "-0.006",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2021MNRAS.503.3279S"
+    },
+    {
+     "query_id": "Cl Melotte   25",
+     "dist": "0.05",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "paral",
+     "bibcode": "2022MNRAS.509..421N"
+    }
+   ]
+  },
+  "pleiades": {
+   "basic": {
+    "query_id": "M  45",
+    "main_id": "Cl Melotte   22",
+    "otype": "OpC",
+    "ra": "56.600833333333334",
+    "dec": "24.11388888888889",
+    "coo_bibcode": "2021A&A...647A..19T",
+    "plx_value": "7.364",
+    "plx_err": "0.005",
+    "plx_bibcode": "2018A&A...616A..10G",
+    "sp_type": "",
+    "rvz_redshift": "1.961376114745228E-5",
+    "galdim_majaxis": "76.86",
+    "galdim_minaxis": "76.86",
+    "vmag": ""
+   },
+   "distances": [
+    {
+     "query_id": "M  45",
+     "dist": "130.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2005A&A...438.1163K"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "134.4",
+     "plus_err": "2.9",
+     "minus_err": "-2.8",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2017A&A...598A..48G"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "130.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2018MNRAS.473..849D"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "135.0",
+     "plus_err": "1.0",
+     "minus_err": "-1.0",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2021MNRAS.504..356D"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "147.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2017AstBu..72..257L"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "128.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2021A&A...651A.104P"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "0.135",
+     "plus_err": "0.004",
+     "minus_err": "-0.004",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2021MNRAS.503.3279S"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "0.13",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "paral",
+     "bibcode": "2022MNRAS.509..421N"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "135.9",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2022ApJ...931..156P"
+    },
+    {
+     "query_id": "M  45",
+     "dist": "135.4",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2022ApJ...939...94M"
+    }
+   ]
+  },
+  "helix-nebula": {
+   "basic": {
+    "query_id": "NGC  7293",
+    "main_id": "NGC  7293",
+    "otype": "PN",
+    "ra": "337.41060585298",
+    "dec": "-20.837152011779995",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "5.0124",
+    "plx_err": "0.0437",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "DAO.5",
+    "rvz_redshift": "-5.0033362611112686E-5",
+    "galdim_majaxis": "13.4",
+    "galdim_minaxis": "13.4",
+    "vmag": "13.524"
+   },
+   "distances": [
+    {
+     "query_id": "NGC  7293",
+     "dist": "159.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2008ApJ...689..194S"
+    },
+    {
+     "query_id": "NGC  7293",
+     "dist": "152.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2011ApJ...743..138G"
+    },
+    {
+     "query_id": "NGC  7293",
+     "dist": "200.9646",
+     "plus_err": "3.0815",
+     "minus_err": "-3.0815",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "NGC  7293",
+     "dist": "199.505",
+     "plus_err": "1.7394",
+     "minus_err": "-1.7394",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    },
+    {
+     "query_id": "NGC  7293",
+     "dist": "0.16",
+     "plus_err": "0.032",
+     "minus_err": "-0.032",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2010ApJ...714.1096S"
+    }
+   ]
+  },
+  "orion-nebula": {
+   "basic": {
+    "query_id": "M  42",
+    "main_id": "M  42",
+    "otype": "HII",
+    "ra": "83.8201",
+    "dec": "-5.3876",
+    "coo_bibcode": "2022A&A...661A..38P",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "9.273511836616066E-5",
+    "galdim_majaxis": "66.0",
+    "galdim_minaxis": "66.0",
+    "vmag": ""
+   },
+   "distances": [
+    {
+     "query_id": "M  42",
+     "dist": "0.5",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "kin",
+     "bibcode": "2006ApJ...653.1226Q"
+    },
+    {
+     "query_id": "M  42",
+     "dist": "458.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2018MNRAS.473..849D"
+    },
+    {
+     "query_id": "M  42",
+     "dist": "433.0",
+     "plus_err": "12.0",
+     "minus_err": "-15.0",
+     "unit": "pc",
+     "method": "plx",
+     "bibcode": "2020A&A...633A..51Z"
+    },
+    {
+     "query_id": "M  42",
+     "dist": "488.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2017AstBu..72..257L"
+    }
+   ]
+  },
+  "ring-nebula": {
+   "basic": {
+    "query_id": "M  57",
+    "main_id": "M  57",
+    "otype": "PN",
+    "ra": "283.39623652463",
+    "dec": "33.029134246539996",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "1.2696",
+    "plx_err": "0.0438",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "DA(O?)",
+    "rvz_redshift": "-6.370871278282841E-5",
+    "galdim_majaxis": "1.153",
+    "galdim_minaxis": "1.153",
+    "vmag": "15.769"
+   },
+   "distances": [
+    {
+     "query_id": "M  57",
+     "dist": "880.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2008ApJ...689..194S"
+    },
+    {
+     "query_id": "M  57",
+     "dist": "786.968",
+     "plus_err": "36.7875",
+     "minus_err": "-36.7875",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2018yCat.1345....0G"
+    },
+    {
+     "query_id": "M  57",
+     "dist": "787.65",
+     "plus_err": "27.1732",
+     "minus_err": "-27.1732",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2020yCat.1350....0G"
+    },
+    {
+     "query_id": "M  57",
+     "dist": "0.842",
+     "plus_err": "0.168",
+     "minus_err": "-0.168",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2010ApJ...714.1096S"
+    }
+   ]
+  },
+  "eagle-nebula": {
+   "basic": {
+    "query_id": "M  16",
+    "main_id": "M  16",
+    "otype": "OpC",
+    "ra": "274.688",
+    "dec": "-13.792",
+    "coo_bibcode": "2021A&A...647A..19T",
+    "plx_value": "0.566",
+    "plx_err": "0.006",
+    "plx_bibcode": "2020A&A...633A..99C",
+    "sp_type": "",
+    "rvz_redshift": "6.0043339737081425E-5",
+    "galdim_majaxis": "80.0",
+    "galdim_minaxis": "80.0",
+    "vmag": ""
+   },
+   "distances": [
+    {
+     "query_id": "M  16",
+     "dist": "1646.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2018MNRAS.473..849D"
+    },
+    {
+     "query_id": "M  16",
+     "dist": "1719.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "ST-L",
+     "bibcode": "2005A&A...438.1163K"
+    },
+    {
+     "query_id": "M  16",
+     "dist": "1740.0",
+     "plus_err": "130.0",
+     "minus_err": "-120.0",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2019ApJ...870...32K"
+    },
+    {
+     "query_id": "M  16",
+     "dist": "1690.0",
+     "plus_err": "22.0",
+     "minus_err": "-24.0",
+     "unit": "pc",
+     "method": "plx",
+     "bibcode": "2020A&A...633A..51Z"
+    },
+    {
+     "query_id": "M  16",
+     "dist": "1.8",
+     "plus_err": "0.5",
+     "minus_err": "-0.5",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2006A&A...445..567B"
+    },
+    {
+     "query_id": "M  16",
+     "dist": "1582.0",
+     "plus_err": "134.0",
+     "minus_err": "-134.0",
+     "unit": "pc",
+     "method": "paral",
+     "bibcode": "2021MNRAS.504..356D"
+    },
+    {
+     "query_id": "M  16",
+     "dist": "1715.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "pc",
+     "method": "",
+     "bibcode": "2017AstBu..72..257L"
+    }
+   ]
+  },
+  "crab-nebula": {
+   "basic": {
+    "query_id": "M   1",
+    "main_id": "M   1",
+    "otype": "SNR",
+    "ra": "83.6324",
+    "dec": "22.0174",
+    "coo_bibcode": "2022A&A...661A..38P",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "",
+    "galdim_majaxis": "7.0",
+    "galdim_minaxis": "5.0",
+    "vmag": ""
+   },
+   "distances": [
+    {
+     "query_id": "M   1",
+     "dist": "2.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "1973PASP...85..579T"
+    }
+   ]
+  },
+  "47-tucanae": {
+   "basic": {
+    "query_id": "NGC   104",
+    "main_id": "NGC   104",
+    "otype": "GlC",
+    "ra": "6.022329166666666",
+    "dec": "-72.08144444444444",
+    "coo_bibcode": "2006AJ....131.1163S",
+    "plx_value": "0.232",
+    "plx_err": "0.009",
+    "plx_bibcode": "2021MNRAS.505.5978V",
+    "sp_type": "",
+    "rvz_redshift": "-5.737137863648378E-5",
+    "galdim_majaxis": "43.8",
+    "galdim_minaxis": "43.8",
+    "vmag": "4.09"
+   },
+   "distances": [
+    {
+     "query_id": "NGC   104",
+     "dist": "4.69",
+     "plus_err": "0.136",
+     "minus_err": "-0.136",
+     "unit": "kpc",
+     "method": "SED-fit",
+     "bibcode": "2012AJ....143...50W"
+    },
+    {
+     "query_id": "NGC   104",
+     "dist": "0.005",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2008MNRAS.389.1924F"
+    },
+    {
+     "query_id": "NGC   104",
+     "dist": "4.41",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "kin",
+     "bibcode": "2018MNRAS.478.1520B"
+    },
+    {
+     "query_id": "NGC   104",
+     "dist": "4.15",
+     "plus_err": "0.08",
+     "minus_err": "-0.08",
+     "unit": "kpc",
+     "method": "PM",
+     "bibcode": "2015ApJ...812..149W"
+    }
+   ]
+  },
+  "omega-centauri": {
+   "basic": {
+    "query_id": "NGC  5139",
+    "main_id": "NGC  5139",
+    "otype": "GlC",
+    "ra": "201.69699999999997",
+    "dec": "-47.47947222222223",
+    "coo_bibcode": "2010AJ....140.1830G",
+    "plx_value": "0.193",
+    "plx_err": "0.009",
+    "plx_bibcode": "2021MNRAS.505.5978V",
+    "sp_type": "",
+    "rvz_redshift": "7.765051295434144E-4",
+    "galdim_majaxis": "36.3",
+    "galdim_minaxis": "36.3",
+    "vmag": ""
+   },
+   "distances": [
+    {
+     "query_id": "NGC  5139",
+     "dist": "0.005",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2008MNRAS.389.1924F"
+    },
+    {
+     "query_id": "NGC  5139",
+     "dist": "5.19",
+     "plus_err": "0.07",
+     "minus_err": "-0.08",
+     "unit": "kpc",
+     "method": "PM",
+     "bibcode": "2015ApJ...812..149W"
+    },
+    {
+     "query_id": "NGC  5139",
+     "dist": "5.2",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "kin",
+     "bibcode": "2018MNRAS.478.1520B"
+    }
+   ]
+  },
+  "m13": {
+   "basic": {
+    "query_id": "M  13",
+    "main_id": "M  13",
+    "otype": "GlC",
+    "ra": "250.42347499999994",
+    "dec": "36.46131944444445",
+    "coo_bibcode": "2006AJ....131.1163S",
+    "plx_value": "0.127",
+    "plx_err": "0.01",
+    "plx_bibcode": "2021MNRAS.505.5978V",
+    "sp_type": "",
+    "rvz_redshift": "-8.148986188950547E-4",
+    "galdim_majaxis": "33.0",
+    "galdim_minaxis": "33.0",
+    "vmag": "5.8"
+   },
+   "distances": [
+    {
+     "query_id": "M  13",
+     "dist": "0.008",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2008MNRAS.389.1924F"
+    }
+   ]
+  },
+  "sagittarius-a-star": {
+   "basic": {
+    "query_id": "NAME Sgr A*",
+    "main_id": "NAME Sgr A*",
+    "otype": "X",
+    "ra": "266.41681662499997",
+    "dec": "-29.00782497222222",
+    "coo_bibcode": "2011AJ....142...35P",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": ""
+   },
+   "distances": []
+  },
+  "lmc": {
+   "basic": {
+    "query_id": "NAME LMC",
+    "main_id": "NAME LMC",
+    "otype": "G",
+    "ra": "80.89416666666666",
+    "dec": "-69.75611111111111",
+    "coo_bibcode": "2003A&A...412...45P",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "8.749878593401483E-4",
+    "galdim_majaxis": "322.82666",
+    "galdim_minaxis": "274.77",
+    "vmag": "0.4"
+   },
+   "distances": [
+    {
+     "query_id": "NAME LMC",
+     "dist": "50.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "1999PASP..111..775F"
+    },
+    {
+     "query_id": "NAME LMC",
+     "dist": "0.05",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "NAME LMC",
+     "dist": "0.05",
+     "plus_err": "0.06",
+     "minus_err": "-0.06",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    },
+    {
+     "query_id": "NAME LMC",
+     "dist": "0.05",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    },
+    {
+     "query_id": "NAME LMC",
+     "dist": "0.05",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "NAME LMC",
+     "dist": "50.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2020ApJ...893...47D"
+    },
+    {
+     "query_id": "NAME LMC",
+     "dist": "50.12",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "NAME LMC",
+     "dist": "0.05",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    }
+   ]
+  },
+  "smc": {
+   "basic": {
+    "query_id": "NAME SMC",
+    "main_id": "NAME SMC",
+    "otype": "G",
+    "ra": "13.158333333333333",
+    "dec": "-72.80027777777778",
+    "coo_bibcode": "2003A&A...412...45P",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "4.85787317253461E-4",
+    "galdim_majaxis": "158.11333",
+    "galdim_minaxis": "93.105",
+    "vmag": "2.2"
+   },
+   "distances": [
+    {
+     "query_id": "NAME SMC",
+     "dist": "60.6",
+     "plus_err": "1.0",
+     "minus_err": "-1.0",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2005MNRAS.357..304H"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "59156.0",
+     "plus_err": "10.0",
+     "minus_err": "-10.0",
+     "unit": "pc",
+     "method": "RRLyr",
+     "bibcode": "2010MNRAS.402..691D"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "0.06",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "0.06",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2017AJ....153....6K"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "0.06",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "62.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2020ApJ...893...47D"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "61.66",
+     "plus_err": "3.4",
+     "minus_err": "-3.4",
+     "unit": "kpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "0.06",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "0.06",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "NAME SMC",
+     "dist": "0.06",
+     "plus_err": "0.06",
+     "minus_err": "-0.06",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    }
+   ]
+  },
+  "andromeda": {
+   "basic": {
+    "query_id": "M  31",
+    "main_id": "M  31",
+    "otype": "AGN",
+    "ra": "10.684708333333333",
+    "dec": "41.268750000000004",
+    "coo_bibcode": "2006AJ....131.1163S",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "-0.0010001920937326991",
+    "galdim_majaxis": "199.53",
+    "galdim_minaxis": "70.79",
+    "vmag": "3.44"
+   },
+   "distances": [
+    {
+     "query_id": "M  31",
+     "dist": "0.78",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007ApJS..173..185G"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "0.8",
+     "plus_err": "0.1",
+     "minus_err": "-0.1",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "0.78",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "0.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2011MNRAS.413..813C"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "779.0",
+     "plus_err": "19.0",
+     "minus_err": "-18.0",
+     "unit": "kpc",
+     "method": "T-RGB",
+     "bibcode": "2012ApJ...758...11C"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "752.0",
+     "plus_err": "27.0",
+     "minus_err": "-27.0",
+     "unit": "kpc",
+     "method": "CEP",
+     "bibcode": "2012ApJ...745..156R"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "0.77",
+     "plus_err": "0.06",
+     "minus_err": "-0.06",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "797.0",
+     "plus_err": "29.0",
+     "minus_err": "-29.0",
+     "unit": "kpc",
+     "method": "Cep",
+     "bibcode": "2015MNRAS.451..724W"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "731.0",
+     "plus_err": "30.0",
+     "minus_err": "-30.0",
+     "unit": "kpc",
+     "method": "Cep",
+     "bibcode": "2015MNRAS.451..724W"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "0.77",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "0.82",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-RDB",
+     "bibcode": "2017AJ....153....6K"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "0.77",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "0.79",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    },
+    {
+     "query_id": "M  31",
+     "dist": "761.0",
+     "plus_err": "11.0",
+     "minus_err": "-11.0",
+     "unit": "kpc",
+     "method": "",
+     "bibcode": "2021ApJ...920...84L"
+    }
+   ]
+  },
+  "triangulum": {
+   "basic": {
+    "query_id": "M  33",
+    "main_id": "M  33",
+    "otype": "GiG",
+    "ra": "23.46206906218",
+    "dec": "30.660175111980003",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "-5.975683146816069E-4",
+    "galdim_majaxis": "60.26",
+    "galdim_minaxis": "35.48",
+    "vmag": "5.72"
+   },
+   "distances": [
+    {
+     "query_id": "M  33",
+     "dist": "4.11",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2007ApJ...655..790C"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.84",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007ApJS..173..185G"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.88",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.9",
+     "plus_err": "0.1",
+     "minus_err": "-0.2",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "820.0",
+     "plus_err": "20.0",
+     "minus_err": "-19.0",
+     "unit": "kpc",
+     "method": "T-RGB",
+     "bibcode": "2012ApJ...758...11C"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.91",
+     "plus_err": "0.05",
+     "minus_err": "-0.05",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.91",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.93",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-RDB",
+     "bibcode": "2017AJ....153....6K"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.93",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "765.6",
+     "plus_err": "45.78",
+     "minus_err": "-45.78",
+     "unit": "kpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "820.35",
+     "plus_err": "86.79",
+     "minus_err": "-86.79",
+     "unit": "kpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "851.14",
+     "plus_err": "39.15",
+     "minus_err": "-39.15",
+     "unit": "kpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.84",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.75",
+     "plus_err": "0.08",
+     "minus_err": "-0.08",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2020ApJ...902..145K"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "0.8",
+     "plus_err": "0.1",
+     "minus_err": "-0.1",
+     "unit": "Mpc",
+     "method": "kin",
+     "bibcode": "2018ApJ...861...49H"
+    },
+    {
+     "query_id": "M  33",
+     "dist": "840.0",
+     "plus_err": "11.0",
+     "minus_err": "-11.0",
+     "unit": "kpc",
+     "method": "Cep",
+     "bibcode": "2023ApJ...951..118B"
+    }
+   ]
+  },
+  "m81": {
+   "basic": {
+    "query_id": "M  81",
+    "main_id": "M  81",
+    "otype": "Sy2",
+    "ra": "148.88821939854",
+    "dec": "69.06529514038",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "0.1495",
+    "plx_err": "0.06",
+    "plx_bibcode": "2020yCat.1350....0G",
+    "sp_type": "",
+    "rvz_redshift": "-1.5677512474313146E-4",
+    "galdim_majaxis": "21.38",
+    "galdim_minaxis": "10.23",
+    "vmag": "6.94"
+   },
+   "distances": [
+    {
+     "query_id": "M  81",
+     "dist": "4.11",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2007ApJ...655..790C"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.6",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007ApJS..173..185G"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.77",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "4.3",
+     "plus_err": "0.7",
+     "minus_err": "-0.7",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.64",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2010ApJ...725.2270P"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.61",
+     "plus_err": "0.06",
+     "minus_err": "-0.06",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.61",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-RDB",
+     "bibcode": "2017AJ....153....6K"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.5975",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2019A&A...631A..38L"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.55",
+     "plus_err": "0.13",
+     "minus_err": "0.13",
+     "unit": "Mpc",
+     "method": "Ceph",
+     "bibcode": "2010ApJS..190..233M"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.55",
+     "plus_err": "0.34",
+     "minus_err": "-0.34",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.47",
+     "plus_err": "0.33",
+     "minus_err": "-0.33",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.89",
+     "plus_err": "0.25",
+     "minus_err": "-0.25",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.63",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "3.39",
+     "plus_err": "0.3",
+     "minus_err": "-0.3",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2020ApJ...902..145K"
+    },
+    {
+     "query_id": "M  81",
+     "dist": "4.9",
+     "plus_err": "1.01",
+     "minus_err": "-1.01",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2022MNRAS.511.6160K"
+    }
+   ]
+  },
+  "centaurus-a": {
+   "basic": {
+    "query_id": "NGC  5128",
+    "main_id": "NAME Centaurus A",
+    "otype": "BLL",
+    "ra": "201.36506337683332",
+    "dec": "-43.019112508083325",
+    "coo_bibcode": "2020A&A...644A.159C",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "0.00187695",
+    "galdim_majaxis": "25.7",
+    "galdim_minaxis": "17.78",
+    "vmag": "6.84"
+   },
+   "distances": [
+    {
+     "query_id": "NGC  5128",
+     "dist": "4.9",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2004ApJ...602..231C"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.77",
+     "plus_err": "0.38",
+     "minus_err": "-0.38",
+     "unit": "Mpc",
+     "method": "T-RGB",
+     "bibcode": "2007AJ....133..504K"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.8",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007ApJS..173..185G"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "5.07",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2007ApJ...655..790C"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.77",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "SBF",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "7.85",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2010ApJ...725.2270P"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.66",
+     "plus_err": "0.06",
+     "minus_err": "-0.06",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.66",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.6813",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2019A&A...631A..38L"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.68",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.22",
+     "plus_err": "0.39",
+     "minus_err": "-0.39",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "NGC  5128",
+     "dist": "3.66",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    }
+   ]
+  },
+  "m101": {
+   "basic": {
+    "query_id": "M 101",
+    "main_id": "M 101",
+    "otype": "GiP",
+    "ra": "210.80242916666668",
+    "dec": "54.34875",
+    "coo_bibcode": "2006AJ....131.1163S",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "8.11E-4",
+    "galdim_majaxis": "21.88",
+    "galdim_minaxis": "20.89",
+    "vmag": "7.86"
+   },
+   "distances": [
+    {
+     "query_id": "M 101",
+     "dist": "6.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2005A&A...436..443V"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "4.94",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2007ApJ...655..790C"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "7.5",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007ApJS..173..185G"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "6.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "7.2",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2011MNRAS.413..813C"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "6.95",
+     "plus_err": "0.06",
+     "minus_err": "-0.06",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "6.95",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "7.1121",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2019A&A...631A..38L"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "6.95",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "6.98",
+     "plus_err": "0.58",
+     "minus_err": "-0.58",
+     "unit": "Mpc",
+     "method": "Cep",
+     "bibcode": "2010ApJ...715..277B"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "6.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    },
+    {
+     "query_id": "M 101",
+     "dist": "5.4",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2004ApJ...602..231C"
+    }
+   ]
+  },
+  "whirlpool": {
+   "basic": {
+    "query_id": "M  51",
+    "main_id": "M  51",
+    "otype": "Sy2",
+    "ra": "202.469575",
+    "dec": "47.19525833333333",
+    "coo_bibcode": "2006AJ....131.1163S",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "0.0017445402178863352",
+    "galdim_majaxis": "9.04379",
+    "galdim_minaxis": "7.78399",
+    "vmag": "8.36"
+   },
+   "distances": [
+    {
+     "query_id": "M  51",
+     "dist": "8.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2004AJ....127.2031K"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "7.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2004ApJ...602..231C"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "6.2",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007AJ....133..791S"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "7.53",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2007ApJ...655..790C"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "8.4",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007ApJS..173..185G"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "6.77",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2010ApJ...725.2270P"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "7.6",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2011MNRAS.413..813C"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "8.4",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "8.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    },
+    {
+     "query_id": "M  51",
+     "dist": "7.62",
+     "plus_err": "0.35",
+     "minus_err": "0.35",
+     "unit": "Mpc",
+     "method": "PNLF",
+     "bibcode": "2010ApJS..190..233M"
+    }
+   ]
+  },
+  "sombrero": {
+   "basic": {
+    "query_id": "M 104",
+    "main_id": "M 104",
+    "otype": "LIN",
+    "ra": "189.99763274591663",
+    "dec": "-11.623054494444448",
+    "coo_bibcode": "2020A&A...644A.159C",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "0.003659221749667818",
+    "galdim_majaxis": "8.51",
+    "galdim_minaxis": "5.01",
+    "vmag": "8.0"
+   },
+   "distances": [
+    {
+     "query_id": "M 104",
+     "dist": "13.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007AJ....133..791S"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "12.03",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2007ApJ...655..790C"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "9.1",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007ApJS..173..185G"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "9.77",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "SBF",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "11.27",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "21.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2014MNRAS.444..527S"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "18.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2008MNRAS.389.1924F"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "13.0",
+     "plus_err": "3.0",
+     "minus_err": "-2.0",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "15.7",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2010ApJ...725.2270P"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "11.27",
+     "plus_err": "0.12",
+     "minus_err": "-0.12",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "8.5901",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2019A&A...631A..38L"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "9.55",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2018MNRAS.479.4136K"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "9.33",
+     "plus_err": "0.34",
+     "minus_err": "0.34",
+     "unit": "Mpc",
+     "method": "Mult",
+     "bibcode": "2010ApJS..190..233M"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "9.3",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011ApJS..192....6L"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "9.55",
+     "plus_err": "0.563",
+     "minus_err": "-0.563",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2025ApJ...978...77B"
+    },
+    {
+     "query_id": "M 104",
+     "dist": "14.5",
+     "plus_err": "2.8",
+     "minus_err": "-2.8",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2022MNRAS.511.6160K"
+    }
+   ]
+  },
+  "m87": {
+   "basic": {
+    "query_id": "M  87",
+    "main_id": "M  87",
+    "otype": "AGN",
+    "ra": "187.70593076725",
+    "dec": "12.391123246083334",
+    "coo_bibcode": "2020A&A...644A.159C",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "0.0042",
+    "galdim_majaxis": "6.29875",
+    "galdim_minaxis": "5.7262",
+    "vmag": "8.63"
+   },
+   "distances": [
+    {
+     "query_id": "M  87",
+     "dist": "19.73",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2007ApJ...655..790C"
+    },
+    {
+     "query_id": "M  87",
+     "dist": "19.74",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2007ApJ...655..790C"
+    },
+    {
+     "query_id": "M  87",
+     "dist": "17.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2007ApJS..173..185G"
+    },
+    {
+     "query_id": "M  87",
+     "dist": "17.22",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "SBF",
+     "bibcode": "2008ApJ...676..184T"
+    },
+    {
+     "query_id": "M  87",
+     "dist": "17.0",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2010ApJ...725.2270P"
+    },
+    {
+     "query_id": "M  87",
+     "dist": "17.2",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "redshift",
+     "bibcode": "2011MNRAS.413..813C"
+    },
+    {
+     "query_id": "M  87",
+     "dist": "16.52",
+     "plus_err": "0.14",
+     "minus_err": "-0.14",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2013AJ....146...86T"
+    },
+    {
+     "query_id": "M  87",
+     "dist": "16.52",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "",
+     "bibcode": "2016AJ....152...50T"
+    }
+   ]
+  },
+  "3c-273": {
+   "basic": {
+    "query_id": "3C 273",
+    "main_id": "3C 273",
+    "otype": "BLL",
+    "ra": "187.27791594049",
+    "dec": "2.05238823055",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "0.0108",
+    "plx_err": "0.0408",
+    "plx_bibcode": "2018yCat.1345....0G",
+    "sp_type": "",
+    "rvz_redshift": "0.15756751",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "14.83"
+   },
+   "distances": [
+    {
+     "query_id": "3C 273",
+     "dist": "657.8",
+     "plus_err": "",
+     "minus_err": "",
+     "unit": "Mpc",
+     "method": "T-F",
+     "bibcode": "2011PASP..123.1011A"
+    }
+   ]
+  },
+  "ton-618": {
+   "basic": {
+    "query_id": "Ton  618",
+    "main_id": "Ton  618",
+    "otype": "Bla",
+    "ra": "187.10402488560996",
+    "dec": "31.47711916322",
+    "coo_bibcode": "2020yCat.1350....0G",
+    "plx_value": "",
+    "plx_err": "",
+    "plx_bibcode": "",
+    "sp_type": "",
+    "rvz_redshift": "2.2",
+    "galdim_majaxis": "",
+    "galdim_minaxis": "",
+    "vmag": "15.87"
+   },
+   "distances": []
+  }
+ }
+}

@@ -1,0 +1,1747 @@
+{
+ "retrieved": "2026-10-03",
+ "objects": {
+  "sun": {
+   "wiki": "Sun",
+   "summary": {
+    "title": "Sun",
+    "extract": "The Sun is the star located at the centre of the Solar System. It is a massive sphere of hot plasma, heated to incandescence by nuclear fusion reactions in its core, radiating the energy from its surface mainly as visible light and infrared radiation, with 10% at ultraviolet energies. It is the main source of energy for life on Earth. The Sun has been an object of veneration in many cultures and a central subject of astronomical research since antiquity.",
+    "description": "Star at the centre of the Solar System",
+    "url": "https://en.wikipedia.org/wiki/Sun"
+   },
+   "image": {
+    "src": "/media/sun.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "The Sun in white light",
+    "credit": "Matúš Motlo",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Sun_in_white_light.jpg",
+    "description": "The Sun photographed on the 8th of May, 2019 in white light (true color). Sunspots AR2740 (to the right) and AR2741 (to the left) visible. Some other interesting features include faculae, white spots near AR2741, limb darkening, and tiny convection cells called granules all across its surface."
+   }
+  },
+  "mercury": {
+   "wiki": "Mercury_(planet)",
+   "summary": {
+    "title": "Mercury (planet)",
+    "extract": "Mercury is the first planet from the Sun and the smallest in the Solar System. It is a rocky planet with a trace atmosphere and a surface gravity slightly lower than that of Mars. The surface of Mercury is similar to Earth's Moon, being cratered, with an expansive rupes system generated from thrust faults, and bright ray systems, formed by ejecta. Its largest crater, Caloris Planitia, has a diameter of 1,550 km (960 mi), which is about one-third the diameter of the planet. Being the most inferior orbiting planet, it always appears close to the Sun in Earth's sky, as either a \"morning star\" or an \"evening star\". It is the planet with the highest delta-v required for travel from Earth, as well as to and from the other planets in the Solar System.",
+    "description": "First planet from the Sun",
+    "url": "https://en.wikipedia.org/wiki/Mercury_(planet)"
+   },
+   "image": {
+    "src": "/media/mercury.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Mercury in true color",
+    "credit": "NASA/Johns Hopkins University Applied Physics Laboratory/Arizona State University/Carnegie Institution of Washington",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mercury_in_true_color.jpg",
+    "description": "This is a cropped bottom right image from the original four image mosaic PIA11364: Mercury's \"True\" Color is in the Eye of the Beholder. Original Caption Released with Image: Given the WAC’s ability to take images through 11 narrow-band color filters, it is natural to wonder what does Mercury look like in “true” color such as would be seen by the human eye. However, creating such a natural color v"
+   }
+  },
+  "venus": {
+   "wiki": "Venus",
+   "summary": {
+    "title": "Venus",
+    "extract": "Venus is the second planet from the Sun. Similar in size and mass to Earth, Venus has no liquid water, and its atmosphere is far thicker and denser than that of any other rocky body in the Solar System. The atmosphere is composed mostly of carbon dioxide and has a thick cloud layer of sulfuric acid that spans the whole planet. At the mean surface level, the atmosphere reaches a temperature of 737 K, making it the hottest planet in the solar system and also a pressure 92 times greater than Earth's at sea level, turning the lowest layer of the atmosphere into a supercritical fluid. From Earth, Venus is visible as a star-like point of light, appearing brighter than any other natural point of light in the sky, as either the brightest \"morning star\" or \"evening star\". It was also given the poetic name Ēarendel in Old English, meaning \"ray of light\" along with the two previous epithets.",
+    "description": "Second planet from the Sun",
+    "url": "https://en.wikipedia.org/wiki/Venus"
+   },
+   "image": {
+    "src": "/media/venus.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Venus from Mariner 10",
+    "credit": "NASA/JPL-Caltech",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Venus_from_Mariner_10.jpg",
+    "description": "As it sped away from Venus, NASA's Mariner 10 spacecraft captured this seemingly peaceful view of a planet the size of Earth, wrapped in a dense, global cloud layer. But, contrary to its serene appearance, the clouded globe of Venus is a world of intense heat, crushing atmospheric pressure and clouds of corrosive acid."
+   }
+  },
+  "earth": {
+   "wiki": "Earth",
+   "summary": {
+    "title": "Earth",
+    "extract": "Earth is the third planet from the Sun and the only astronomical object known to harbor life. This is made possible by Earth being an ocean world, the only one in the Solar System sustaining liquid surface water. Almost all of Earth's water is contained in its ocean, which covers 70.8% of Earth's crust. The remaining 29.2% of Earth's crust is land, which is predominantly located within Earth's land hemisphere in the form of continental landmasses. Most of Earth's land is at least somewhat humid and covered by vegetation, while large ice sheets at Earth's polar deserts retain more water than Earth's groundwater, lakes, rivers, and atmospheric water combined. Earth's crust consists of slowly moving tectonic plates, which interact to produce mountain ranges, volcanoes, and earthquakes. Earth has a liquid outer core that generates a magnetosphere capable of deflecting most of the destructive solar winds and cosmic radiation.",
+    "description": "Third planet from the Sun",
+    "url": "https://en.wikipedia.org/wiki/Earth"
+   },
+   "image": {
+    "src": "/media/earth.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Meteosat-12-fci-march-equinox-2025-noon",
+    "credit": "EUMETSAT",
+    "license": "Attribution",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Meteosat-12-fci-march-equinox-2025-noon.jpg",
+    "description": "Earth from geostationary orbit as imaged by the FCI instrument on the Meteosat-12 satellite"
+   }
+  },
+  "moon": {
+   "wiki": "Moon",
+   "summary": {
+    "title": "Moon",
+    "extract": "The Moon is the only natural satellite of Earth. It orbits Earth at an average distance of 384,399 kilometers (238,854 mi). Because the Moon follows an elliptical path, its distance from Earth varies over the year, ranging from 357,000–407,000 kilometers (222,000–253,000 mi), a distance roughly 30 times the width of Earth. It completes an orbit in relation to Earth and the Sun (synodically) every 29.5 days. The Moon and Earth are bound by gravitational attraction, which is stronger on the sides facing each other. The resulting tidal forces are the main driver of Earth's tides, and have pulled the Moon to always face Earth with the same near side. This tidal locking effectively synchronizes the Moon's rotation period to its orbital period.",
+    "description": "Natural satellite orbiting Earth",
+    "url": "https://en.wikipedia.org/wiki/Moon"
+   },
+   "image": {
+    "src": "/media/moon.jpg",
+    "width": 800,
+    "height": 760,
+    "kind": "observed",
+    "title": "FullMoon2010",
+    "credit": "Gregory H. Revera",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:FullMoon2010.jpg",
+    "description": "Full Moon photograph taken 10-22-2010 from Madison, Alabama, USA. Photographed with a Celestron 9.25 Schmidt-Cassegrain telescope. Acquired with a Canon EOS Rebel T1i (EOS 500D), 20 images stacked to reduce noise. 200 ISO 1/640 sec."
+   }
+  },
+  "mars": {
+   "wiki": "Mars",
+   "summary": {
+    "title": "Mars",
+    "extract": "Mars is the fourth planet from the Sun. It is also known as the \"Red Planet\", for its orange-red appearance. Mars is a desert-like rocky planet with a tenuous atmosphere that is primarily carbon dioxide. At the average surface level the atmospheric pressure is a few thousandths of Earth's, atmospheric temperature ranges from −153 to 20 °C, and cosmic radiation is high. Mars retains some water, in the ground as well as thinly in the atmosphere, forming cirrus clouds, fog, frost, larger polar regions of permafrost and ice caps, but no bodies of liquid surface water. Its surface gravity is roughly a third of Earth's or double that of the Moon. Its mean diameter, 6,779 km (4,212 mi), is about half the Earth's, or twice the Moon's, and its surface area is around the size of all the dry land of Earth.",
+    "description": "Fourth planet from the Sun",
+    "url": "https://en.wikipedia.org/wiki/Mars"
+   },
+   "image": {
+    "src": "/media/mars.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Mars - August 30 2021 - Flickr - Kevin M. Gill",
+    "credit": "Kevin Gill from Los Angeles, CA, United States",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png",
+    "description": "Filters: f635, f546, f437 CU/LASP EMM/EXI ITF/Kevin M. Gill"
+   }
+  },
+  "phobos": {
+   "wiki": "Phobos_(moon)",
+   "summary": {
+    "title": "Phobos (moon)",
+    "extract": "Phobos is the innermost and larger of the two natural satellites of Mars, the other being Deimos. The two moons were discovered in 1877 by American astronomer Asaph Hall. Phobos is named after the Greek god of fear and panic, who is the twin brother of Deimos and son of Ares (Mars).",
+    "description": "Larger of the two moons of Mars",
+    "url": "https://en.wikipedia.org/wiki/Phobos_(moon)"
+   },
+   "image": {
+    "src": "/media/phobos.jpg",
+    "width": 800,
+    "height": 754,
+    "kind": "observed",
+    "title": "Phobos colour 2008",
+    "credit": "NASA / JPL-Caltech / University of Arizona",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Phobos_colour_2008.jpg",
+    "description": "Color image of Phobos , imaged by the Mars Reconnaissance Orbiter on 23 March 2008. The High Resolution Imaging Science Experiment (HiRISE) camera on NASA's Mars Reconnaissance Orbiter took two images of the larger of Mars' two moons, Phobos, within 10 minutes of each other on 23 March 2008. This is the first, taken from a distance of about 6,800 kilometers (about 4,200 miles). It is presented in "
+   }
+  },
+  "deimos": {
+   "wiki": "Deimos_(moon)",
+   "summary": {
+    "title": "Deimos (moon)",
+    "extract": "Deimos is the smaller and outer of the two natural satellites of Mars, the other being Phobos. Deimos has a mean radius of 6.2 km (3.9 mi) and takes 30.3 hours to orbit Mars. Deimos is 23,460 km (14,580 mi) from Mars, much farther than Mars's other moon, Phobos. It is named after Deimos, the Ancient Greek god and personification of dread and terror.",
+    "description": "Smaller and outer moon of Mars",
+    "url": "https://en.wikipedia.org/wiki/Deimos_(moon)"
+   },
+   "image": {
+    "src": "/media/deimos.jpg",
+    "width": 800,
+    "height": 792,
+    "kind": "observed",
+    "title": "NASA-Deimos-MarsMoon-20090221",
+    "credit": "NASA/JPL/University of Arizona",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:NASA-Deimos-MarsMoon-20090221.jpg",
+    "description": "Deimos, Moon of Mars ESP_012068_9000 - 2nd Observation (21 February 2009) http://hirise.lpl.arizona.edu/deimos.php HiRISE captured these enhanced-color images of Deimos, the smaller of the two moons of Mars, on 21 February 2009. Deimos has a smooth surface due to a blanket of fragmental rock or regolith, except for the most recent impact craters. It is a dark, reddish object, very similar to Phobo"
+   }
+  },
+  "jupiter": {
+   "wiki": "Jupiter",
+   "summary": {
+    "title": "Jupiter",
+    "extract": "Jupiter is the fifth planet from the Sun, and the largest in the Solar System. It is a gas giant with a mass nearly 2.5 times that of all the other planets in the Solar System combined and slightly less than one-thousandth the mass of the Sun. The diameter of Jupiter is 11 times that of Earth and a tenth that of the Sun. It orbits the Sun at a distance of 5.20 AU (778.5 Gm), with an orbital period of 11.86 years. Jupiter is the third-brightest natural object in the Earth's night sky, after the Moon and Venus, and has been observed since prehistoric times. Its name derives from that of Jupiter, the chief deity of ancient Roman religion.",
+    "description": "Fifth planet from the Sun",
+    "url": "https://en.wikipedia.org/wiki/Jupiter"
+   },
+   "image": {
+    "src": "/media/jupiter.png",
+    "width": 800,
+    "height": 724,
+    "kind": "observed",
+    "title": "Jupiter OPAL 2024",
+    "credit": "NASA/STSCI (S.T.A.R.S)",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Jupiter_OPAL_2024.png",
+    "description": "Jupiter in true color by Hubble's \"Outer Planet Atmospheres Legacy\" (OPAL) - January 5 2024"
+   }
+  },
+  "io": {
+   "wiki": "Io_(moon)",
+   "summary": {
+    "title": "Io (moon)",
+    "extract": "Io is the innermost and second smallest of the four Galilean moons of Jupiter. Slightly larger than Earth's Moon, Io is the fourth-largest natural satellite in the Solar System, has the highest density and strongest surface gravity of any natural satellite, and the lowest amount of water by atomic ratio of any known astronomical object in the Solar System.",
+    "description": "Innermost Galilean moon of Jupiter",
+    "url": "https://en.wikipedia.org/wiki/Io_(moon)"
+   },
+   "image": {
+    "src": "/media/io.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Io highest resolution natural color",
+    "credit": "NASA",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Io_highest_resolution_natural_color.png",
+    "description": "NASA's Galileo spacecraft acquired its highest resolution images of Jupiter's moon Io on 3 July 1999 during its closest pass to Io since orbit insertion in late 1995. This color mosaic uses the near-infrared, green and violet filters (slightly more than the visible range) of the spacecraft's camera and approximates what the human eye would see. Most of Io's surface has pastel colors, punctuated by"
+   }
+  },
+  "europa": {
+   "wiki": "Europa_(moon)",
+   "summary": {
+    "title": "Europa (moon)",
+    "extract": "Europa is the smallest and least massive of Jupiter's four Galilean moons. It is observable from Earth with common binoculars and is a planetary-mass moon, slightly smaller and less massive than Earth's Moon. Europa is an icy moon, and, of the three icy Galilean moons, the closest orbiting Jupiter. As a result, it exhibits a relatively young surface shaped by tidal heating.",
+    "description": "Smallest Galilean moon of Jupiter",
+    "url": "https://en.wikipedia.org/wiki/Europa_(moon)"
+   },
+   "image": {
+    "src": "/media/europa.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Europa - Perijove 45 (cropped)",
+    "credit": "NASA/JPL-Caltech/SwRI/MSSS/Kevin M. Gill",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Europa_-_Perijove_45_(cropped).png",
+    "description": "This is Europa in true color, cropped from Juno's flyby of Europa at Perijove 45."
+   }
+  },
+  "ganymede": {
+   "wiki": "Ganymede_(moon)",
+   "summary": {
+    "title": "Ganymede (moon)",
+    "extract": "Ganymede is a natural satellite of Jupiter and is the largest and most massive moon in the Solar System. Like Saturn's largest moon, Titan, it is larger than the planet Mercury, but has somewhat less surface gravity than Mercury, Io, or Earth's Moon due to its lower density compared to the three. Ganymede orbits Jupiter in roughly seven days and is in a 1:2:4 orbital resonance with the moons Europa and Io, respectively.",
+    "description": "Largest moon of Jupiter",
+    "url": "https://en.wikipedia.org/wiki/Ganymede_(moon)"
+   },
+   "image": {
+    "src": "/media/ganymede.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Ganymede - Perijove 34 Composite",
+    "credit": "NASA/JPL-Caltech/SwRI/MSSS/ Kevin M. Gill",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ganymede_-_Perijove_34_Composite.png",
+    "description": "Ganymede photographed by Juno in 2021, Projected from the perspective of '3."
+   }
+  },
+  "callisto": {
+   "wiki": "Callisto_(moon)",
+   "summary": {
+    "title": "Callisto (moon)",
+    "extract": "Callisto is the second-largest moon of Jupiter, after Ganymede. It is also the third-largest moon in the Solar System, following Ganymede and Saturn's moon Titan, and nearly as large as the planet Mercury, but only about a third of that planet's mass. With a diameter of 4,821 km, Callisto is roughly a third larger than Earth's Moon and orbits Jupiter on average at a distance of 1.883 million km, which is about five times further out than the Moon orbiting Earth. It is the outermost of the four large Galilean moons of Jupiter, which were discovered in 1610 with one of the first telescopes, and is today visible from Earth with common binoculars.",
+    "description": "Second-largest moon of Jupiter",
+    "url": "https://en.wikipedia.org/wiki/Callisto_(moon)"
+   },
+   "image": {
+    "src": "/media/callisto.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Callisto VGR2 C2060635 OGB",
+    "credit": "zelario12",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Callisto_VGR2_C2060635_OGB.png",
+    "description": "From Voyager 2. Large mosaic of the moon Callisto made from 9 separate clear filter narrow-angle images. Color was added using four lower-resolution wide-angle frames in the orange, green, blue, and violet filters. Color is calibrated against spectral data and is close to the natural color of Callisto."
+   }
+  },
+  "saturn": {
+   "wiki": "Saturn",
+   "summary": {
+    "title": "Saturn",
+    "extract": "Saturn is the sixth planet from the Sun, and is the second largest planet in the Solar System, after Jupiter. It is a gas giant, with an average radius of about 9 times that of Earth. It has an eighth of the average density of Earth, but is over 95 times more massive. Even though Saturn is almost as big as Jupiter, it has less than a third of its mass. Saturn orbits the Sun at a distance of 9.59 AU (1,434 million km), with an orbital period of 29.45 years.",
+    "description": "Sixth planet from the Sun",
+    "url": "https://en.wikipedia.org/wiki/Saturn"
+   },
+   "image": {
+    "src": "/media/saturn.png",
+    "width": 800,
+    "height": 320,
+    "kind": "observed",
+    "title": "Saturn global view from Cassini, rings open Better Colour",
+    "credit": "NASA / JPL-Caltech / SSI / color composite by Gordan Ugarkovic",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Saturn_global_view_from_Cassini,_rings_open_Better_Colour.png",
+    "description": "Cassini captured the 30 frames required to construct this mosaic on 23 July 2008, from a distance of about a million kilometers. About a year before Saturn's equinox, the ring shadows have shifted from where they were early in Cassini's mission to a fat arc a little above the equator."
+   }
+  },
+  "enceladus": {
+   "wiki": "Enceladus",
+   "summary": {
+    "title": "Enceladus",
+    "extract": "Enceladus is the sixth-largest moon of Saturn and the 18th largest in the Solar System. It is about 500 kilometres in diameter, about a tenth of that of Saturn's largest moon, Titan. It is covered by clean, freshly deposited snow hundreds of meters thick, making it one of the most reflective bodies of the Solar System. Consequently, its surface temperature at noon reaches only −198 °C, far colder than a light-absorbing body would be. Despite its small size, Enceladus has a wide variety of surface features, ranging from old, heavily cratered regions to young, tectonically deformed terrain.",
+    "description": "Natural satellite orbiting Saturn",
+    "url": "https://en.wikipedia.org/wiki/Enceladus"
+   },
+   "image": {
+    "src": "/media/enceladus.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "PIA17202 - Approaching Enceladus",
+    "credit": "National Aeronautics and Space Administration (NASA) / Jet Propulsion Laboratory (JPL)",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:PIA17202_-_Approaching_Enceladus.jpg",
+    "description": "Original caption: NASA's Cassini spacecraft captured this view as it neared icy Enceladus for its closest-ever dive past the moon's active south polar region. The view shows heavily cratered northern latitudes at top, transitioning to fractured, wrinkled terrain in the middle and southern latitudes. The wavy boundary of the moon's active south polar region -- Cassini's destination for this flyby -"
+   }
+  },
+  "titan": {
+   "wiki": "Titan_(moon)",
+   "summary": {
+    "title": "Titan (moon)",
+    "extract": "Titan is the largest moon of Saturn and the second largest in the Solar System. It is the only moon that is known to have a dense atmosphere, and is the only known object in the Solar System besides Earth with clear evidence of stable bodies of surface liquid. Titan is one of seven gravitationally rounded moons of Saturn, and is the second-most distant among them. Frequently described as a planet-like moon, Titan is 48.16% larger in diameter than Earth's moon, and 80% more massive. It is the second-largest moon in the Solar System after Jupiter's Ganymede, and is larger than Mercury, and yet Titan is only 40% as massive as Mercury, because Mercury is mainly iron and rock, whereas Titan is mostly ice, which is less dense.",
+    "description": "Largest moon of Saturn",
+    "url": "https://en.wikipedia.org/wiki/Titan_(moon)"
+   },
+   "image": {
+    "src": "/media/titan.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Titan in true color by Kevin M. Gill",
+    "credit": "NASA/JPL-Caltech/SSI/Kevin M. Gill",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Titan_in_true_color_by_Kevin_M._Gill.jpg",
+    "description": "I've taken a slightly larger image that is processed by Kevin M. Gill, with far less noise. Titan's color in this image also more closely match with its spectra color."
+   }
+  },
+  "uranus": {
+   "wiki": "Uranus",
+   "summary": {
+    "title": "Uranus",
+    "extract": "Uranus is the seventh planet from the Sun. It is a gaseous cyan-coloured ice giant. Most of the planet is made of water, ammonia, and methane in a supercritical phase of matter, which astronomers call \"ice\" or \"volatiles\". The planet's atmosphere has a complex layered cloud structure, and has the lowest minimum temperature of all of the Solar System's planets. It has a marked axial tilt of 82.23°, with a retrograde rotation period of 17 hours and 14 minutes. This means that in an 84-Earth-year orbital period around the Sun, its poles get around 42 years of continuous sunlight, followed by 42 years of continuous darkness.",
+    "description": "Seventh planet from the Sun",
+    "url": "https://en.wikipedia.org/wiki/Uranus"
+   },
+   "image": {
+    "src": "/media/uranus.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Uranus Voyager2 color calibrated",
+    "credit": "Ardenau4",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Uranus_Voyager2_color_calibrated.png",
+    "description": "Uranus on 1986-01-23, taken by NASA's Voyager 2 probe. This color image was composed of three frames, orange, green, and blue, taken by Voyager 2's imaging system. This color image has been calibrated to best represent Uranus's true color and appearance. Based on: (in English) Irwin, Patrick G J ( 2023-12-23 ). \" Modelling the seasonal cycle of Uranus’s colour and magnitude, and comparison with Ne"
+   }
+  },
+  "neptune": {
+   "wiki": "Neptune",
+   "summary": {
+    "title": "Neptune",
+    "extract": "Neptune is the eighth and farthest known planet orbiting the Sun. It is the fourth-largest planet in the Solar System by diameter, the third-most-massive planet, and the densest giant planet. It is 17 times the mass of Earth. Compared to Uranus, its neighbouring ice giant, Neptune is slightly smaller, but more massive and dense. Being composed primarily of gases and liquids, it has no well-defined solid surface. Neptune orbits the Sun once every 164.8 years at an orbital distance of 30.1 astronomical units. It is named after the Roman god of the sea and has the astronomical symbol , representing Neptune's trident.",
+    "description": "Eighth planet from the Sun",
+    "url": "https://en.wikipedia.org/wiki/Neptune"
+   },
+   "image": {
+    "src": "/media/neptune.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Neptune Voyager2 color calibrated",
+    "credit": "NASA / Voyager 2 / PDS / OPUS / Ardenau4",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Neptune_Voyager2_color_calibrated.png",
+    "description": "Neptune on 1989-08-17, taken by NASA's Voyager 2 probe. This color image was composed of three frames, orange, green, and blue, taken by Voyager 2's imaging system. This color image has been calibrated to best represent Neptune's true color and appearance. Based on: (in English) Irwin, Patrick G J ( 2023-12-23 ). \" Modelling the seasonal cycle of Uranus’s colour and magnitude, and comparison with "
+   }
+  },
+  "triton": {
+   "wiki": "Triton_(moon)",
+   "summary": {
+    "title": "Triton (moon)",
+    "extract": "Triton is the largest natural satellite of the planet Neptune. It is the only moon of Neptune massive enough to be rounded under its own gravity and hosts a thin, hazy atmosphere. Triton orbits Neptune in a retrograde orbit—revolving in the opposite direction to the parent planet's rotation—the only large moon in the Solar System to do so. Triton is thought to have once been a dwarf planet from the Kuiper belt, captured into Neptune's orbit by the latter's gravity.",
+    "description": "Largest moon of Neptune",
+    "url": "https://en.wikipedia.org/wiki/Triton_(moon)"
+   },
+   "image": {
+    "src": "/media/triton.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Triton-usgs23-with-frame",
+    "credit": "Michael T. Bland, U.S. Geological Survey (USGS)",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Triton-usgs23-with-frame.jpg",
+    "description": "A full-disc mosaic of Triton"
+   }
+  },
+  "pluto": {
+   "wiki": "Pluto",
+   "summary": {
+    "title": "Pluto",
+    "extract": "Pluto is a dwarf planet in the Kuiper belt, a ring of bodies beyond the orbit of Neptune. It is the ninth-largest and tenth-most-massive known object to directly orbit the Sun. It is the largest known trans-Neptunian object by volume by a small margin, but is less massive than Eris. Like other Kuiper belt objects, Pluto is made primarily of ice and rock and is much smaller than the inner planets. Pluto has roughly one-sixth the mass of the Moon and one-third of its volume. Originally considered a planet, its status was changed when astronomers adopted a new definition of the word with new criteria.",
+    "description": "Largest dwarf planet in the Solar System",
+    "url": "https://en.wikipedia.org/wiki/Pluto"
+   },
+   "image": {
+    "src": "/media/pluto.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Pluto in True Color - High-Res",
+    "credit": "NASA/Johns Hopkins University Applied Physics Laboratory/Southwest Research Institute/Alex Parker",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pluto_in_True_Color_-_High-Res.png",
+    "description": "Three years after NASA's New Horizons spacecraft gave humankind our first close-up views of Pluto and its largest moon, Charon, scientists are still revealing the wonders of these incredible worlds in the outer solar system. Marking the anniversary of New Horizons' historic flight through the Pluto system on July 14, 2015, mission scientists released the highest-resolution color images of Pluto an"
+   }
+  },
+  "charon": {
+   "wiki": "Charon_(moon)",
+   "summary": {
+    "title": "Charon (moon)",
+    "extract": "Charon, formal designation (134340) Pluto I, is the largest of the five known natural satellites of the dwarf planet Pluto. It has a mean radius of 606 km (377 mi). Charon is a planetary-mass moon and the sixth-largest known trans-Neptunian object after Pluto, Eris, Haumea, Makemake, and Gonggong. It was discovered in 1978 at the United States Naval Observatory in Washington, D.C., using photographic plates taken at the United States Naval Observatory Flagstaff Station (NOFS).",
+    "description": "Largest natural satellite of Pluto",
+    "url": "https://en.wikipedia.org/wiki/Charon_(moon)"
+   },
+   "image": {
+    "src": "/media/charon.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Charon in True Color - High-Res",
+    "credit": "NASA/Johns Hopkins University Applied Physics Laboratory/Southwest Research Institute/Alex Parker",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Charon_in_True_Color_-_High-Res.png",
+    "description": "Three years after NASA's New Horizons spacecraft gave humankind our first close-up views of Pluto and its largest moon, Charon, scientists are still revealing the wonders of these incredible worlds in the outer solar system. Marking the anniversary of New Horizons' historic flight through the Pluto system on July 14, 2015, mission scientists released the highest-resolution color images of Pluto an"
+   }
+  },
+  "ceres": {
+   "wiki": "Ceres_(dwarf_planet)",
+   "summary": {
+    "title": "Ceres (dwarf planet)",
+    "extract": "Ceres is a dwarf planet in the main asteroid belt between the orbits of Mars and Jupiter. It was the first object identified in the asteroid belt, discovered on 1 January 1801 by Giuseppe Piazzi at Palermo Astronomical Observatory in Sicily, and announced as a new planet. Ceres was later classified as an asteroid, and then more recently as the only confirmed dwarf planet within the asteroid belt, and the largest without a moon. It is also the only recognized dwarf planet in the solar system whose orbit lies within that of Neptune. In the minor planet numbering system, its designation is 1 Ceres or (1) Ceres.",
+    "description": "Dwarf planet in the asteroid belt",
+    "url": "https://en.wikipedia.org/wiki/Ceres_(dwarf_planet)"
+   },
+   "image": {
+    "src": "/media/ceres.jpg",
+    "width": 800,
+    "height": 785,
+    "kind": "observed",
+    "title": "Ceres - RC3 - Haulani Crater (22381131691) (cropped)",
+    "credit": "Justin Cowart",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ceres_-_RC3_-_Haulani_Crater_(22381131691)_(cropped).jpg",
+    "description": "Approximate true-color image of Ceres, using the F7 ('red'), F2 ('green') and F8 ('blue') filters, projected onto a clear filter image. Images were acquired by Dawn at 04:13 UT May 4, 2015, at a distance of 13641 km. At the time, Dawn was over Ceres' northern hemisphere. The prominent, bright crater at right is Haulani. The smaller bright spot to its left is exposed on the floor of Oxo. Ejecta fro"
+   }
+  },
+  "vesta": {
+   "wiki": "4_Vesta",
+   "summary": {
+    "title": "4 Vesta",
+    "extract": "Vesta is one of the objects in the asteroid belt, with a mean diameter of 525 kilometres (326 mi). It was discovered by the German astronomer Heinrich Wilhelm Matthias Olbers on 29 March 1807 and is named after Vesta, the virgin goddess of home and hearth from Roman mythology.",
+    "description": "Second largest main-belt asteroid",
+    "url": "https://en.wikipedia.org/wiki/4_Vesta"
+   },
+   "image": {
+    "src": "/media/vesta.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Vesta in natural color",
+    "credit": "NASA / JPL / MPS / DLR / IDA / Björn Jónsson",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vesta_in_natural_color.jpg",
+    "description": "Vesta is a colorful world; craters of a variety of ages make splashes of lighter and darker brown against its surface. This photo was processed from data acquired on July 24, 2011, from a distance of about 5200 kilometers, during the third \"rotation characterization\" observation by Dawn."
+   }
+  },
+  "bennu": {
+   "wiki": "101955_Bennu",
+   "summary": {
+    "title": "101955 Bennu",
+    "extract": "101955 Bennu (provisional designation 1999 RQ36) is a carbonaceous asteroid in the Apollo group, discovered by the LINEAR Project on 11 September 1999. It is a potentially hazardous object that is listed on the Sentry Risk Table and has the second highest cumulative rating on the Palermo scale. It has a cumulative chance of around 1 in 1,750 of impacting Earth between 2178 and 2290 with the greatest risk being on 24 September 2182. It is named after Bennu, the ancient Egyptian mythological bird associated with the Sun, creation, and rebirth.",
+    "description": "Carbonaceous Apollo asteroid",
+    "url": "https://en.wikipedia.org/wiki/101955_Bennu"
+   },
+   "image": {
+    "src": "/media/bennu.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Bennu mosaic OSIRIS-REx (square)",
+    "credit": "NASA/Goddard/University of Arizona",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bennu_mosaic_OSIRIS-REx_(square).png",
+    "description": "Original description: This mosaic of Bennu was created using observations made by NASA’s OSIRIS-REx spacecraft that was in close proximity to the asteroid for over two years."
+   }
+  },
+  "eris": {
+   "wiki": "Eris_(dwarf_planet)",
+   "summary": {
+    "title": "Eris (dwarf planet)",
+    "extract": "Eris is the most massive and second-largest-known dwarf planet in the Solar System. It is a trans-Neptunian object (TNO) in the scattered disk and has a high-eccentricity orbit. Eris was discovered in January 2005 by a Palomar Observatory–based team led by Mike Brown and verified later that year. It was named in September 2006 after the Greco-Roman goddess of strife and discord. Eris is the ninth-most massive known object orbiting the Sun and the sixteenth-most massive in the Solar System. It is also the largest-known object in the Solar System that has not been visited by a spacecraft. Eris has been measured at 2,326 ± 12 kilometres (1,445 ± 7 mi) in diameter; its mass is 0.28% that of the Earth and 27% greater than that of Pluto, although Pluto is slightly larger by volume. Both Eris and Pluto have a surface area that is comparable to that of Russia or South America.",
+    "description": "Most massive dwarf planet",
+    "url": "https://en.wikipedia.org/wiki/Eris_(dwarf_planet)"
+   },
+   "image": {
+    "src": "/media/eris.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Eris and moon Dysnomia JWST NIRCam",
+    "credit": "NASA/ESA/CSA JWST NIRCam; Ana Carolina de Souza Feliciano et al. & Melina Thévenot",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eris_and_moon_Dysnomia_JWST_NIRCam.jpg",
+    "description": "Dwarf planet Eris and moon Dysnomia imaged by JWST NIRCam on 23 August 2024 Filters: F070W, F115W, F210M proposal id: GO 6064 Principal Investigator: Ana Carolina de Souza Feliciano I created this image with SAO Image DS9 and Photoshop Elements"
+   }
+  },
+  "arrokoth": {
+   "wiki": "486958_Arrokoth",
+   "summary": {
+    "title": "486958 Arrokoth",
+    "extract": "486958 Arrokoth (provisional designation 2014 MU69; formerly nicknamed Ultima Thule) is a small, icy Kuiper belt object orbiting the Sun beyond Neptune and Pluto. It became the farthest object in the Solar System visited by a spacecraft when the NASA space probe New Horizons flew past it on 1 January 2019. Arrokoth was discovered on 26 June 2014 by astronomer Marc Buie and the New Horizons Search Team, who had been using the Hubble Space Telescope to find Kuiper belt objects that New Horizons could visit.",
+    "description": "Kuiper belt object",
+    "url": "https://en.wikipedia.org/wiki/486958_Arrokoth"
+   },
+   "image": {
+    "src": "/media/arrokoth.png",
+    "width": 800,
+    "height": 998,
+    "kind": "observed",
+    "title": "Reworked composite image of Arrokoth",
+    "credit": "NASA/JHUAPL/SwRI/Roman Tkachenko",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Reworked_composite_image_of_Arrokoth.png",
+    "description": "Processed LORRI stack was colorized using low-res MVIC color data in NIRRB. High precision alignment of two observations with different geometry gives a pretty accurate colorization of this premodal KBO performed in two versions."
+   }
+  },
+  "halley": {
+   "wiki": "Halley's_Comet",
+   "summary": {
+    "title": "Halley's Comet",
+    "extract": "Halley's Comet is the only known short-period comet that is consistently visible to the naked eye from Earth, appearing roughly every 74–79 years. It last appeared in the inner parts of the Solar System in 1986 and will next appear in mid-2061. Officially designated 1P/Halley, it is also commonly called Comet Halley, or sometimes simply Halley.",
+    "description": "Periodic comet",
+    "url": "https://en.wikipedia.org/wiki/Halley's_Comet"
+   },
+   "image": {
+    "src": "/media/halley.jpg",
+    "width": 800,
+    "height": 555,
+    "kind": "observed",
+    "title": "Lspn comet halley",
+    "credit": "NASA/W. Liller",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lspn_comet_halley.jpg",
+    "description": "Comet 1P/Halley as taken March 8, 1986 by W. Liller, Easter Island, part of the International Halley Watch (IHW) Large Scale Phenomena Network."
+   }
+  },
+  "voyager-1": {
+   "wiki": "Voyager_1",
+   "summary": {
+    "title": "Voyager 1",
+    "extract": "Voyager 1 is a space probe launched by NASA on September 5, 1977, as part of the Voyager program, to study the outer Solar System and the interstellar space beyond the Sun's heliosphere. It was launched 16 days after its twin, Voyager 2. It communicates through the NASA Deep Space Network (DSN) to receive routine commands and to transmit data to Earth. Real-time distance and velocity data are provided by NASA and JPL. At a distance of 171.19 AU as of August 2026, it is the most distant human-made object from Earth. Voyager 1 is projected to reach a distance of one light day from Earth in November 2026.",
+    "description": "NASA space probe launched in 1977",
+    "url": "https://en.wikipedia.org/wiki/Voyager_1"
+   },
+   "image": {
+    "src": "/media/voyager-1.png",
+    "width": 800,
+    "height": 580,
+    "kind": "illustration",
+    "title": "Voyager spacecraft model",
+    "credit": "National Aeronautics and Space Administration (NASA)",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Voyager_spacecraft_model.png",
+    "description": "Artist's rendering, from NASA , of the design employed by the twin Voyager 1 and Voyager 2 spacecraft, in mission configuration. Sent into the outer solar system for the purpose of embarking on the \"grand tour\" of the Gas giants , Voyager 1 made successful reconnaissance flybys of the planet Jupiter and Saturn in 1979 and 1980. Voyager 2 also performed flybys of Jupiter and Saturn in 1979 and 1981"
+   }
+  },
+  "voyager-2": {
+   "wiki": "Voyager_2",
+   "summary": {
+    "title": "Voyager 2",
+    "extract": "Voyager 2 is a space probe launched by NASA on August 20, 1977, as a part of the Voyager program. It was launched on a trajectory towards the gas giants and enabled further encounters with the ice giants. The only spacecraft to have visited either of the ice giant planets, it was the third of five spacecraft to achieve Solar escape velocity, which allowed it to leave the Solar System. Launched 16 days before its twin Voyager 1, the primary mission of the spacecraft was to study the outer planets and its extended mission is to study interstellar space beyond the Sun's heliosphere.",
+    "description": "NASA space probe launched in 1977",
+    "url": "https://en.wikipedia.org/wiki/Voyager_2"
+   },
+   "image": {
+    "src": "/media/voyager-2.png",
+    "width": 800,
+    "height": 580,
+    "kind": "illustration",
+    "title": "Voyager spacecraft model",
+    "credit": "National Aeronautics and Space Administration (NASA)",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Voyager_spacecraft_model.png",
+    "description": "Artist's rendering, from NASA , of the design employed by the twin Voyager 1 and Voyager 2 spacecraft, in mission configuration. Sent into the outer solar system for the purpose of embarking on the \"grand tour\" of the Gas giants , Voyager 1 made successful reconnaissance flybys of the planet Jupiter and Saturn in 1979 and 1980. Voyager 2 also performed flybys of Jupiter and Saturn in 1979 and 1981"
+   }
+  },
+  "new-horizons": {
+   "wiki": "New_Horizons",
+   "summary": {
+    "title": "New Horizons",
+    "extract": "New Horizons is an interplanetary space probe launched as a part of NASA's New Frontiers program. Launched in 2006, it became the first spacecraft to perform a flyby study and capture high-resolution photographs of Pluto and its moons during its encounter.",
+    "description": "NASA spacecraft (2006–present)",
+    "url": "https://en.wikipedia.org/wiki/New_Horizons"
+   },
+   "image": {
+    "src": "/media/new-horizons.png",
+    "width": 800,
+    "height": 746,
+    "kind": "illustration",
+    "title": "New Horizons spacecraft model 1",
+    "credit": "National Aeronautics and Space Administration (NASA) , Applied Physics Laboratory",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:New_Horizons_spacecraft_model_1.png",
+    "description": "A transparent image of the New Horizons spacecraft."
+   }
+  },
+  "jwst": {
+   "wiki": "James_Webb_Space_Telescope",
+   "summary": {
+    "title": "James Webb Space Telescope",
+    "extract": "The James Webb Space Telescope (JWST) is a space telescope designed to conduct infrared astronomy. It is the largest telescope in space, and is equipped with high-resolution and high-sensitivity instruments, allowing it to view objects too old, distant, or faint for the Hubble Space Telescope. This enables investigations across many fields of astronomy and cosmology, such as observation of the first stars and the formation of the first galaxies, and detailed atmospheric characterization of potentially habitable exoplanets.",
+    "description": "NASA/ESA/CSA space infrared telescope launched in 2021",
+    "url": "https://en.wikipedia.org/wiki/James_Webb_Space_Telescope"
+   },
+   "image": {
+    "src": "/media/jwst.png",
+    "width": 800,
+    "height": 685,
+    "kind": "illustration",
+    "title": "JWST spacecraft model 3",
+    "credit": "NASA",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:JWST_spacecraft_model_3.png",
+    "description": "The James Webb Space Telescope (sometimes called JWST or Webb) is an orbiting infrared observatory that complements and extends the discoveries of the Hubble Space Telescope, with longer wavelength coverage and greatly improved sensitivity. The longer wavelengths enable Webb to look much closer to the beginning of time and to hunt for the unobserved formation of the first galaxies, as well as to l"
+   }
+  },
+  "europa-clipper": {
+   "wiki": "Europa_Clipper",
+   "summary": {
+    "title": "Europa Clipper",
+    "extract": "Europa Clipper is a mission to send a space probe developed by NASA to study Europa, a Galilean moon of Jupiter. Launched by a Falcon Heavy on October 14, 2024, the probe is planned to enter Jupiter orbit in April 2030 and conduct a series of flybys of Europa from March 2031. Europa Clipper is the largest interplanetary spacecraft ever launched by NASA. The mission used a gravity assist from Mars in March 2025, and will use an assist from Earth in December 2026.",
+    "description": "NASA space mission to Jupiter and Europa",
+    "url": "https://en.wikipedia.org/wiki/Europa_Clipper"
+   },
+   "image": {
+    "src": "/media/europa-clipper.png",
+    "width": 800,
+    "height": 664,
+    "kind": "illustration",
+    "title": "Europa Clipper spacecraft model",
+    "credit": "National Aeronautics and Space Administration (NASA) · Jet Propulsion Laboratory",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Europa_Clipper_spacecraft_model.png",
+    "description": "Transparent background version of the Europa Clipper spacecraft rendering, per the official JPL website."
+   }
+  },
+  "proxima-centauri": {
+   "wiki": "Proxima_Centauri",
+   "summary": {
+    "title": "Proxima Centauri",
+    "extract": "Proxima Centauri is the nearest star to Earth after the Sun, located 4.25 light-years away in the southern constellation of Centaurus. Discovered in 1915 by Robert Innes, it is a small, low-mass star, too faint to be seen with the naked eye, with an apparent magnitude of 11.13. Proxima Centauri is a member of the Alpha Centauri star system, being identified as component Alpha Centauri C, and is 2.18° southwest of the Alpha Centauri AB pair. It is currently 12,950 AU (0.2 ly) from AB, which it orbits with a period of about 550,000 years. Its Latin name means the 'nearest [star] of Centaurus'.",
+    "description": "Nearest star to the Solar System",
+    "url": "https://en.wikipedia.org/wiki/Proxima_Centauri"
+   },
+   "image": {
+    "src": "/media/proxima-centauri.jpg",
+    "width": 800,
+    "height": 784,
+    "kind": "observed",
+    "title": "New shot of Proxima Centauri, our nearest neighbour",
+    "credit": "ESA/Hubble & NASA",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:New_shot_of_Proxima_Centauri,_our_nearest_neighbour.jpg",
+    "description": "Shining brightly in this Hubble image is our closest stellar neighbour: Proxima Centauri. Proxima Centauri lies in the constellation of Centaurus (The Centaur), just over four light-years from Earth. Although it looks bright through the eye of Hubble, as you might expect from the nearest star to the Solar System, Proxima Centauri is not visible to the naked eye. Its average luminosity is very low,"
+   }
+  },
+  "alpha-centauri-a": {
+   "wiki": "Alpha_Centauri",
+   "summary": {
+    "title": "Alpha Centauri",
+    "extract": "Alpha Centauri is a star system in the southern constellation of Centaurus. It consists of three stars: Rigil Kentaurus/ Alpha Centauri A, Toliman/Alpha Centauri B, and Proxima Centauri/Alpha Centauri C. Proxima Centauri is the closest star to the Sun at 4.2465 light-years (ly), which is 1.3020 parsecs (pc), while Alpha Centauri A and B are the nearest stars visible to the naked eye.",
+    "description": "Star system in the Centaurus constellation",
+    "url": "https://en.wikipedia.org/wiki/Alpha_Centauri"
+   },
+   "image": {
+    "src": "/media/alpha-centauri-a.jpg",
+    "width": 800,
+    "height": 812,
+    "kind": "observed",
+    "title": "The sky around Alpha Centauri and Proxima Centauri (eso1629i)",
+    "credit": "Digitized Sky Survey 2. Acknowledgement: Davide De Martin/ Mahdi Zamani",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_sky_around_Alpha_Centauri_and_Proxima_Centauri_(eso1629i).jpg",
+    "description": "This image of the sky around the bright star Alpha Centauri AB also shows the much fainter red dwarf star, Proxima Centauri, the closest star to the Solar System. The picture was created from pictures forming part of the Digitized Sky Survey 2. The blue halo around Alpha Centauri AB is an artifact of the photographic process, the star is really pale yellow in colour like the Sun.Proxima Centauri a"
+   }
+  },
+  "alpha-centauri-b": {
+   "wiki": "Alpha_Centauri",
+   "summary": {
+    "title": "Alpha Centauri",
+    "extract": "Alpha Centauri is a star system in the southern constellation of Centaurus. It consists of three stars: Rigil Kentaurus/ Alpha Centauri A, Toliman/Alpha Centauri B, and Proxima Centauri/Alpha Centauri C. Proxima Centauri is the closest star to the Sun at 4.2465 light-years (ly), which is 1.3020 parsecs (pc), while Alpha Centauri A and B are the nearest stars visible to the naked eye.",
+    "description": "Star system in the Centaurus constellation",
+    "url": "https://en.wikipedia.org/wiki/Alpha_Centauri"
+   },
+   "image": null
+  },
+  "barnards-star": {
+   "wiki": "Barnard's_Star",
+   "summary": {
+    "title": "Barnard's Star",
+    "extract": "Barnard's Star is a small red dwarf star in the constellation of Ophiuchus. At a distance of 5.96 light-years (1.83 pc) from Earth, it is the fourth-nearest-known individual star to the Sun after the three components of the Alpha Centauri system, and is the closest star in the northern celestial hemisphere. Its stellar mass is about 16% of the Sun's, and it has 19% of the Sun's diameter. Despite its proximity, the star has a dim apparent visual magnitude of +9.5 and is invisible to the unaided eye; it is much brighter in the infrared than in visible light.",
+    "description": "Red dwarf star in the constellation Ophiuchus",
+    "url": "https://en.wikipedia.org/wiki/Barnard's_Star"
+   },
+   "image": {
+    "src": "/media/barnards-star.jpg",
+    "width": 800,
+    "height": 531,
+    "kind": "observed",
+    "title": "Barnardstar2006",
+    "credit": "Steve Quirk",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Barnardstar2006.jpg",
+    "description": "Barnard's star"
+   }
+  },
+  "wolf-359": {
+   "wiki": "Wolf_359",
+   "summary": {
+    "title": "Wolf 359",
+    "extract": "Wolf 359 is a red dwarf star located in the constellation Leo, near the ecliptic. At a distance of 7.86 light-years from Earth, it has an apparent magnitude of 13.54 and can only be seen with a large telescope. Wolf 359 is one of the nearest stars to the Sun with only the Alpha Centauri system, Barnard's Star, and the brown dwarfs Luhman 16 and WISE 0855−0714 known to be closer. Its proximity to Earth has led to its mention in several works of fiction.",
+    "description": "Red dwarf in the constellation Leo",
+    "url": "https://en.wikipedia.org/wiki/Wolf_359"
+   },
+   "image": null
+  },
+  "sirius": {
+   "wiki": "Sirius",
+   "summary": {
+    "title": "Sirius",
+    "extract": "Sirius is the brightest star in the night sky, located in the southern constellation of Canis Major. Its name is derived from the Ancient Greek word Σείριος. The star is designated α Canis Majoris, Romanized to Alpha Canis Majoris, and abbreviated α CMa or Alpha CMa. With a visual apparent magnitude of −1.46, Sirius is almost twice as bright as Canopus, the next brightest star. Sirius is a binary star consisting of a main-sequence star of spectral type A0 or A1, termed Sirius A, and a faint white dwarf companion of spectral type DA2, termed Sirius B. The distance between the two varies between 8.2 and 31.5 astronomical units as they orbit every 50 years.",
+    "description": "Brightest star in Earth's night sky",
+    "url": "https://en.wikipedia.org/wiki/Sirius"
+   },
+   "image": null
+  },
+  "luytens-star": {
+   "wiki": "Luyten's_Star",
+   "summary": {
+    "title": "Luyten's Star",
+    "extract": "Luyten's Star (GJ 273) is a red dwarf in the constellation Canis Minor located at a distance of 12.35 light-years from the Sun. It has a visual magnitude of 9.9, making it too faint to be viewed with the unaided eye. It is named after Willem Jacob Luyten, who, in collaboration with Edwin G. Ebbighausen, first determined its high proper motion in 1935. The star has two confirmed planets and two candidate planets, of which Luyten b is in the circumstellar habitable zone.",
+    "description": "Star in the constellation Canis Minor",
+    "url": "https://en.wikipedia.org/wiki/Luyten's_Star"
+   },
+   "image": null
+  },
+  "epsilon-eridani": {
+   "wiki": "Epsilon_Eridani",
+   "summary": {
+    "title": "Epsilon Eridani",
+    "extract": "Epsilon Eridani, proper name Ran, is a star in the southern constellation of Eridanus. At a declination of −9.46°, it is visible from most of Earth's surface. Located at a distance of 10.5 light-years from the Sun, it has an apparent magnitude of 3.73, making it the third-closest individual star visible to the naked eye.",
+    "description": "Star in the constellation Eridanus",
+    "url": "https://en.wikipedia.org/wiki/Epsilon_Eridani"
+   },
+   "image": null
+  },
+  "61-cygni": {
+   "wiki": "61_Cygni",
+   "summary": {
+    "title": "61 Cygni",
+    "extract": "61 Cygni is a binary star system in the northern constellation Cygnus, consisting of a pair of K-type dwarf stars that orbit each other in a period of about 659 years. Of apparent magnitude 5.20 and 6.05, respectively, they can be seen with binoculars in city skies or with the naked eye in rural areas without light pollution.",
+    "description": "Binary star system in the Cygnus constellation",
+    "url": "https://en.wikipedia.org/wiki/61_Cygni"
+   },
+   "image": null
+  },
+  "procyon": {
+   "wiki": "Procyon",
+   "summary": {
+    "title": "Procyon",
+    "extract": "Procyon is the brightest star in the constellation of Canis Minor and usually the eighth-brightest star in the night sky, with an apparent visual magnitude of 0.34. It has the Bayer designation α Canis Minoris, which is Latinized to Alpha Canis Minoris, and abbreviated α CMi or Alpha CMi, respectively. As determined by the European Space Agency Hipparcos astrometry satellite, this system lies at a distance of just 11.46 light-years, and is therefore one of Earth's nearest stellar neighbors. A binary star system, Procyon consists of a white-hued main-sequence star of spectral type F5 IV–V, designated component A, in orbit with a faint white dwarf companion of spectral type DQZ, named Procyon B. The pair orbit each other with a period of 40.84 years and an eccentricity of 0.4.",
+    "description": "Star in the constellation Canis Minor",
+    "url": "https://en.wikipedia.org/wiki/Procyon"
+   },
+   "image": null
+  },
+  "ross-128": {
+   "wiki": "Ross_128",
+   "summary": {
+    "title": "Ross 128",
+    "extract": "Ross 128 is a red dwarf star in the equatorial zodiac constellation of Virgo, near β Virginis. The apparent magnitude of Ross 128 is 11.13, which is too faint to be seen with the unaided eye. Based upon parallax measurements, the distance of this star from Earth is 11.007 light-years, making it the twelfth closest stellar system to the Solar System. It was first cataloged in 1926 by American astronomer Frank Elmore Ross. It is the nearest star in Virgo, and so is occasionally called \"Proxima Virginis\" by analogy with Proxima Centauri.",
+    "description": "Small star in constellation of Virgo",
+    "url": "https://en.wikipedia.org/wiki/Ross_128"
+   },
+   "image": null
+  },
+  "tau-ceti": {
+   "wiki": "Tau_Ceti",
+   "summary": {
+    "title": "Tau Ceti",
+    "extract": "Tau Ceti is a single star in the constellation Cetus. Its name is a Bayer designation. Spectrally, this star is similar to the Sun, although it has only about 78% of the Sun's mass. At a distance of just under 12 light-years from the Solar System, it is a relatively nearby star and the closest solitary G-type star. The star appears stable, with little stellar variation, and is metal-deficient relative to the Sun.",
+    "description": "Single yellow-hued star in the constellation Cetus",
+    "url": "https://en.wikipedia.org/wiki/Tau_Ceti"
+   },
+   "image": null
+  },
+  "teegardens-star": {
+   "wiki": "Teegarden's_Star",
+   "summary": {
+    "title": "Teegarden's Star",
+    "extract": "Teegarden's Star is a red dwarf star in the constellation Aries, 12.5 light-years from the Solar System. Although it is near-Earth it is a dim magnitude 15 and can only be seen through large telescopes. This star was found to have a very large proper motion of about 5 arcseconds per year. Only seven stars with such large proper motions are currently known. Teegarden's Star hosts a planetary system with at least three planets.",
+    "description": "Red dwarf star in the constellation Aries",
+    "url": "https://en.wikipedia.org/wiki/Teegarden's_Star"
+   },
+   "image": null
+  },
+  "gliese-581": {
+   "wiki": "Gliese_581",
+   "summary": {
+    "title": "Gliese 581",
+    "extract": "Gliese 581 is a red dwarf star of spectral type M3V which hosts a planetary system, 20.5 light-years away from Earth in the constellation Libra. Its estimated mass is about a third of that of the Sun, and it is the 101st closest known star system to the Sun. Gliese 581 is one of the oldest, least active M dwarfs known. Its low stellar activity improves the likelihood of its three planets retaining significant atmospheres, and lessens the sterilizing impact of stellar flares.",
+    "description": "Star in the constellation Libra",
+    "url": "https://en.wikipedia.org/wiki/Gliese_581"
+   },
+   "image": null
+  },
+  "altair": {
+   "wiki": "Altair",
+   "summary": {
+    "title": "Altair",
+    "extract": "Altair is the brightest star in the equatorial constellation of Aquila and the twelfth-brightest star in the night sky. It has the Bayer designation Alpha Aquilae, which is Latinised from α Aquilae and abbreviated Alpha Aql or α Aql. Altair is an A-type main-sequence star with an apparent visual magnitude of 0.77 and is one of the vertices of the Summer Triangle asterism; the other two vertices are marked by Deneb and Vega. It is located at a distance of 16.7 light-years from the Sun. Altair is currently in the G-cloud—a nearby interstellar cloud formed from an accumulation of gas and dust.",
+    "description": "Brightest star in the constellation Aquila",
+    "url": "https://en.wikipedia.org/wiki/Altair"
+   },
+   "image": null
+  },
+  "vega": {
+   "wiki": "Vega",
+   "summary": {
+    "title": "Vega",
+    "extract": "Vega is the brightest star in the northern constellation of Lyra. It has the Bayer designation α Lyrae, which is Latinised to Alpha Lyrae and abbreviated Alpha Lyr or α Lyr. This star is relatively close to the Solar System, at only 25 light-years from the Sun, and one of the most luminous stars in the Sun's neighborhood, being intrinsically brighter than any star nearer to the Sun. It is the fifth-brightest star in the night sky, and the second-brightest star in the northern celestial hemisphere, after Arcturus.",
+    "description": "Brightest star in the constellation Lyra",
+    "url": "https://en.wikipedia.org/wiki/Vega"
+   },
+   "image": null
+  },
+  "fomalhaut": {
+   "wiki": "Fomalhaut",
+   "summary": {
+    "title": "Fomalhaut",
+    "extract": "Fomalhaut is the brightest star in the southern constellation of Piscis Austrinus, the Southern Fish, and one of the brightest stars in the night sky. It has the Bayer designation Alpha Piscis Austrini, which is an alternative form of α Piscis Austrini, and is abbreviated Alpha PsA or α PsA. This is a class A star on the main sequence approximately 25 light-years (7.7 pc) from the Sun as measured by the Hipparcos astrometry satellite. Since 1943, the spectrum of this star has served as one of the stable anchor points by which other stars are classified.",
+    "description": "Triple star system in the constellation Piscis Austrinus",
+    "url": "https://en.wikipedia.org/wiki/Fomalhaut"
+   },
+   "image": null
+  },
+  "trappist-1": {
+   "wiki": "TRAPPIST-1",
+   "summary": {
+    "title": "TRAPPIST-1",
+    "extract": "TRAPPIST-1 is a red dwarf star with seven known exoplanets. It lies in the constellation Aquarius approximately 40.66 light-years (12.47 pc) away from Earth. An ultra-cool dwarf, it has a surface temperature of about 2,566 K. Its radius is slightly larger than Jupiter's and it has a mass of about 9% of the Sun. It is estimated to be 7.6 billion years old, making it older than the Solar System. The discovery of the star was first published in 2000.",
+    "description": "Red dwarf star in the constellation Aquarius",
+    "url": "https://en.wikipedia.org/wiki/TRAPPIST-1"
+   },
+   "image": {
+    "src": "/media/trappist-1.png",
+    "width": 800,
+    "height": 800,
+    "kind": "illustration",
+    "title": "TRAPPIST-1 SDSS 2009-09-28 square crop",
+    "credit": "Processing and color compositing by Nrco0e ; original images by Sloan Digital Sky Survey",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:TRAPPIST-1_SDSS_2009-09-28_square_crop.png",
+    "description": "A visible-color photograph of TRAPPIST-1 by the Sloan Digital Sky Survey, taken on 2009 September 28. The field of view of this square image is 1.65x1.65-arcminutes. This color image is a composite of three 54-second exposures, each in visible-light g, r, i filters. The exposures are tinted a specific color according to their filter (g=blue, r=green. i=red) and they are additively stacked together"
+   }
+  },
+  "pollux": {
+   "wiki": "Pollux_(star)",
+   "summary": {
+    "title": "Pollux (star)",
+    "extract": "Pollux is the brightest star in the constellation of Gemini. It has the Bayer designation β Geminorum, which is Latinised to Beta Geminorum and abbreviated Beta Gem or β Gem. This is an orange-hued red giant located at a distance of 34 light-years, making it the closest red giant to the Sun. Since 1943, the spectrum of this star has served as one of the stable anchor points by which other stars are classified. In 2006, an exoplanet was announced to be orbiting it.",
+    "description": "Star in the constellation Gemini",
+    "url": "https://en.wikipedia.org/wiki/Pollux_(star)"
+   },
+   "image": null
+  },
+  "arcturus": {
+   "wiki": "Arcturus",
+   "summary": {
+    "title": "Arcturus",
+    "extract": "Arcturus is a red giant star in the northern constellation of Boötes, and the brightest star in the constellation. It has the Bayer designation α Boötis, which is Latinized to Alpha Boötis and abbreviated Alpha Boo or α Boo. With an apparent visual magnitude of −0.05, it is the fourth-brightest star in the night sky and the brightest in the northern celestial hemisphere. Arcturus forms one corner of the Spring Triangle asterism.",
+    "description": "Brightest star in the constellation Boötes",
+    "url": "https://en.wikipedia.org/wiki/Arcturus"
+   },
+   "image": null
+  },
+  "capella": {
+   "wiki": "Capella",
+   "summary": {
+    "title": "Capella",
+    "extract": "Capella is the brightest star in the northern constellation of Auriga. It has the Bayer designation α Aurigae, which is Latinised to Alpha Aurigae and abbreviated Alpha Aur or α Aur. Capella is the sixth-brightest star in the night sky, and the third-brightest in the northern celestial hemisphere after Arcturus and Vega. A prominent object in the northern sky, it is circumpolar to observers north of 44°N. Its name meaning \"little goat\" in Latin, Capella depicted the goat Amalthea that suckled Zeus in classical mythology. Capella is relatively close, at 42.9 light-years. It is one of the brightest X-ray sources in the sky, thought to come primarily from the corona of Capella Aa.",
+    "description": "Brightest star in the constellation Auriga",
+    "url": "https://en.wikipedia.org/wiki/Capella"
+   },
+   "image": null
+  },
+  "castor": {
+   "wiki": "Castor_(star)",
+   "summary": {
+    "title": "Castor (star)",
+    "extract": "Castor is the second-brightest object in the zodiac constellation of Gemini. It has the Bayer designation α Geminorum, which is Latinised to Alpha Geminorum and abbreviated Alpha Gem or α Gem. With an apparent visual magnitude of 1.58, it is one of the brightest stars in the night sky. Castor appears singular to the naked eye, but it is actually a sextuple star system organized into three binary pairs. Although it is the 'α' (alpha) member of the constellation, it is half a magnitude fainter than 'β' (beta) Geminorum, Pollux.",
+    "description": "Sextuple star system in Gemini",
+    "url": "https://en.wikipedia.org/wiki/Castor_(star)"
+   },
+   "image": null
+  },
+  "51-pegasi": {
+   "wiki": "51_Pegasi",
+   "summary": {
+    "title": "51 Pegasi",
+    "extract": "51 Pegasi, also named Helvetios, is a Sun-like star located 50.6 light-years from Earth in the constellation of Pegasus. It was the first main-sequence star found to have an exoplanet orbiting it.",
+    "description": "Star in the constellation Pegasus",
+    "url": "https://en.wikipedia.org/wiki/51_Pegasi"
+   },
+   "image": {
+    "src": "/media/51-pegasi.jpg",
+    "width": 800,
+    "height": 565,
+    "kind": "observed",
+    "title": "Wide-field view of the sky around the star 51 Pegasi (eso1517c) (cropped)",
+    "credit": "ESO/Digitized Sky Survey 2",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Wide-field_view_of_the_sky_around_the_star_51_Pegasi_(eso1517c)_(cropped).jpg",
+    "description": "This image shows the sky around the star 51 Pegasi in the northern constellation of Pegasus (The Winged Horse). In 1995 the first exoplanet to be discovered was detected orbiting this star. Twenty years later this object was also the first exoplanet to be be directly detected spectroscopically in visible light. This image was created from photographic material forming part of the Digitized Sky Sur"
+   }
+  },
+  "lhs-1140": {
+   "wiki": "LHS_1140",
+   "summary": {
+    "title": "LHS 1140",
+    "extract": "LHS 1140 is a red dwarf star in the constellation of Cetus. Based on stellar parallax measurement, it is 48.8 light-years away from the Sun. 'LHS' refers to the Luyten Half-Second Catalogue of stars with proper motions exceeding half a second of arc annually. The star is over 5 billion years old and has only about 18% the mass of the Sun and 21% of its radius.\nLHS 1140's rotational period is 130 days. No flares have been observed.",
+    "description": "Star in the constellation Cetus",
+    "url": "https://en.wikipedia.org/wiki/LHS_1140"
+   },
+   "image": {
+    "src": "/media/lhs-1140.jpg",
+    "width": 800,
+    "height": 600,
+    "kind": "illustration",
+    "title": "Artist’s impression of the super-Earth exoplanet LHS 1140b",
+    "credit": "ESO/spaceengine.org",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Artist%E2%80%99s_impression_of_the_super-Earth_exoplanet_LHS_1140b.jpg",
+    "description": "This artist’s impression shows the exoplanet LHS 1140b, which orbits a red dwarf star 40 light-years from Earth and may be the new holder of the title “best place to look for signs of life beyond the Solar System”. Using ESO’s HARPS instrument at La Silla, and other telescopes around the world, an international team of astronomers discovered this super-Earth orbiting in the habitable zone around t"
+   }
+  },
+  "hd-189733": {
+   "wiki": "HD_189733",
+   "summary": {
+    "title": "HD 189733",
+    "extract": "HD 189733, also catalogued as V452 Vulpeculae, is a binary star system 64.5 light-years away in the constellation of Vulpecula. The primary star is suspected to be an orange dwarf star, while the secondary star is a red dwarf star. Given that this system has the same visual magnitude as HD 209458, it promises much for the study of close transiting extrasolar planets. The star can be found with binoculars 0.3 degrees east of the Dumbbell Nebula (M27).",
+    "description": "Binary star system in the constellation Vulpecula",
+    "url": "https://en.wikipedia.org/wiki/HD_189733"
+   },
+   "image": {
+    "src": "/media/hd-189733.jpg",
+    "width": 800,
+    "height": 640,
+    "kind": "observed",
+    "title": "HD189733map",
+    "credit": "Akira Fujii and Zolt Levay",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:HD189733map.jpg",
+    "description": "HD 189733 is located in Constellation Vulpecula --near Cygnus ."
+   }
+  },
+  "aldebaran": {
+   "wiki": "Aldebaran",
+   "summary": {
+    "title": "Aldebaran",
+    "extract": "Aldebaran is a red giant star in the zodiac constellation of Taurus. It has the Bayer designation α Tauri, which is Latinized to Alpha Tauri and abbreviated Alpha Tau or α Tau. Aldebaran varies in brightness from an apparent visual magnitude of 0.75 down to 0.95, making it the brightest star in the constellation, as well as (typically) the fourteenth-brightest star in the night sky. It is at a distance of approximately 67 light-years. The star lies along the line of sight to the nearby Hyades cluster, but is unrelated and much older than the young cluster.",
+    "description": "Brightest star in Taurus",
+    "url": "https://en.wikipedia.org/wiki/Aldebaran"
+   },
+   "image": null
+  },
+  "regulus": {
+   "wiki": "Regulus",
+   "summary": {
+    "title": "Regulus",
+    "extract": "Regulus is the brightest object in the constellation Leo and one of the brightest stars in the night sky. It has the Bayer designation designated α Leonis, which is Latinized to Alpha Leonis, and abbreviated Alpha Leo or α Leo. Regulus appears single, but is actually a quadruple star system composed of four stars that are organized into two pairs. The system lies approximately 79 light years from the Solar System.",
+    "description": "Brightest star in the constellation Leo",
+    "url": "https://en.wikipedia.org/wiki/Regulus"
+   },
+   "image": null
+  },
+  "mizar": {
+   "wiki": "Mizar",
+   "summary": {
+    "title": "Mizar",
+    "extract": "Mizar is a second-magnitude star in the handle of the Big Dipper asterism in the constellation of Ursa Major. It has the Bayer designation ζ Ursae Majoris. It forms a well-known naked eye double star with the fainter star Alcor, and is itself a quadruple star system. The Mizar and Alcor system lies about 83 light-years away from the Sun, as measured by the Hipparcos astrometry satellite, and is part of the Ursa Major Moving Group.",
+    "description": "Quadruple star system in Ursa Major",
+    "url": "https://en.wikipedia.org/wiki/Mizar"
+   },
+   "image": null
+  },
+  "algol": {
+   "wiki": "Algol",
+   "summary": {
+    "title": "Algol",
+    "extract": "Algol, designated Beta Persei, known colloquially as the Demon Star, is a bright multiple star in the constellation of Perseus and one of the first non-nova variable stars to be discovered.",
+    "description": "Eclipsing variable star in the constellation Perseus",
+    "url": "https://en.wikipedia.org/wiki/Algol"
+   },
+   "image": null
+  },
+  "dubhe": {
+   "wiki": "Dubhe",
+   "summary": {
+    "title": "Dubhe",
+    "extract": "Dubhe is a multiple star system in the northern constellation of Ursa Major. It is formally designated Alpha Ursae Majoris, Latinised from α Ursae Majoris, Despite being designated \"α\" (alpha), it is the second-brightest object in the constellation. Alpha Ursae Majoris is the northern of the 'pointers', the second being Beta Ursae Majoris, or 'Merak' – this pair of stars point towards Polaris, the North Star. α Ursae Majoris is located at a distance of approximately 123 light years from the Sun, based on parallax measurements.",
+    "description": "Binary star in the constellation Ursa Major",
+    "url": "https://en.wikipedia.org/wiki/Dubhe"
+   },
+   "image": null
+  },
+  "k2-18": {
+   "wiki": "K2-18",
+   "summary": {
+    "title": "K2-18",
+    "extract": "K2-18, also known as EPIC 201912552, is a red dwarf star with two known exoplanets located 124 light-years from Earth, in the constellation of Leo.",
+    "description": "Red dwarf star in the constellation Leo",
+    "url": "https://en.wikipedia.org/wiki/K2-18"
+   },
+   "image": null
+  },
+  "achernar": {
+   "wiki": "Achernar",
+   "summary": {
+    "title": "Achernar",
+    "extract": "Achernar is the brightest star in the constellation of Eridanus and the ninth-brightest in the night sky. It has the Bayer designation Alpha Eridani, which is Latinized from α Eridani and abbreviated Alpha Eri or α Eri. The name Achernar applies to the primary component of a binary system. The two components are designated Alpha Eridani A and B, with the latter known informally as Achernar B. As determined by the Hipparcos astrometry satellite, this system is located at a distance of approximately 139 light-years from the Sun.",
+    "description": "Brightest star in the constellation Eridanus",
+    "url": "https://en.wikipedia.org/wiki/Achernar"
+   },
+   "image": null
+  },
+  "hd-209458": {
+   "wiki": "HD_209458",
+   "summary": {
+    "title": "HD 209458",
+    "extract": "HD 209458 is a star with an orbiting exoplanet in the constellation Pegasus. It has an apparent visual magnitude of 7.65 and an absolute magnitude of 4.28. Because it is located at a distance of 157 light-years from the Sun as measured via parallax, it is not visible to the unaided eye. With good binoculars or a small telescope it should be easily detectable. The system is drifting closer with a heliocentric radial velocity of −14.8 km/s.",
+    "description": "F-type or G-type star in the constellation Pegasus",
+    "url": "https://en.wikipedia.org/wiki/HD_209458"
+   },
+   "image": null
+  },
+  "spica": {
+   "wiki": "Spica",
+   "summary": {
+    "title": "Spica",
+    "extract": "Spica is the brightest object in the constellation of Virgo and one of the 20 brightest stars in the night sky. It has the Bayer designation α Virginis, which is Latinised to Alpha Virginis and abbreviated Alpha Vir or α Vir. Analysis of its parallax shows that it is located 250±10 light-years from the Sun. It is triple star system, containing an inner spectroscopic binary and rotating ellipsoidal variable; a system whose two stars are so close together they are egg-shaped rather than spherical, and can only be separated by their spectra. The outer companion is orbiting farther away from the binary. The primary is a blue giant and a variable star of the Beta Cephei type.",
+    "description": "Star in the constellation Virgo",
+    "url": "https://en.wikipedia.org/wiki/Spica"
+   },
+   "image": null
+  },
+  "bellatrix": {
+   "wiki": "Bellatrix",
+   "summary": {
+    "title": "Bellatrix",
+    "extract": "Bellatrix is the third-brightest star in the constellation of Orion, positioned 5° west of the red supergiant Betelgeuse. It has the Bayer designation γ Orionis, which is Latinized to Gamma Orionis. With a slightly variable magnitude of around 1.6, it is typically the 25th-brightest star in the night sky. At only 244.6 light-years from the Solar System, it is the closest major star in Orion.",
+    "description": "Star in the constellation Orion",
+    "url": "https://en.wikipedia.org/wiki/Bellatrix"
+   },
+   "image": null
+  },
+  "thuban": {
+   "wiki": "Thuban",
+   "summary": {
+    "title": "Thuban",
+    "extract": "Thuban, with Bayer designation Alpha Draconis or α Draconis, is a binary star system in the northern constellation of Draco. A relatively inconspicuous star in the night sky of the Northern Hemisphere, it is historically significant as having been the north pole star from the 4th to 2nd millennium BC.",
+    "description": "Star in the constellation of Draco",
+    "url": "https://en.wikipedia.org/wiki/Thuban"
+   },
+   "image": null
+  },
+  "mira": {
+   "wiki": "Mira",
+   "summary": {
+    "title": "Mira",
+    "extract": "Mira is a binary star system in the constellation Cetus. It has the Bayer designation Omicron Ceti, which is Latinized from ο Ceti, and abbreviated Omicron Cet or ο Cet. The system consists of a variable red giant along with a white dwarf companion. Mira A is a pulsating variable star and was the first non-supernova variable star discovered, with the possible exception of Algol. It is the prototype of the Mira variables. The system lies at a distance of 300 light-years.",
+    "description": "Binary star system in the constellation Cetus",
+    "url": "https://en.wikipedia.org/wiki/Mira"
+   },
+   "image": {
+    "src": "/media/mira.jpg",
+    "width": 800,
+    "height": 587,
+    "kind": "observed",
+    "title": "A Wide-field view of the sky around a field studied in the MASSIV survey (eso1212d)(cropped)",
+    "credit": "Digitized Sky Survey 2. Acknowledgment: Davide De Martin.",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:A_Wide-field_view_of_the_sky_around_a_field_studied_in_the_MASSIV_survey_(eso1212d)(cropped).jpg",
+    "description": "This image shows a photographic view created from the Digitized Sky Survey 2 of part of the constellation of Cetus (The Sea Monster). The bright red star at the upper right is the famous variable star Mira (Omicron Ceti) and towards the lower left is the region of space studied in a new survey, using ESO’s VLT and the SINFONI instrument, of the feeding habits of young galaxies as they grew through"
+   }
+  },
+  "canopus": {
+   "wiki": "Canopus",
+   "summary": {
+    "title": "Canopus",
+    "extract": "Canopus is the brightest star in the southern constellation of Carina and the second-brightest star in the night sky. It is designated α Carinae, which is romanized (transliterated) to Alpha Carinae. With a visual apparent magnitude of −0.74, it is outshone only by Sirius.",
+    "description": "Brightest star in the constellation of Carina",
+    "url": "https://en.wikipedia.org/wiki/Canopus"
+   },
+   "image": {
+    "src": "/media/canopus.jpg",
+    "width": 800,
+    "height": 524,
+    "kind": "observed",
+    "title": "Canopus",
+    "credit": "NASA",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Canopus.jpg",
+    "description": "Canopus taken from ISS."
+   }
+  },
+  "polaris": {
+   "wiki": "Polaris",
+   "summary": {
+    "title": "Polaris",
+    "extract": "Polaris is a yellow supergiant star in the northern circumpolar constellation of Ursa Minor. It is designated α Ursae Minoris and is commonly called the North Star. With an apparent magnitude that fluctuates around 1.98, it is the brightest star in the constellation and is readily visible to the naked eye at night. The position of the star lies less than 1° away from the north celestial pole, making it the current northern pole star. The stable position of the star in the Northern Sky makes it useful for navigation.",
+    "description": "Northern pole-star; brightest star in Ursa Minor",
+    "url": "https://en.wikipedia.org/wiki/Polaris"
+   },
+   "image": null
+  },
+  "betelgeuse": {
+   "wiki": "Betelgeuse",
+   "summary": {
+    "title": "Betelgeuse",
+    "extract": "Betelgeuse is a red supergiant star in the equatorial constellation of Orion. It is usually the tenth-brightest star in the night sky and, after Rigel, the second brightest in its constellation. It is a distinctly reddish, semiregular variable star whose apparent magnitude, varying between +0.0 and +1.6, with a main period near 400 days, has the widest range displayed by any first-magnitude star. Betelgeuse is the brightest star in the night sky at near-infrared wavelengths. Its Bayer designation is α Orionis, Latinised to Alpha Orionis and abbreviated Alpha Ori or α Ori.",
+    "description": "Red supergiant star in the constellation Orion",
+    "url": "https://en.wikipedia.org/wiki/Betelgeuse"
+   },
+   "image": null
+  },
+  "antares": {
+   "wiki": "Antares",
+   "summary": {
+    "title": "Antares",
+    "extract": "Antares is the brightest star in the constellation of Scorpius. It has the Bayer designation α Scorpii, which is Latinised to Alpha Scorpii. Often referred to as \"the heart of the scorpion\", Antares is flanked by σ Scorpii and τ Scorpii near the center of the constellation. Distinctly reddish when viewed with the naked eye, Antares is a slow irregular variable star that ranges in brightness from an apparent visual magnitude of +0.6 down to +1.6. It is on average the fifteenth-brightest star in the night sky. Antares is the brightest and most evolved stellar member of the Scorpius–Centaurus association, the nearest OB association to the Sun. It is located about 170 parsecs (550 ly) from Earth at the rim of the Upper Scorpius subgroup, and is illuminating the Rho Ophiuchi cloud complex in its foreground.",
+    "description": "Binary star in the constellation Scorpius",
+    "url": "https://en.wikipedia.org/wiki/Antares"
+   },
+   "image": null
+  },
+  "kepler-186": {
+   "wiki": "Kepler-186",
+   "summary": {
+    "title": "Kepler-186",
+    "extract": "Kepler-186 is a red dwarf star, located 177.5 parsecs away in the constellation of Cygnus. The star is slightly cooler than the Sun, with roughly half its metallicity. It is known to have five planets, including the first Earth-sized planet discovered in the habitable zone: Kepler-186f. The star hosts four other planets discovered so far, though they all orbit interior to the habitable zone.",
+    "description": "Star in the constellation Cygnus",
+    "url": "https://en.wikipedia.org/wiki/Kepler-186"
+   },
+   "image": null
+  },
+  "kepler-22": {
+   "wiki": "Kepler-22",
+   "summary": {
+    "title": "Kepler-22",
+    "extract": "Kepler-22 is a Sun-like star in the northern constellation of Cygnus, the swan, that is orbited by a planet found to be unequivocally within the star's habitable zone. It is located at the celestial coordinates: Right Ascension 19h 16m 52.2s, Declination +47° 53′ 3.9″. With an apparent visual magnitude of 11.7, this star is too faint to be seen with the naked eye. It can be viewed with a telescope having an aperture of at least 4 in (10 cm). The estimated distance to Kepler-22 is 644 light-years.",
+    "description": "Star in the constellation Cygnus",
+    "url": "https://en.wikipedia.org/wiki/Kepler-22"
+   },
+   "image": null
+  },
+  "rigel": {
+   "wiki": "Rigel",
+   "summary": {
+    "title": "Rigel",
+    "extract": "Rigel is a blue supergiant star in the equatorial constellation of Orion. It has the Bayer designation β Orionis, which is Latinized to Beta Orionis and abbreviated Beta Ori or β Ori. Rigel is the brightest and most massive component – and the eponym – of a star system of at least four stars that appear as a single blue-white point of light to the naked eye. This system is located at a distance of approximately 850 light-years (260 pc).",
+    "description": "Brightest star in the constellation Orion",
+    "url": "https://en.wikipedia.org/wiki/Rigel"
+   },
+   "image": null
+  },
+  "tabbys-star": {
+   "wiki": "Tabby's_Star",
+   "summary": {
+    "title": "Tabby's Star",
+    "extract": "Tabby's Star or Boyajian's Star is a binary star in the constellation Cygnus approximately 1,470 light-years from Earth. The system is composed of an F-type main-sequence star and a red dwarf companion.",
+    "description": "Star noted for unusual dimming events",
+    "url": "https://en.wikipedia.org/wiki/Tabby's_Star"
+   },
+   "image": {
+    "src": "/media/tabbys-star.png",
+    "width": 800,
+    "height": 450,
+    "kind": "observed",
+    "title": "KIC 8462852 in IR and UV",
+    "credit": "Infrared: IPAC/NASA Ultraviolet: STScI (NASA)",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:KIC_8462852_in_IR_and_UV.png",
+    "description": "Star KIC 8462852 in infrared (2MASS survey) and ultraviolet (GALEX)."
+   }
+  },
+  "kepler-452": {
+   "wiki": "Kepler-452",
+   "summary": {
+    "title": "Kepler-452",
+    "extract": "Kepler-452 is a G-type subgiant star located about 1,810 light-years away from Earth in the Cygnus constellation. Although similar in temperature to the Sun, it is 20% brighter, 3.7% more massive and 11% larger. Alongside this, the star is approximately six billion years old and possesses a high metallicity.",
+    "description": "G-type main-sequence star in the constellation Cygnus",
+    "url": "https://en.wikipedia.org/wiki/Kepler-452"
+   },
+   "image": {
+    "src": "/media/kepler-452.jpg",
+    "width": 800,
+    "height": 565,
+    "kind": "observed",
+    "title": "Kepler-452b System",
+    "credit": "NASA",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Kepler-452b_System.jpg",
+    "description": "This size and scale of the Kepler-452 system compared alongside the Kepler-186 system and the solar system. Kepler-186 is a miniature solar system that would fit entirely inside the orbit of Mercury. The habitable zone of Kepler-186 is very small compared to that of Kepler-452 or the sun because it is a much smaller, cooler star. The size and extent of the habitable zone of Kepler-452 is nearly th"
+   }
+  },
+  "alnilam": {
+   "wiki": "Alnilam",
+   "summary": {
+    "title": "Alnilam",
+    "extract": "Alnilam is the central star of Orion's Belt in the equatorial constellation of Orion. It has the Bayer designation ε Orionis, which is Latinised to Epsilon Orionis and abbreviated Epsilon Ori or ε Ori. This is a massive, blue supergiant star some 1,250 light-years distant. It is estimated to be 270,000 times as luminous as the Sun, and 28 times as massive.",
+    "description": "Star in the constellation Orion, in the center of the Orion's Belt",
+    "url": "https://en.wikipedia.org/wiki/Alnilam"
+   },
+   "image": null
+  },
+  "deneb": {
+   "wiki": "Deneb",
+   "summary": {
+    "title": "Deneb",
+    "extract": "Deneb is a blue supergiant star in the constellation of Cygnus. It is the brightest star in the constellation and the 19th brightest in the night sky, with an apparent magnitude slightly varying between +1.21 and +1.29. Deneb is one of the vertices of the asterism known as the Summer Triangle and the \"head\" of the Northern Cross. Its Bayer designation is α Cygni, which is Latinised to Alpha Cygni, abbreviated to Alpha Cyg or α Cyg.",
+    "description": "Blue supergiant star in the constellation Cygnus",
+    "url": "https://en.wikipedia.org/wiki/Deneb"
+   },
+   "image": null
+  },
+  "vy-canis-majoris": {
+   "wiki": "VY_Canis_Majoris",
+   "summary": {
+    "title": "VY Canis Majoris",
+    "extract": "VY Canis Majoris is an extreme oxygen-rich red hypergiant or red supergiant and pulsating variable star 1.2 kiloparsecs from the Solar System in the slightly southern constellation of Canis Major. It is one of the largest known stars, one of the most luminous and massive red supergiants, and one of the most luminous stars in the Milky Way.",
+    "description": "Star in the constellation Canis Major",
+    "url": "https://en.wikipedia.org/wiki/VY_Canis_Majoris"
+   },
+   "image": {
+    "src": "/media/vy-canis-majoris.jpg",
+    "width": 800,
+    "height": 572,
+    "kind": "observed",
+    "title": "VY Canis Majoris, Rutherford Observatory, 07 September 2014",
+    "credit": "Haktarfone",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:VY_Canis_Majoris,_Rutherford_Observatory,_07_September_2014.jpeg",
+    "description": "A zoomed-in picture of VY Canis Majoris, taken and processed from Rutherford Observatory telescope in 07 September 2014."
+   }
+  },
+  "eta-carinae": {
+   "wiki": "Eta_Carinae",
+   "summary": {
+    "title": "Eta Carinae",
+    "extract": "Eta Carinae, formerly known as η Argus, is a stellar system containing at least two stars with a combined luminosity greater than five million times that of the Sun, located around 7,500 light-years away in the constellation Carina. Previously a 4th-magnitude star, it brightened in 1837 to become brighter than Rigel, marking the start of its so-called \"Great Eruption\". It became the second-brightest star in the night sky between 11–14 March 1843 before fading well below naked-eye visibility after 1856. In a smaller eruption, it reached 6th magnitude in 1892 before fading again. It has brightened consistently since about 1940, becoming brighter than magnitude 4.5 by 2014.",
+    "description": "Stellar system in the constellation Carina",
+    "url": "https://en.wikipedia.org/wiki/Eta_Carinae"
+   },
+   "image": {
+    "src": "/media/eta-carinae.jpg",
+    "width": 800,
+    "height": 799,
+    "kind": "observed",
+    "title": "Eta Carinae",
+    "credit": "Jon Morse (University of Colorado) & NASA Hubble Space Telescope",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eta_Carinae.jpg",
+    "description": "(NASA News Release) A huge, billowing pair of gas and dust clouds are captured in this stunning NASA Hubble Space Telescope image of the supermassive star Eta Carinae. Using a combination of image processing techniques (dithering, subsampling and deconvolution), astronomers created one of the highest resolution images of an extended object ever produced by Hubble Space Telescope. The resulting pic"
+   }
+  },
+  "hyades": {
+   "wiki": "Hyades_(star_cluster)",
+   "summary": {
+    "title": "Hyades (star cluster)",
+    "extract": "The Hyades is the nearest open cluster and one of the best-studied star clusters. Located about 153 light-years away from the Sun, it consists of a roughly spherical group of hundreds of stars sharing the same age, place of origin, chemical characteristics, and motion through space.",
+    "description": "Open cluster in the constellation Taurus",
+    "url": "https://en.wikipedia.org/wiki/Hyades_(star_cluster)"
+   },
+   "image": {
+    "src": "/media/hyades.jpg",
+    "width": 800,
+    "height": 624,
+    "kind": "observed",
+    "title": "Hyades cluster",
+    "credit": "NASA, ESA, and STScI",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hyades_cluster.jpg",
+    "description": "This image shows the Hyades star cluster, the nearest cluster to us. The Hyades cluster is very well studied due to its location, but previous searches for planets have produced only one. A new study led by Jay Farihi of the University of Cambridge, UK, has now found the atmospheres of two burnt-out stars in this cluster — known as white dwarfs — to be “polluted” by rocky debris circling the star."
+   }
+  },
+  "pleiades": {
+   "wiki": "Pleiades",
+   "summary": {
+    "title": "Pleiades",
+    "extract": "The Pleiades, also known as Seven Sisters and Messier 45 (M45), is an asterism of an open star cluster containing young B-type stars in the northwest of the constellation Taurus. At a distance of about 444 light-years, it is among the star clusters nearest to Earth and is the Messier object nearest to Earth, being the star cluster most obvious to the naked eye in the night sky. It contains over 1,000 stars, with the brightest six or seven being easily visible to the naked eye.",
+    "description": "Star cluster in the constellation of Taurus",
+    "url": "https://en.wikipedia.org/wiki/Pleiades"
+   },
+   "image": {
+    "src": "/media/pleiades.jpg",
+    "width": 800,
+    "height": 577,
+    "kind": "observed",
+    "title": "Pleiades large",
+    "credit": "NASA, ESA, AURA/Caltech, Palomar Observatory The science team consists of: D. Soderblom and E. Nelan (STScI), F. Benedict and B. Arthur (U. Texas), and B. Jones (Lick Obs.)",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pleiades_large.jpg",
+    "description": "The Pleiades , an open cluster consisting of approximately 3,000 stars at a distance of 400 light-years (120 parsecs) from Earth in the constellation of Taurus . It is also known as ‘The Seven Sisters’, or the astronomical designations NGC 1432/35 and M 45."
+   }
+  },
+  "helix-nebula": {
+   "wiki": "Helix_Nebula",
+   "summary": {
+    "title": "Helix Nebula",
+    "extract": "The Helix Nebula is a planetary nebula (PN) located in the constellation Aquarius. Discovered by Karl Ludwig Harding, most likely before 1824, this object is one of the closest to Earth of all the bright planetary nebulae. The distance, measured by the Gaia mission, is 655±13 light-years. It is similar in appearance to the Cat's Eye Nebula and the Ring Nebula, whose size, age, and physical characteristics are in turn similar to the Dumbbell Nebula, differing only in their relative proximity and the appearance from the equatorial viewing angle. The Helix Nebula has sometimes been referred to as the \"Eye of God\" in pop culture, as well as the \"Eye of Sauron\".",
+    "description": "Planetary nebula in the constellation Aquarius",
+    "url": "https://en.wikipedia.org/wiki/Helix_Nebula"
+   },
+   "image": {
+    "src": "/media/helix-nebula.jpg",
+    "width": 800,
+    "height": 862,
+    "kind": "observed",
+    "title": "NGC7293 (2004)",
+    "credit": "The HST data are from proposal 9700. Processed images may be obtained from the Helix MAST web site. The Hubble Helix Team includes M. Meixner, H.E. Bond, G. Chapman (STScI), Y.-H. Chu (U. Illinois, Ur",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:NGC7293_(2004).jpg",
+    "description": "The Helix Nebula: a Gaseous Envelope Expelled By a Dying Star About the Object Object Name: Helix Nebula , NGC 7293 or \"The Eye of God\" Object Description: Planetary Nebula Position (J2000): R.A. 22h 29m 48.20s Dec. -20° 49' 26.0\" Constellation: Aquarius Distance: About 690 light-years (213 parsecs) Dimensions: The image is roughly 28.7 arcminutes (5.6 light-years or 1.7 parsecs) across. About the"
+   }
+  },
+  "orion-nebula": {
+   "wiki": "Orion_Nebula",
+   "summary": {
+    "title": "Orion Nebula",
+    "extract": "The Orion Nebula is a diffuse nebula in the Milky Way situated south of Orion's Belt in the constellation of Orion, and is known as the middle \"star\" in the \"sword\" of Orion. It is one of the brightest nebulae and is visible to the naked eye in the night sky with an apparent magnitude of 4.0. It is 1,267.0 ± 5.4 light-years (388.5 ± 1.7 pc) away and is the closest region of massive star formation to Earth. M42 is estimated to be 25 light-years across. It has a mass of about 2,000 times that of the Sun. Older texts frequently refer to the Orion Nebula as the Great Nebula in Orion or the Great Orion Nebula.",
+    "description": "Diffuse nebula in the constellation Orion",
+    "url": "https://en.wikipedia.org/wiki/Orion_Nebula"
+   },
+   "image": {
+    "src": "/media/orion-nebula.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Orion Nebula - Hubble 2006 mosaic 18000",
+    "credit": "NASA, ESA, M. Robberto (Space Telescope Science Institute/ESA) and the Hubble Space Telescope Orion Treasury Project Team",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg",
+    "description": "In one of the most detailed astronomical images ever produced, NASA/ESA's Hubble Space Telescope captured an unprecedented look at the Orion Nebula . ... This extensive study took 105 Hubble orbits to complete. All imaging instruments aboard the telescope were used simultaneously to study Orion. The Advanced Camera mosaic covers approximately the apparent angular size of the full moon. Coordinates"
+   }
+  },
+  "ring-nebula": {
+   "wiki": "Ring_Nebula",
+   "summary": {
+    "title": "Ring Nebula",
+    "extract": "The Ring Nebula is a planetary nebula in the northern constellation of Lyra, about mid-way between the prominent stars Beta and Gamma Lyrae. It is also catalogued as Messier 57, M57 and NGC 6720. The nebula was discovered by Charles Messier in 1779. It has an apparent visual magnitude of 8.8, which is too faint to be visible with the naked eye, but it can be readily observed with a small telescope.",
+    "description": "Planetary nebula in Lyra",
+    "url": "https://en.wikipedia.org/wiki/Ring_Nebula"
+   },
+   "image": {
+    "src": "/media/ring-nebula.jpg",
+    "width": 800,
+    "height": 812,
+    "kind": "observed",
+    "title": "Webb captures detailed beauty of Ring Nebula (NIRCam image) (weic2320b)",
+    "credit": "ESA/Webb, NASA, CSA, M. Barlow, N. Cox, R. Wesson",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Webb_captures_detailed_beauty_of_Ring_Nebula_(NIRCam_image)_(weic2320b).jpg",
+    "description": "The NASA/ESA/CSA James Webb Space Telescope has observed the well-known Ring Nebula with unprecedented detail. Formed by a star throwing off its outer layers as it runs out of fuel, the Ring Nebula is an archetypal planetary nebula. Also known as M57 and NGC 6720, it is both relatively close to Earth at roughly 2,500 light-years away.This new image provides unprecedented spatial resolution and spe"
+   }
+  },
+  "eagle-nebula": {
+   "wiki": "Eagle_Nebula",
+   "summary": {
+    "title": "Eagle Nebula",
+    "extract": "The Eagle Nebula is a young open cluster of stars in the constellation of Serpens. Alternatively, it is catalogued as Messier 16, M16, or NGC 6611, and sometimes referred to as the Star Queen Nebula. This cluster discovered by Jean-Philippe de Cheseaux in 1745–46. Both the \"Eagle\" and the \"Star Queen\" refer to visual impressions of the dark silhouette near the center of the nebula, an area made famous as the \"Pillars of Creation\" imaged by the Hubble Space Telescope. The nebula contains several active star-forming gas and dust regions, including the aforementioned Pillars of Creation. The Eagle Nebula lies in the Sagittarius Arm of the Milky Way.",
+    "description": "Open cluster in the constellation Serpens",
+    "url": "https://en.wikipedia.org/wiki/Eagle_Nebula"
+   },
+   "image": {
+    "src": "/media/eagle-nebula.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Eagle Nebula from ESO",
+    "credit": "ESO",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eagle_Nebula_from_ESO.jpg",
+    "description": "Three-colour composite mosaic image of the Eagle Nebula (Messier 16, or NGC 6611), based on images obtained with the Wide-Field Imager camera on the MPG/ESO 2.2-metre telescope at the La Silla Observatory. At the centre, the so-called “Pillars of Creation” can be seen. This wide-field image shows not only the central pillars, but also several others in the same star-forming region, as well as a hu"
+   }
+  },
+  "crab-nebula": {
+   "wiki": "Crab_Nebula",
+   "summary": {
+    "title": "Crab Nebula",
+    "extract": "The Crab Nebula is also known as Messier 1(M1) or NGC 1952",
+    "description": "Supernova remnant in the constellation Taurus",
+    "url": "https://en.wikipedia.org/wiki/Crab_Nebula"
+   },
+   "image": {
+    "src": "/media/crab-nebula.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Crab Nebula",
+    "credit": "NASA , ESA , J. Hester and A. Loll (Arizona State University)",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Crab_Nebula.jpg",
+    "description": "This is a mosaic image, one of the largest ever taken by NASA's Hubble Space Telescope, of the Crab Nebula , a six-light-year-wide expanding remnant of a star's supernova explosion. Japanese and Chinese astronomers recorded this violent event in 1054 CE. The orange filaments are the tattered remains of the star and consist mostly of hydrogen. The rapidly spinning neutron star embedded in the cente"
+   }
+  },
+  "47-tucanae": {
+   "wiki": "47_Tucanae",
+   "summary": {
+    "title": "47 Tucanae",
+    "extract": "47 Tucanae is a globular cluster located in the constellation of Tucana. It is about 4.45 ± 0.01 kpc (14,500 ± 32.6 ly) from Earth, and 120 light years in diameter. 47 Tuc can be seen with the naked eye, with an apparent magnitude of 4.1. It appears about 44 arcminutes across including its far outreaches. Due to its far southern location, 18° from the south celestial pole, it was not catalogued by European astronomers until the 1750s, when the cluster was first identified by Nicolas-Louis de Lacaille from South Africa.",
+    "description": "Globular cluster in the constellation Tucana",
+    "url": "https://en.wikipedia.org/wiki/47_Tucanae"
+   },
+   "image": null
+  },
+  "omega-centauri": {
+   "wiki": "Omega_Centauri",
+   "summary": {
+    "title": "Omega Centauri",
+    "extract": "Omega Centauri is a globular cluster in the constellation of Centaurus that was first identified as a non-stellar object by Edmond Halley in 1677. Located at a distance of 17,090 light-years, it is the largest known globular cluster in the Milky Way at a diameter of roughly 150 light-years. It is estimated to contain approximately 10 million stars, with a total mass of 4 million solar masses, making it the most massive known globular cluster in the Milky Way.",
+    "description": "Globular cluster in the constellation Centaurus",
+    "url": "https://en.wikipedia.org/wiki/Omega_Centauri"
+   },
+   "image": {
+    "src": "/media/omega-centauri.png",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Omega Centauri Stars",
+    "credit": "Chuck Ayoub",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Omega_Centauri_Stars.png",
+    "description": "This is the globular cluster \"Omega Centauri\". It’s the largest globular cluster not just in our galaxy but in many others nearby with over 10 million stars. Captured by amateur astronomer Chuck Ayoub. Target: Omega Centauri Imaging Telescope: Celestron RASA (400 focal length) Focuser: Celestron Electronic Focuser Mount: Sky-Watcher EQ6-R Pro Imaging Camera: ZWO ASI533MC Color Total Exposure Time:"
+   }
+  },
+  "m13": {
+   "wiki": "Messier_13",
+   "summary": {
+    "title": "Messier 13",
+    "extract": "Messier 13, or M13, is a globular cluster of several hundred thousand stars in the constellation of Hercules.",
+    "description": "Globular cluster in the constellation Hercules",
+    "url": "https://en.wikipedia.org/wiki/Messier_13"
+   },
+   "image": {
+    "src": "/media/m13.png",
+    "width": 800,
+    "height": 796,
+    "kind": "observed",
+    "title": "M13-Globular-Cluster",
+    "credit": "Chuck Ayoub",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:M13-Globular-Cluster.png",
+    "description": "This is M13, the Great Globular Cluster in Hercules. It was captured with a broadband filter and color camera by amateur astronomer Chuck Ayoub. Target: M13 Imaging Telescope: Celestron RASA (400 focal length) Focuser: Celestron Electronic Focuser Mount: Sky-Watcher EQ6-R Pro Imaging Camera: ZWO ASI533MC Color Total Exposure Time: 2 hours"
+   }
+  },
+  "sagittarius-a-star": {
+   "wiki": "Sagittarius_A*",
+   "summary": {
+    "title": "Sagittarius A*",
+    "extract": "Sagittarius A*, abbreviated as Sgr A*, is the supermassive black hole at the Galactic Center of the Milky Way. Viewed from Earth, it is located near the border of the constellations Sagittarius and Scorpius, about 5.6° south of the ecliptic, visually close to the Butterfly Cluster (M6) and Lambda Scorpii. Sagittarius A* is a bright and very compact astronomical radio source.",
+    "description": "Supermassive black hole at the center of the Milky Way",
+    "url": "https://en.wikipedia.org/wiki/Sagittarius_A*"
+   },
+   "image": null
+  },
+  "lmc": {
+   "wiki": "Large_Magellanic_Cloud",
+   "summary": {
+    "title": "Large Magellanic Cloud",
+    "extract": "The Large Magellanic Cloud (LMC) is a dwarf galaxy and satellite galaxy of the Milky Way. At a distance of around 50 kiloparsecs, the LMC is the second- or third-closest galaxy to the Milky Way, after the Sagittarius Dwarf Spheroidal and the possible dwarf irregular galaxy called the Canis Major Overdensity. It is about 9.86 kiloparsecs across and has roughly one-hundredth the mass of the Milky Way, making it the fourth-largest galaxy in the Local Group after the Andromeda Galaxy (M31), the Milky Way, and the Triangulum Galaxy (M33).",
+    "description": "Satellite galaxy of the Milky Way",
+    "url": "https://en.wikipedia.org/wiki/Large_Magellanic_Cloud"
+   },
+   "image": {
+    "src": "/media/lmc.jpg",
+    "width": 800,
+    "height": 657,
+    "kind": "observed",
+    "title": "Eso1021d",
+    "credit": "Robert Gendler/ESO",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eso1021d.jpg",
+    "description": "This image shows the entire Large Magellanic Cloud, with some of the brightest objects marked. The field of the new MPG/ESO 2.2-metre telescope image is indicated with an outline. The field of view is about ten degrees across."
+   }
+  },
+  "smc": {
+   "wiki": "Small_Magellanic_Cloud",
+   "summary": {
+    "title": "Small Magellanic Cloud",
+    "extract": "The Small Magellanic Cloud (SMC) is a dwarf galaxy near the Milky Way. Classified as a dwarf irregular galaxy, the SMC has a D25 isophotal diameter of about 5.78 kiloparsecs (18,900 light-years), and contains several hundred million stars. It has a total mass of approximately 7 billion solar masses. At a distance of about 200,000 light-years, the SMC is among the nearest intergalactic neighbors of the Milky Way and is one of the most distant objects visible to the naked eye.",
+    "description": "Dwarf irregular galaxy, satellite galaxy of the Milky Way",
+    "url": "https://en.wikipedia.org/wiki/Small_Magellanic_Cloud"
+   },
+   "image": {
+    "src": "/media/smc.jpg",
+    "width": 800,
+    "height": 832,
+    "kind": "observed",
+    "title": "Small Magellanic Cloud (Digitized Sky Survey 2)",
+    "credit": "ESA/Hubble and Digitized Sky Survey 2",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Small_Magellanic_Cloud_(Digitized_Sky_Survey_2).jpg",
+    "description": "The two-color image shows an overview of the full Small Magellanic Cloud (SMC) and was composed from two images from the Digitized Sky Survey 2 . The field of view is slightly larger than 3.5 × 3.6 degrees. N66 with the open star cluster NGC 346 is the largest of the star-forming regions seen below the center of the SMC."
+   }
+  },
+  "andromeda": {
+   "wiki": "Andromeda_Galaxy",
+   "summary": {
+    "title": "Andromeda Galaxy",
+    "extract": "The Andromeda Galaxy is a barred spiral galaxy and is the nearest major galaxy to the Milky Way. It was originally named the Andromeda Nebula and is cataloged as Messier 31, M31, and NGC 224. Andromeda has a D25 isophotal diameter of about 46.56 kiloparsecs (152,000 light-years) and is approximately 765 kpc (2.5 million light-years) from Earth. The galaxy's name stems from the area of Earth's sky in which it appears, the constellation of Andromeda, which itself is named after the princess who was the wife of Perseus in Greek mythology.",
+    "description": "Barred spiral galaxy in the Local Group",
+    "url": "https://en.wikipedia.org/wiki/Andromeda_Galaxy"
+   },
+   "image": {
+    "src": "/media/andromeda.png",
+    "width": 800,
+    "height": 522,
+    "kind": "observed",
+    "title": "Andromeda Galaxy 2025",
+    "credit": "Brody Wesner",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Andromeda_Galaxy_2025.png",
+    "description": "Pictured above is a True Color photograph of the \"Great Andromeda Galaxy\" and its 2 satellite galaxies, M32 above and M110 below. The Andromeda Galaxy is the largest member of the \"Local Group\" followed by the Milky Way and the Triangulum Galaxy with a diameter of around 152,000 lightyears and an estimated star count of around 1 trillion. The Andromeda Galaxy has been known since ancient times. Th"
+   }
+  },
+  "triangulum": {
+   "wiki": "Triangulum_Galaxy",
+   "summary": {
+    "title": "Triangulum Galaxy",
+    "extract": "The Triangulum Galaxy is a spiral galaxy 2.878 million light-years (ly) from Earth in the constellation Triangulum. It is catalogued as Messier 33 or NGC 598. With the D25 isophotal diameter of 18.74 kiloparsecs (61,100 light-years), the Triangulum Galaxy is the third-largest member of the Local Group of galaxies, behind the Andromeda Galaxy and the Milky Way.",
+    "description": "Spiral galaxy in the constellation Triangulum",
+    "url": "https://en.wikipedia.org/wiki/Triangulum_Galaxy"
+   },
+   "image": {
+    "src": "/media/triangulum.jpg",
+    "width": 800,
+    "height": 954,
+    "kind": "observed",
+    "title": "VST snaps a very detailed view of the Triangulum Galaxy",
+    "credit": "ESO",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:VST_snaps_a_very_detailed_view_of_the_Triangulum_Galaxy.jpg",
+    "description": "The VLT Survey Telescope (VST) at ESO’s Paranal Observatory in Chile has captured this beautifully detailed image of the galaxy Messier 33, often called the Triangulum Galaxy. This nearby spiral, the second closest large galaxy to our own galaxy, the Milky Way, is packed with bright star clusters, and clouds of gas and dust. This picture is amongst the most detailed wide-field views of this object"
+   }
+  },
+  "m81": {
+   "wiki": "Messier_81",
+   "summary": {
+    "title": "Messier 81",
+    "extract": "Messier 81 (also known as NGC 3031 or Bode's Galaxy) is a grand design spiral galaxy about 12 million light-years away in the constellation Ursa Major. It has a D25 isophotal diameter of 29.44 kiloparsecs (96,000 light-years).",
+    "description": "Spiral galaxy in the constellation Ursa Major",
+    "url": "https://en.wikipedia.org/wiki/Messier_81"
+   },
+   "image": {
+    "src": "/media/m81.jpg",
+    "width": 800,
+    "height": 538,
+    "kind": "observed",
+    "title": "Messier 81 HST",
+    "credit": "NASA, ESA and the Hubble Heritage Team (STScI/AURA)",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Messier_81_HST.jpg",
+    "description": "The spiral galaxy Messier 81 is tilted at an oblique angle on to our line of sight, giving a \"birds-eye view\" of the spiral structure. The galaxy is similar to our Milky Way , but our favorable view provides a better picture of the typical architecture of spiral galaxies. Though the galaxy is 11.6 million light-years away, NASA Hubble Space Telescope 's view is so sharp that it can resolve individ"
+   }
+  },
+  "centaurus-a": {
+   "wiki": "Centaurus_A",
+   "summary": {
+    "title": "Centaurus A",
+    "extract": "Centaurus A is a galaxy in the constellation of Centaurus. It was discovered in 1826 by Scottish astronomer James Dunlop from his home in Parramatta, in New South Wales, Australia. There is considerable debate in the literature regarding the galaxy's fundamental properties such as its Hubble type and distance. It is the closest radio galaxy to Earth, as well as the closest BL Lac object, so its active galactic nucleus has been extensively studied by professional astronomers. The galaxy is also the fifth-brightest in the sky, making it an ideal amateur astronomy target. It is only visible from the southern hemisphere and low northern latitudes.",
+    "description": "Radio galaxy in the constellation Centaurus",
+    "url": "https://en.wikipedia.org/wiki/Centaurus_A"
+   },
+   "image": {
+    "src": "/media/centaurus-a.jpg",
+    "width": 800,
+    "height": 842,
+    "kind": "observed",
+    "title": "ESO Centaurus A LABOCA",
+    "credit": "ESO/WFI (Optical); MPIfR/ESO/APEX/A.Weiss et al. (Submillimetre); NASA/CXC/CfA/R.Kraft et al. (X-ray)",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:ESO_Centaurus_A_LABOCA.jpg",
+    "description": "Colour composite image of Centaurus A, revealing the lobes and jets emanating from the active galaxy’s central black hole. This is a composite of images obtained with three instruments, operating at very different wavelengths. The 870-micron submillimetre data, from LABOCA on APEX, are shown in orange. X-ray data from the Chandra X-ray Observatory are shown in blue. Visible light data from the Wid"
+   }
+  },
+  "m101": {
+   "wiki": "Pinwheel_Galaxy",
+   "summary": {
+    "title": "Pinwheel Galaxy",
+    "extract": "The Pinwheel Galaxy is a face-on, counterclockwise intermediate spiral galaxy located 21 million light-years from Earth in the constellation Ursa Major. It was discovered by Pierre Méchain in 1781 and was communicated that year to Charles Messier, who verified its position for inclusion in the Messier Catalogue as one of its final entries.",
+    "description": "Galaxy in the constellation Ursa Major",
+    "url": "https://en.wikipedia.org/wiki/Pinwheel_Galaxy"
+   },
+   "image": {
+    "src": "/media/m101.jpg",
+    "width": 800,
+    "height": 625,
+    "kind": "observed",
+    "title": "M101 hires STScI-PRC2006-10a",
+    "credit": "Credit: Image: European Space Agency & NASA Acknowledgements: Project Investigators for the original Hubble data: K.D. Kuntz (GSFC), F. Bresolin (University of Hawaii), J. Trauger (JPL), J. Mould (NOA",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:M101_hires_STScI-PRC2006-10a.jpg",
+    "description": "The galaxy Messier 101 (M101, also known as NGC 5457 and also nicknamed the Pinwheel Galaxy) lies in the northern circumpolar constellation, Ursa Major (The Great Bear), at a distance of about 21 million light-years from Earth. This is one of the largest and most detailed photos of a spiral galaxy that have been released from Hubble. The galaxy's portrait is actually composed of 51 individual Hubb"
+   }
+  },
+  "whirlpool": {
+   "wiki": "Whirlpool_Galaxy",
+   "summary": {
+    "title": "Whirlpool Galaxy",
+    "extract": "The Whirlpool Galaxy, also known as Messier 51a (M51a) or NGC 5194, is an interacting grand-design spiral galaxy with a Seyfert 2 active galactic nucleus. It lies in the constellation Canes Venatici, and was the first galaxy to be classified as a spiral galaxy. It is 31 million light-years away and 23.58 kiloparsecs (76,900 ly) in diameter.",
+    "description": "Galaxy in the constellation Canes Venatici",
+    "url": "https://en.wikipedia.org/wiki/Whirlpool_Galaxy"
+   },
+   "image": {
+    "src": "/media/whirlpool.jpg",
+    "width": 800,
+    "height": 555,
+    "kind": "observed",
+    "title": "Messier51 sRGB",
+    "credit": "NASA and European Space Agency",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Messier51_sRGB.jpg",
+    "description": "The Whirlpool Galaxy (Spiral Galaxy M51, NGC 5194), a classic spiral galaxy located in the Canes Venatici constellation, and its companion NGC 5195 ."
+   }
+  },
+  "sombrero": {
+   "wiki": "Sombrero_Galaxy",
+   "summary": {
+    "title": "Sombrero Galaxy",
+    "extract": "The Sombrero Galaxy is a peculiar galaxy of unclear classification in the constellation borders of Virgo and Corvus, being about 9.55 megaparsecs from the Milky Way galaxy. It is a member of the Virgo II Groups, a series of galaxies and galaxy clusters strung out from the southern edge of the Virgo Supercluster. It has an isophotal diameter of approximately 29.09 to 32.32 kiloparsecs, making it slightly larger than the Milky Way.",
+    "description": "Galaxy in the constellation Virgo",
+    "url": "https://en.wikipedia.org/wiki/Sombrero_Galaxy"
+   },
+   "image": {
+    "src": "/media/sombrero.jpg",
+    "width": 800,
+    "height": 474,
+    "kind": "observed",
+    "title": "Sombrero Galaxy (heic2506a)",
+    "credit": "ESA/Hubble & NASA, K. Noll",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sombrero_Galaxy_(heic2506a).jpg",
+    "description": "Located around 30 million light-years away in the constellation Virgo , the Sombrero Galaxy is instantly recognisable. Viewed nearly edge on, the galaxy’s softly luminous bulge and sharply outlined disc resemble the rounded crown and broad brim of the Mexican hat from which the galaxy gets its name.Though the Sombrero Galaxy is packed with stars, it’s surprisingly not a hotbed of star formation. L"
+   }
+  },
+  "m87": {
+   "wiki": "Messier_87",
+   "summary": {
+    "title": "Messier 87",
+    "extract": "Messier 87 is a supergiant elliptical galaxy in the constellation Virgo that contains several trillion stars. One of the largest and most massive galaxies in the local universe, it has a large population of globular clusters—about 15,000 compared with the 150–200 orbiting the Milky Way—and a jet of energetic plasma that originates at the core and extends at least 1,500 parsecs, traveling at a relativistic speed. It is one of the brightest radio sources in the sky and a popular target for both amateur and professional astronomers.",
+    "description": "Galaxy in the constellation Virgo",
+    "url": "https://en.wikipedia.org/wiki/Messier_87"
+   },
+   "image": {
+    "src": "/media/m87.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "Messier 87 Hubble WikiSky",
+    "credit": "en:NASA , en:STScI , en:WikiSky",
+    "license": "Public domain",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Messier_87_Hubble_WikiSky.jpg",
+    "description": "The galactic core of Messier 87 as imaged by the Hubble Space Telescope . This is a composite image of visible and infrared observations in order to resolve the blue jet. The field of view is about 1.5 arc minutes across, the jet extends to about a third of an arc minute (or 20 arc seconds) with a width of about 2 arc seconds (absolute length 5 kly at a distance of 53 Mly)"
+   }
+  },
+  "3c-273": {
+   "wiki": "3C_273",
+   "summary": {
+    "title": "3C 273",
+    "extract": "3C 273 is a quasar located at the center of a giant elliptical galaxy in the constellation of Virgo. It was the first quasar ever to be identified and is the visually brightest quasar in the sky as seen from the Earth, with an apparent visual magnitude of 12.9, outshining by more than 16 times the entire galaxy that hosts it. The derived distance to this object is 749 megaparsecs. The mass of its central supermassive black hole is approximately 900 million times the mass of the Sun.",
+    "description": "Brightest quasar from Earth located in the constellation Virgo",
+    "url": "https://en.wikipedia.org/wiki/3C_273"
+   },
+   "image": {
+    "src": "/media/3c-273.jpg",
+    "width": 800,
+    "height": 790,
+    "kind": "observed",
+    "title": "Best image of bright quasar 3C 273 (10953173335)",
+    "credit": "Hubble ESA",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Best_image_of_bright_quasar_3C_273_(10953173335).jpg",
+    "description": "This image from Hubble’s Wide Field and Planetary Camera 2 (WFPC2) is likely the best of ancient and brilliant quasar 3C 273, which resides in a giant elliptical galaxy in the constellation of Virgo (The Virgin). Its light has taken some 2.5 billion years to reach us. Despite this great distance, it is still one of the closest quasars to our home. It was the first quasar ever to be identified, and"
+   }
+  },
+  "ton-618": {
+   "wiki": "TON_618",
+   "summary": {
+    "title": "TON 618",
+    "extract": "TON 618 is a hyperluminous, broad-emission-line, radio-loud quasar, and Lyman-alpha blob located near the border of the constellations Canes Venatici and Coma Berenices, with the projected comoving distance of approximately 18.2 billion light-years from Earth. It contains one of the most massive black holes ever found, at roughly 40.7 billion times the Sun's mass (M☉), though some older, more frequently-cited estimates yield 66 billion M☉.",
+    "description": "Quasar",
+    "url": "https://en.wikipedia.org/wiki/TON_618"
+   },
+   "image": {
+    "src": "/media/ton-618.jpg",
+    "width": 800,
+    "height": 800,
+    "kind": "observed",
+    "title": "TON 618 SDSS9 version 3",
+    "credit": "Sloan Digital Sky Survey, Apache Point Observatory, Astrophysical Research Consortium",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:TON_618_SDSS9_version_3.jpg",
+    "description": "TON 618, from the Sloan Digital Sky Survey Data Release 9 (DR9). Image retrieved via CDS-Aladin Lite."
+   }
+  }
+ }
+}

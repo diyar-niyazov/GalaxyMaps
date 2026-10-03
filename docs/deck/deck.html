@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>SpaceMaps: BigRed//Hacks 2026</title>
+    <style>
+      @page {
+        size: 1280px 720px;
+        margin: 0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #202124;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .slide {
+        width: 1280px;
+        height: 720px;
+        position: relative;
+        overflow: hidden;
+        page-break-after: always;
+        break-after: page;
+        background: #fff;
+        padding: 64px 72px;
+        display: flex;
+        flex-direction: column;
+      }
+      .slide:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      h1 {
+        font-size: 64px;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        font-size: 40px;
+        margin: 0 0 28px;
+        letter-spacing: -0.01em;
+      }
+      p,
+      li {
+        font-size: 24px;
+        line-height: 1.45;
+      }
+      ul {
+        margin: 0;
+        padding-left: 28px;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+      .kicker {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #1a73e8;
+        margin-bottom: 14px;
+      }
+      .muted {
+        color: #5f6368;
+      }
+      .small {
+        font-size: 17px;
+      }
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1.25fr;
+        gap: 40px;
+        align-items: center;
+        flex: 1;
+      }
+      .shot {
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(60, 64, 67, 0.25);
+        border: 1px solid #dadce0;
+      }
+      .dark {
+        background: #0b1020;
+        color: #fff;
+      }
+      .dark .muted {
+        color: #bdc1c6;
+      }
+      .hero {
+        position: absolute;
+        top: 0;
+        left: -40%;
+        width: 140%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.55;
+      }
+      .hero-text {
+        position: relative;
+        margin-top: auto;
+        background: rgba(255, 255, 255, 0.96);
+        color: #202124;
+        border-radius: 16px;
+        padding: 36px 40px;
+        max-width: 760px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      }
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .pin {
+        width: 44px;
+        height: 44px;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        background: #1a73e8;
+        display: inline-block;
+        position: relative;
+      }
+      .pin::after {
+        content: "";
+        position: absolute;
+        inset: 13px;
+        border-radius: 50%;
+        background: #fff;
+      }
+      .big-stat {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 8px;
+      }
+      .stat {
+        border: 1px solid #dadce0;
+        border-radius: 12px;
+        padding: 20px 22px;
+      }
+      .stat b {
+        display: block;
+        font-size: 34px;
+        color: #1a73e8;
+        margin-bottom: 4px;
+      }
+      .stat span {
+        font-size: 17px;
+        color: #5f6368;
+      }
+      .stat.fiction b {
+        color: #9334e6;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 12px;
+        background: #e8f0fe;
+        color: #1967d2;
+        margin-left: 6px;
+        vertical-align: middle;
+      }
+      .tag.warn {
+        background: #fef7e0;
+        color: #b06000;
+      }
+      .flow {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 10px 0 26px;
+        font-size: 20px;
+      }
+      .flow div {
+        border: 1px solid #dadce0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        background: #f8f9fa;
+      }
+      .flow .arrow {
+        border: none;
+        background: none;
+        padding: 0;
+        color: #5f6368;
+      }
+      .footer {
+        position: absolute;
+        left: 72px;
+        bottom: 28px;
+        font-size: 14px;
+        color: #80868b;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="slide dark">
+      <img class="hero" src="../screenshots/milky-way.png" alt="" />
+      <div class="hero-text">
+        <div class="logo"><span class="pin"></span><h1>SpaceMaps</h1></div>
+        <p style="font-size: 30px; margin: 18px 0 8px">Explore the universe through a familiar, interactive map.</p>
+        <p class="muted small" style="margin: 0">BigRed//Hacks 2026 · Navigation</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">The problem</div>
+      <h2>Space distances are numbers nobody can feel.</h2>
+      <ul>
+        <li>"Polaris is 433 light-years away." What does that actually mean for a trip?</li>
+        <li>Planetarium apps show the sky, not <em>how far</em> or <em>how long</em>.</li>
+        <li>But everyone already knows one spatial interface: <strong>the map</strong>. Search, Directions, compare modes, read the ETA.</li>
+      </ul>
+      <p style="margin-top: 36px; font-size: 30px"><strong>What if the universe had directions?</strong></p>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">The product</div>
+      <h2>A mapping app for the universe</h2>
+      <div class="split">
+        <ul>
+          <li>One continuous map from the Earth–Moon system to nearby galaxies</li>
+          <li>Search 618 objects and 109,000 stars</li>
+          <li>Place cards with sourced facts and images</li>
+          <li>Directions, travel modes, multi-stop trips, playback</li>
+          <li>Realistic and Atlas layers</li>
+        </ul>
+        <img class="shot" src="../screenshots/route-polaris.png" alt="Earth to Polaris directions" />
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Directions, honestly</div>
+      <h2>Earth → Polaris: 433 light-years</h2>
+      <div class="big-stat">
+        <div class="stat"><b>433 years</b><span>at light speed</span></div>
+        <div class="stat"><b>7.7 million yr</b><span>at Voyager 1's real speed (JPL, heliocentric)</span></div>
+        <div class="stat"><b>437 yr / 62 yr</b><span>at 0.99 c: Earth time / onboard (relativity)</span></div>
+        <div class="stat fiction"><b>3.4 months</b><span>USS Enterprise, warp 9 <em>(fiction)</em></span></div>
+      </div>
+      <ul style="margin-top: 34px">
+        <li>True 3D distance between catalog positions, with its uncertainty (± 6.4 ly)</li>
+        <li>Constant-speed comparison: no acceleration, gravity or target motion, and the app says so</li>
+        <li>"On the way" is computed, never guessed: adding Vega costs <strong>+2.3%</strong></li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Real data, visible provenance</div>
+      <h2>Every number has a source</h2>
+      <div class="split">
+        <ul class="small-list">
+          <li>NASA/JPL Horizons, SIMBAD, HYG v4.4, NASA Exoplanet Archive, cited papers</li>
+          <li>Parallaxes inverted only when the error is ≤ 20%; otherwise the object is "route unavailable", with the reason</li>
+          <li>No fake routes to cosmological objects (3C 273, TON 618)</li>
+          <li>Imagery labeled: Observed image · Scientific illustration · AI reconstruction</li>
+        </ul>
+        <img class="shot" src="../screenshots/place-saturn.png" alt="Saturn destination card" />
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Navigation is orbits</div>
+      <h2>Why not fly straight to Mars?</h2>
+      <div class="split">
+        <ul>
+          <li>Idealized Hohmann transfer: <strong>≈ 259 days</strong></li>
+          <li>Mars must be about 44° ahead at launch, so windows open roughly every 26 months</li>
+          <li>Circular, coplanar orbits; assumptions shown on screen</li>
+          <li>An educational model, not a launch-ready mission</li>
+        </ul>
+        <img class="shot" src="../screenshots/transfer.png" alt="Earth to Mars Hohmann transfer" />
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Technical depth</div>
+      <h2>One map, 17 orders of magnitude</h2>
+      <div class="split">
+        <ul>
+          <li>Float64, camera-relative rendering (Three.js) from 6,000 km to 10²¹ km</li>
+          <li>van Wijk–Nuij smooth zoom flights; ecliptic → galactic plane blend</li>
+          <li>109k stars in one batched draw, colored by temperature</li>
+          <li>Reproducible data pipeline → 4.5 MB offline bundle</li>
+          <li>47 unit tests (physics, frames, dataset) + headless browser smoke test</li>
+        </ul>
+        <img class="shot" src="../screenshots/milky-way-atlas.png" alt="Milky Way atlas view" />
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">AI that can't make things up</div>
+      <h2>A grounded guide</h2>
+      <div class="flow">
+        <div>You: "Take me to Polaris"</div>
+        <span class="arrow">→</span>
+        <div>Grok Voice</div>
+        <span class="arrow">→</span>
+        <div>searchObjects · setRoute · suggestStops</div>
+        <span class="arrow">→</span>
+        <div>SpaceMaps computes</div>
+      </div>
+      <ul>
+        <li>The model only calls validated tools; IDs and arguments are checked against the catalog</li>
+        <li>The API key stays on the server; the browser gets a 5-minute ephemeral token</li>
+        <li>Without a key: a clearly labeled <em>offline scripted guide</em>, never presented as Grok</li>
+      </ul>
+      <p class="small muted" style="margin-top: 20px">Status: Grok Voice and Grok Imagine are implemented <span class="tag warn">not yet tested with a live API key</span></p>
+    </section>
+
+    <section class="slide dark">
+      <img class="hero" src="../screenshots/solar-system.png" alt="" />
+      <div class="hero-text">
+        <div class="kicker">What's next</div>
+        <ul>
+          <li>Live Grok narration across more journeys</li>
+          <li>Gaia DR3 stars with real uncertainties</li>
+          <li>Actual mission trajectories (Voyager's real path)</li>
+          <li>A classroom-ready offline PWA</li>
+        </ul>
+        <p style="font-size: 30px; margin: 20px 0 0"><strong>Thank you!</strong> <span class="muted small">SpaceMaps · BigRed//Hacks 2026</span></p>
+      </div>
+    </section>
+  </body>
+</html>

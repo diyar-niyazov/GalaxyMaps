@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+# Large raw downloads are reproducible with `npm run data:fetch`.
+data/raw/hyg_v44.csv.gz
+data/raw/textures-src/
+data/raw/media-src/
