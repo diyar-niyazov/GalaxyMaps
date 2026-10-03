@@ -122,6 +122,6 @@ if (PROD) {
 }
 
 app.listen(PORT, () => {
-  console.log(`SpaceMaps server on http://localhost:${PORT} (${PROD ? "production" : "API only; open the Vite URL"})`);
+  console.log(`GalaxyMaps server on http://localhost:${PORT} (${PROD ? "production" : "API only; open the Vite URL"})`);
   console.log(`Grok: ${KEY ? "XAI_API_KEY configured" : "not configured (map and calculations still work)"}`);
 });

@@ -8,3 +8,7 @@ dist/
 data/raw/hyg_v44.csv.gz
 data/raw/textures-src/
 data/raw/media-src/
+
+# Large texture sources (see README "Textures")
+data/raw/sky/
+data/raw/earth/

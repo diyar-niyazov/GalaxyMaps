@@ -1,6 +1,6 @@
 # Data sources and preparation
 
-SpaceMaps ships with a prebuilt dataset in `public/data/`, so the demo never depends on live astronomy APIs. Everything in it can be regenerated with two commands:
+GalaxyMaps ships with a prebuilt dataset in `public/data/`, so the demo never depends on live astronomy APIs. Everything in it can be regenerated with two commands:
 
 ```bash
 npm run data:fetch   # downloads every upstream source into data/raw/   (network, ~2–5 min)
@@ -54,7 +54,7 @@ Every `Fact`, distance and image in `catalog.json` records its `sourceId`, and `
 
 | File | Size | Contents |
 | --- | --- | --- |
-| `catalog.json` | ~750 kB | 618 objects: 105 featured destination cards (102 routable) plus named HYG stars; sources; spacecraft speed references |
+| `catalog.json` | ~1.9 MB | 919 objects: 374 featured destination cards (126 highlights) plus named HYG stars; category tree tags; sources; spacecraft speed references |
 | `ephemeris.json` | ~280 kB | Daily vectors, satellite elements, orbit elements |
 | `stars.bin` | ~3.5 MB | 109,389 × 8 float32 columns (`x_pc, y_pc, z_pc, absmag, ci, mag, hyg_id, hip`) |
 | `star-names.json` | ~110 kB | Labels, spectral types and constellations for point-cloud stars |
@@ -62,8 +62,10 @@ Every `Fact`, distance and image in `catalog.json` records its `sourceId`, and `
 The build prints a summary, e.g.:
 
 ```
-Catalog: 618 objects (105 featured, … HYG named), 66 with images
-Routable featured: 102; not routable: Alnilam, 3C 273, TON 618
+Catalog: 919 objects (374 featured, 507 HYG named), 271 with images
+Destinations (featured): 374; highlights: 126 (solar-system 24, stars 16, galaxies 26, …)
+Gallery images: 475 kept, 218 dropped as unrelated to the object
+Galaxies: 68; Andromeda features: 21; SpaceX / human spaceflight: 10
 ```
 
 ## Adding a destination

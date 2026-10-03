@@ -3,8 +3,8 @@
  * Pass step names to run a subset, e.g. `npm run data:fetch -- simbad media`.
  */
 import { fetchHorizons } from "./horizons";
-import { fetchSimbad, fetchExoplanets, fetchFactsheet, fetchHyg } from "./catalogs";
-import { fetchMedia, fetchTextures } from "./media";
+import { fetchSimbad, fetchExoplanets, fetchFactsheet, fetchHyg, fetchSbdb } from "./catalogs";
+import { fetchMedia, fetchTextures, makeThumbs } from "./media";
 
 const steps: Record<string, () => Promise<void>> = {
   hyg: fetchHyg,
@@ -12,8 +12,10 @@ const steps: Record<string, () => Promise<void>> = {
   simbad: fetchSimbad,
   exoplanets: fetchExoplanets,
   horizons: fetchHorizons,
+  sbdb: fetchSbdb,
   textures: fetchTextures,
   media: fetchMedia,
+  thumbs: makeThumbs,
 };
 
 const wanted = process.argv.slice(2);

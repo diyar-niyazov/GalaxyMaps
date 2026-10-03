@@ -1,27 +1,23 @@
 import { useMemo } from "react";
 import { useStore } from "./store";
-import { allModes, customSpeedKmS, type TransportMode } from "../lib/transport";
-import { computeRoute, type RouteResult } from "../lib/route";
+import { travelModes, LIGHT_MODE, type TransportMode } from "../lib/transport";
+import { computeRoute, type RouteModelPreference, type RouteResult } from "../lib/route";
 import type { CatalogObject } from "../lib/types";
 import type { DataBundle } from "../data/bundle";
-import { LIGHT_MODE } from "../lib/transport";
 
-export function modesFor(data: DataBundle | null, custom: { value: number; unit: "km/s" | "km/h" | "c" }, fictional: { enterprise: number; falcon: number }): TransportMode[] {
-  return allModes(data?.catalog.speedReferences ?? [], customSpeedKmS(custom.value, custom.unit), fictional);
+export function modesFor(data: DataBundle | null): TransportMode[] {
+  return travelModes(data?.catalog.speedReferences ?? []);
 }
 
 export function useModes(): TransportMode[] {
   const data = useStore((s) => s.data);
-  const custom = useStore((s) => s.custom);
-  const fictional = useStore((s) => s.fictional);
-  return useMemo(() => modesFor(data, custom, fictional), [data, custom, fictional]);
+  return useMemo(() => modesFor(data), [data]);
 }
 
-/** The selected mode, or null when it is invalid (e.g. a custom speed above c). */
-export function useMode(): TransportMode | null {
+export function useMode(): TransportMode {
   const modes = useModes();
   const modeId = useStore((s) => s.modeId);
-  return modes.find((m) => m.id === modeId) ?? (modeId === "custom" ? null : LIGHT_MODE);
+  return modes.find((m) => m.id === modeId) ?? LIGHT_MODE;
 }
 
 export function useStopObjects(): (CatalogObject | null)[] {
@@ -30,16 +26,18 @@ export function useStopObjects(): (CatalogObject | null)[] {
   return useMemo(() => stops.map((id) => (id && data ? data.byId.get(id) ?? null : null)), [data, stops]);
 }
 
-export function routeFor(data: DataBundle, stopIds: (string | null)[], mode: TransportMode, jd: number): RouteResult | null {
+export function routeFor(data: DataBundle, stopIds: (string | null)[], mode: TransportMode, jd: number, model: RouteModelPreference = "auto"): RouteResult | null {
   const objs = stopIds.map((id) => (id ? data.byId.get(id) : undefined));
   if (objs.some((o) => !o)) return null;
-  return computeRoute(objs as CatalogObject[], mode, { eph: data.eph, jdTdb: jd });
+  return computeRoute(objs as CatalogObject[], mode, { eph: data.eph, jdTdb: jd }, model);
 }
 
+/** Route recomputation is throttled to whole days so the Play-time clock does not rerun it every tick. */
 export function useRoute(): RouteResult | null {
   const data = useStore((s) => s.data);
   const stops = useStore((s) => s.stops);
-  const jd = useStore((s) => s.jd);
+  const day = useStore((s) => Math.round(s.jd * 4) / 4);
+  const model = useStore((s) => s.routeModel);
   const mode = useMode();
-  return useMemo(() => (data && mode ? routeFor(data, stops, mode, jd) : null), [data, stops, mode, jd]);
+  return useMemo(() => (data ? routeFor(data, stops, mode, day, model) : null), [data, stops, mode, day, model]);
 }

@@ -1,8 +1,10 @@
 /**
- * Procedural, schematic face-on Milky Way. This is a scientific illustration, not an
+ * Procedural face-on Milky Way reconstruction. This is a scientific illustration, not an
  * image: a four-arm logarithmic spiral (pitch ≈ 12°) plus the Local Arm, a bar inclined
- * ≈ 27° to the Sun–Galactic Center line, and an exponential disk. It is placed with the
- * Galactic Center 8.178 kpc from the Sun (GRAVITY 2019). It never defines catalog positions.
+ * ≈ 27° to the Sun–Galactic Center line, an exponential disk, irregular arm edges, dust lanes
+ * on the arms' inner edges and star-forming knots. It is placed with the Galactic Center
+ * 8.178 kpc from the Sun (GRAVITY 2019). Nobody has photographed our galaxy from outside, so
+ * the UI always labels it as a reconstruction. It never defines catalog positions.
  */
 import type { Vec3 } from "../lib/types";
 import { GALACTIC_TO_ICRF } from "../lib/coords";
@@ -68,12 +70,13 @@ function armField(r: number, theta: number, arm: Arm) {
 
 export type MilkyWayStyle = "realistic" | "atlas";
 
-export function renderMilkyWay(style: MilkyWayStyle, N = 1024): HTMLCanvasElement {
+export function renderMilkyWay(style: MilkyWayStyle, N = 1536): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = N;
   const ctx = canvas.getContext("2d")!;
   const img = ctx.createImageData(N, N);
   const px = img.data;
+  const c = Math.cos(BAR_ANGLE), s = Math.sin(BAR_ANGLE);
   for (let j = 0; j < N; j++) {
     const Y = (1 - (2 * (j + 0.5)) / N) * HALF_SIZE_KPC;
     for (let i = 0; i < N; i++) {
@@ -81,28 +84,33 @@ export function renderMilkyWay(style: MilkyWayStyle, N = 1024): HTMLCanvasElemen
       const r = Math.hypot(X, Y);
       const theta = Math.atan2(Y, X);
       const disk = Math.exp(-r / 2.6) * Math.exp(-Math.max(0, r - 14) / 1.5);
+      // Irregular arm edges: warp the radius with low-frequency noise.
+      const rw = r + 0.7 * (valueNoise(X * 0.33 + 11, Y * 0.33 + 5) - 0.5) + 0.3 * (valueNoise(X * 1.3 + 3, Y * 1.3 + 17) - 0.5);
       let arms = 0, dust = 0;
       for (const a of ARMS) {
-        const f = armField(r, theta, a);
+        const f = armField(rw, theta, a);
         arms = Math.max(arms, f.v * a.strength);
-        dust = Math.max(dust, Math.exp(-(((f.dr + 0.38) / 0.13) ** 2)) * (f.v > 0.01 || Math.abs(f.dr) < 0.8 ? 1 : 0) * a.strength);
+        dust = Math.max(dust, Math.exp(-(((f.dr + 0.36) / 0.16) ** 2)) * (f.v > 0.01 || Math.abs(f.dr) < 0.8 ? 1 : 0) * a.strength);
       }
       // Bar and bulge in a frame aligned with the bar.
-      const c = Math.cos(BAR_ANGLE), s = Math.sin(BAR_ANGLE);
       const bx = X * c + Y * s, by = -X * s + Y * c;
       const bar = Math.exp(-((bx / 4.4) ** 2 + (by / 1.05) ** 2) * 1.8);
       const bulge = Math.exp(-((r / 0.8) ** 2));
       const o = (j * N + i) * 4;
       if (style === "realistic") {
-        const n = (0.45 + 0.9 * valueNoise(X * 0.55 + 7, Y * 0.55 + 3)) * (0.65 + 0.7 * (0.6 * valueNoise(X * 2.2, Y * 2.2) + 0.4 * valueNoise(X * 6.1, Y * 6.1)));
-        const armL = arms * n * (1 - 0.35 * dust);
+        const fine = 0.6 * valueNoise(X * 2.2, Y * 2.2) + 0.4 * valueNoise(X * 6.1, Y * 6.1);
+        const n = (0.45 + 0.9 * valueNoise(X * 0.55 + 7, Y * 0.55 + 3)) * (0.6 + 0.8 * fine);
+        const dustPatch = dust * (0.45 + 0.9 * valueNoise(X * 4.3 + 1, Y * 4.3 + 8)) + 0.18 * bar * valueNoise(X * 5 + 4, Y * 5);
+        const knots = arms * Math.pow(valueNoise(X * 3.7 + 2, Y * 3.7 + 9), 7) * 3.2;
+        const armL = arms * n;
         const warm = Math.min(1, 1.6 * bulge + 0.9 * bar + 0.35 * disk);
-        const lum = Math.min(1, 0.34 * disk + 0.62 * armL + 0.6 * bar + 0.9 * bulge);
+        let lum = Math.min(1.2, 0.3 * disk + 0.62 * armL + 0.6 * bar + 0.95 * bulge);
+        lum *= 1 - Math.min(0.75, 0.6 * dustPatch);
         const cool = armL / (armL + warm + 1e-6);
-        px[o] = 255 * Math.min(1, lum * (0.78 + 0.22 * (1 - cool)));
-        px[o + 1] = 255 * Math.min(1, lum * (0.8 + 0.08 * (1 - cool)));
-        px[o + 2] = 255 * Math.min(1, lum * (0.72 + 0.28 * cool));
-        px[o + 3] = 255 * Math.min(1, lum * 1.15);
+        px[o] = 255 * Math.min(1, lum * (0.8 + 0.25 * (1 - cool)) + knots * 0.9);
+        px[o + 1] = 255 * Math.min(1, lum * (0.78 + 0.1 * (1 - cool)) + knots * 0.35);
+        px[o + 2] = 255 * Math.min(1, lum * (0.7 + 0.32 * cool) + knots * 0.55);
+        px[o + 3] = 255 * Math.min(1, lum * 1.15 + knots * 0.6);
       } else {
         const a = Math.min(1, 0.22 * disk / 0.4 + 0.55 * arms + 0.7 * bar + 0.9 * bulge);
         const arm = arms / (arms + bar + bulge + 0.05);

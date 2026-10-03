@@ -37,11 +37,20 @@ export function satelliteOffset(sat: SatelliteElements, jdTdb: number): Vec3 {
   return keplerPosition(best, jdTdb);
 }
 
-/** Heliocentric ICRF position (km) of an ephemeris key at jdTdb, or null if out of range. */
+/**
+ * Heliocentric ICRF position (km) of an ephemeris key at jdTdb, or null if unavailable.
+ * Inside the Horizons window: interpolated state vectors. Outside it: two-body propagation of
+ * the Horizons osculating elements (approximate; spacecraft have no fallback).
+ */
 export function ephemerisPosition(eph: Ephemeris, key: string, jdTdb: number): Vec3 | null {
   if (key === "sun") return [0, 0, 0];
   const body = eph.bodies[key];
-  if (body) return interpolateBody(body, jdTdb);
+  if (body) {
+    const p = interpolateBody(body, jdTdb);
+    if (p) return p;
+    const orbit = eph.orbits[key];
+    return orbit ? keplerPosition(orbit, jdTdb) : null;
+  }
   const sat = eph.satellites[key];
   if (sat) {
     const parent = ephemerisPosition(eph, sat.parentKey, jdTdb);
@@ -51,7 +60,26 @@ export function ephemerisPosition(eph: Ephemeris, key: string, jdTdb: number): V
   return null;
 }
 
+/** Julian dates (TDB) bounding the Play-time clock: 1900-01-01 to 2100-01-01. */
+export const PLAY_MIN_JD = 2_415_020.5;
+export const PLAY_MAX_JD = 2_488_069.5;
+
+/** Whether positions at this date come from the Horizons table or the approximate two-body fallback. */
+export function ephemerisAccuracy(eph: Ephemeris, jdTdb: number): "precise" | "approximate" {
+  return jdTdb >= eph.startJdTdb && jdTdb <= eph.endJdTdb ? "precise" : "approximate";
+}
+
 /** Clamp a requested date to the ephemeris coverage. */
 export function clampJd(eph: Ephemeris, jdTdb: number): number {
   return Math.min(Math.max(jdTdb, eph.startJdTdb), eph.endJdTdb);
+}
+
+/** Clamp a date to the range the Play-time clock supports. */
+export function clampPlayJd(jdTdb: number): number {
+  return Math.min(Math.max(jdTdb, PLAY_MIN_JD), PLAY_MAX_JD);
+}
+
+/** One Play-time step: `ms` of real time at `daysPerSecond`, kept inside the supported range. */
+export function advancePlayJd(jdTdb: number, daysPerSecond: number, ms: number): number {
+  return clampPlayJd(jdTdb + (daysPerSecond * ms) / 1000);
 }

@@ -4,12 +4,14 @@ import { loadBundle } from "./data/bundle";
 import { MapView } from "./map/MapView";
 import { EngineSync } from "./map/EngineSync";
 import { getEngine } from "./map/engineRef";
-import { HOME_PRESET } from "./map/presets";
-import { Sidebar, searchInputRef } from "./ui/Sidebar";
+import { Sidebar } from "./ui/Sidebar";
+import { searchInputRef } from "./ui/describe";
 import { MapChrome } from "./ui/MapChrome";
 import { AboutDialog } from "./ui/AboutDialog";
 import { applyUrlState, startUrlSync } from "./state/urlState";
 import { ErrorBoundary } from "./ui/ErrorBoundary";
+import { goHome, escapeCamera } from "./state/actions";
+import { closeTopMenu } from "./ui/menus";
 
 function isTyping(e: KeyboardEvent) {
   const t = e.target as HTMLElement | null;
@@ -20,6 +22,8 @@ export function App() {
   const data = useStore((s) => s.data);
   const loadError = useStore((s) => s.loadError);
   const aboutOpen = useStore((s) => s.aboutOpen);
+  const collapsed = useStore((s) => s.sidebarCollapsed);
+  const sheet = useStore((s) => s.sheet);
 
   useEffect(() => {
     let unsub: (() => void) | undefined;
@@ -31,11 +35,11 @@ export function App() {
         // Defer so the map engine exists before applying camera moves.
         setTimeout(() => {
           if (cancelled) return;
-          applyUrlState();
+          if (!applyUrlState()) getEngine()?.homeEarth(true);
           unsub = startUrlSync();
         }, 0);
       })
-      .catch((e) => useStore.getState().setLoadError(`Could not load the SpaceMaps dataset (${(e as Error).message}). Run "npm run data:build" and reload.`));
+      .catch((e) => useStore.getState().setLoadError(`Could not load the GalaxyMaps dataset (${(e as Error).message}). Run "npm run data:build" and reload.`));
     return () => {
       cancelled = true;
       unsub?.();
@@ -44,9 +48,22 @@ export function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        // Menus first, then the locked/route camera, then panels.
+        if (closeTopMenu()) return e.preventDefault();
+        if (isTyping(e)) return;
+        if (escapeCamera()) return;
+        const st = useStore.getState();
+        if (st.categoryFilter) return st.setCategoryFilter(null);
+        if (st.panel === "place") st.select(null);
+        else if (st.panel !== "explore") st.setPanel(st.selectedId ? "place" : "explore");
+        else if (st.inside) st.setInside(null);
+        return;
+      }
       if (e.ctrlKey || e.metaKey || e.altKey || isTyping(e)) return;
       const st = useStore.getState();
       const eng = getEngine();
+      const locked = eng?.getMode() === "locked";
       switch (e.key) {
         case "/":
           e.preventDefault();
@@ -62,20 +79,32 @@ export function App() {
           eng?.zoomBy(2);
           break;
         case "ArrowLeft":
-          eng?.panBy(-120, 0);
+          e.preventDefault();
+          if (locked) eng?.orbitBy(-0.12, 0);
+          else eng?.panBy(-120, 0);
           break;
         case "ArrowRight":
-          eng?.panBy(120, 0);
+          e.preventDefault();
+          if (locked) eng?.orbitBy(0.12, 0);
+          else eng?.panBy(120, 0);
           break;
         case "ArrowUp":
-          eng?.panBy(0, -120);
+          e.preventDefault();
+          if (locked) eng?.orbitBy(0, -0.1);
+          else eng?.panBy(0, -120);
           break;
         case "ArrowDown":
-          eng?.panBy(0, 120);
+          e.preventDefault();
+          if (locked) eng?.orbitBy(0, 0.1);
+          else eng?.panBy(0, 120);
           break;
         case "h":
         case "H":
-          if (st.data) eng?.flyTo(HOME_PRESET.target(st.data, st.jd));
+          goHome();
+          break;
+        case "r":
+        case "R":
+          eng?.resetView();
           break;
         case "f":
         case "F":
@@ -89,9 +118,10 @@ export function App() {
         case "D":
           st.openDirections(st.panel === "place" ? st.selectedId : undefined);
           break;
-        case "Escape":
-          if (st.panel === "place") st.select(null);
-          else if (st.panel !== "explore") st.setPanel(st.selectedId ? "place" : "explore");
+        case " ":
+          e.preventDefault();
+          if (st.time.armed) st.pauseTime();
+          else st.playTime();
           break;
         default:
           return;
@@ -102,7 +132,7 @@ export function App() {
   }, []);
 
   return (
-    <div className="app">
+    <div className={`app ${collapsed ? "sidebar-collapsed" : ""} sheet-${sheet}`}>
       <ErrorBoundary label="The side panel">
         <Sidebar />
       </ErrorBoundary>

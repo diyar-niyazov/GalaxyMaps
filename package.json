@@ -1,8 +1,8 @@
 {
-  "name": "spacemaps",
+  "name": "galaxymaps",
   "version": "1.0.0",
   "private": true,
-  "description": "SpaceMaps: explore the universe through a familiar, interactive map.",
+  "description": "GalaxyMaps: explore the universe through a familiar, interactive map.",
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n web,api -c blue,green \"vite\" \"tsx watch server/index.ts\"",

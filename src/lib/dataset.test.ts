@@ -3,12 +3,13 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Catalog, Ephemeris, CatalogObject } from "./types";
-import { interpolateBody, ephemerisPosition } from "./ephemeris";
+import { interpolateBody, ephemerisPosition, ephemerisAccuracy } from "./ephemeris";
 import { computeRoute, positionOf } from "./route";
-import { LIGHT_MODE, EVERYDAY_MODES, fictionalModes } from "./transport";
+import { LIGHT_MODE, voyagerMode } from "./transport";
 import { LY_KM, AU_KM, PC_KM, JULIAN_YEAR_S } from "./units";
 import { buildSearchIndex, search, resolveOne } from "./search";
 import { distance } from "./vec";
+import { inCategory } from "./taxonomy";
 
 const root = join(__dirname, "..", "..");
 let catalog: Catalog;
@@ -49,20 +50,36 @@ describe("ephemeris", () => {
     expect(d).toBeGreaterThan(356_000);
     expect(d).toBeLessThan(407_000);
   });
-  it("returns null outside the bundled date range", () => {
-    expect(ephemerisPosition(eph, "earth", eph.endJdTdb + 10)).toBeNull();
+  it("falls back to two-body orbits outside the bundled date range", () => {
+    const p = ephemerisPosition(eph, "earth", eph.endJdTdb + 10);
+    expect(p).not.toBeNull();
+    expect(Math.hypot(...p!) / AU_KM).toBeCloseTo(1, 1);
+    expect(ephemerisAccuracy(eph, eph.endJdTdb + 10)).toBe("approximate");
+    expect(ephemerisAccuracy(eph, eph.startJdTdb + 1)).toBe("precise");
   });
 });
 
 describe("catalog integrity", () => {
-  it("has 50–110 featured destinations with sources", () => {
+  it("has 250–500 featured destinations with sources", () => {
     const featured = catalog.objects.filter((o) => o.featured);
-    expect(featured.length).toBeGreaterThanOrEqual(50);
-    expect(featured.length).toBeLessThanOrEqual(110);
+    expect(featured.length).toBeGreaterThanOrEqual(250);
+    expect(featured.length).toBeLessThanOrEqual(500);
     for (const o of featured) {
       expect(o.sourceIds.length).toBeGreaterThan(0);
       for (const s of o.sourceIds) expect(catalog.sources[s], `${o.id} → ${s}`).toBeDefined();
     }
+  });
+  it("meets the curated-content targets", () => {
+    const highlights = catalog.objects.filter((o) => o.highlight);
+    expect(highlights.length).toBeGreaterThanOrEqual(75);
+    expect(highlights.length).toBeLessThanOrEqual(150);
+    const galaxies = catalog.objects.filter((o) => o.featured && inCategory(o, "galaxies"));
+    expect(galaxies.length).toBeGreaterThanOrEqual(40);
+    expect(galaxies.length).toBeLessThanOrEqual(80);
+    expect(catalog.objects.filter((o) => o.parentId === "andromeda").length).toBeGreaterThanOrEqual(10);
+    const spaceflight = catalog.objects.filter((o) => inCategory(o, "sc-spacex") || inCategory(o, "sc-human"));
+    expect(spaceflight.length).toBeGreaterThanOrEqual(6);
+    expect(spaceflight.length).toBeLessThanOrEqual(10);
   });
   it("every routable object has a finite position; unroutable ones explain why", () => {
     for (const o of catalog.objects) {
@@ -101,20 +118,30 @@ describe("routes on real data", () => {
     if (!r.ok) return;
     expect(r.totalKm / LY_KM).toBeGreaterThan(425);
     expect(r.totalKm / LY_KM).toBeLessThan(440);
-    expect(r.totalSeconds / JULIAN_YEAR_S).toBeCloseTo(r.totalKm / LY_KM, 6);
-    expect(r.proper).toBeNull(); // no proper time at c
+    expect(r.modeledSeconds / JULIAN_YEAR_S).toBeCloseTo(r.totalKm / LY_KM, 6);
+    expect(r.kind).toBe("straight-line");
     expect(r.totalSigmaKm! / LY_KM).toBeGreaterThan(3); // parallax error propagates
   });
   it("is symmetric and switching modes changes time but not distance", () => {
     const a = computeRoute([get("earth"), get("polaris")], LIGHT_MODE, ctx());
-    const b = computeRoute([get("polaris"), get("earth")], EVERYDAY_MODES[0], ctx());
+    const b = computeRoute([get("polaris"), get("earth")], voyagerMode(catalog.speedReferences)!, ctx());
     expect(a.ok && b.ok).toBe(true);
     if (a.ok && b.ok) {
       expect(a.totalKm).toBeCloseTo(b.totalKm, 0);
-      expect(b.totalSeconds).toBeGreaterThan(a.totalSeconds * 1e5);
+      expect(b.modeledSeconds).toBeGreaterThan(a.modeledSeconds * 1e4);
     }
-    const f = computeRoute([get("earth"), get("polaris")], fictionalModes()[0], ctx());
-    expect(f.ok && f.proper).toBeNull();
+  });
+  it("Earth → Mars defaults to a ~259-day Hohmann transfer with a separate benchmark", () => {
+    const r = computeRoute([get("earth"), get("mars")], LIGHT_MODE, ctx());
+    expect(r.ok && r.kind).toBe("orbital-transfer");
+    if (!r.ok || !r.transfer) return;
+    expect(r.modeledSeconds / 86400).toBeGreaterThan(250);
+    expect(r.modeledSeconds / 86400).toBeLessThan(265);
+    expect(r.transfer.inward).toBe(false);
+    expect(r.transfer.departJd).toBeGreaterThanOrEqual(JD);
+    expect(r.comparison.seconds).toBeCloseTo(r.totalKm / LIGHT_MODE.speedKmS, 3);
+    const s = computeRoute([get("earth"), get("mars")], LIGHT_MODE, ctx(), "straight-line");
+    expect(s.ok && s.kind).toBe("straight-line");
   });
   it("Earth → Mars uses ephemeris positions for the date", () => {
     const r = computeRoute([get("earth"), get("mars")], LIGHT_MODE, ctx());

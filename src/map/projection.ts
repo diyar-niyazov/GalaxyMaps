@@ -66,8 +66,14 @@ export interface View {
 export interface Viewport {
   width: number;
   height: number;
+  /** Screen centre of the unobscured map area (defaults to the canvas centre). */
+  cx?: number;
+  cy?: number;
 }
 
+export const centerOf = (vp: Viewport): [number, number] => [vp.cx ?? vp.width / 2, vp.cy ?? vp.height / 2];
+
+/** Orientation that is rotated by heading/tilt; also used for the background sky. */
 export function viewMatrix(view: View): Mat3 {
   return mulMat(rotX(-view.tilt), mulMat(rotZ(view.heading), planeMatrix(view.widthKm)));
 }
@@ -85,7 +91,7 @@ export interface Projector {
 export function makeProjector(view: View, vp: Viewport): Projector {
   const m = viewMatrix(view);
   const k = vp.width / view.widthKm;
-  const cx = vp.width / 2, cy = vp.height / 2;
+  const [cx, cy] = centerOf(vp);
   const c = view.center;
   return {
     m, k, view, vp,
@@ -103,7 +109,8 @@ export function makeProjector(view: View, vp: Viewport): Projector {
 export function unproject(view: View, vp: Viewport, sx: number, sy: number): Vec3 {
   const m = viewMatrix(view);
   const k = vp.width / view.widthKm;
-  const local: Vec3 = [(sx - vp.width / 2) / k, -(sy - vp.height / 2) / k, 0];
+  const [cx, cy] = centerOf(vp);
+  const local: Vec3 = [(sx - cx) / k, -(sy - cy) / k, 0];
   return add(view.center, mulMatVec(transpose(m), local));
 }
 
@@ -132,9 +139,10 @@ export function fitView(points: Vec3[], vp: Viewport, base: View, pad = { left: 
     const spanW = Math.max(maxX - minX, ((maxY - minY) * availW) / availH);
     width = Math.max(minWidthKm, (spanW * vp.width) / availW);
     const k = vp.width / width;
-    // Center so the box sits inside the padded area.
-    const cxLocal = (minX + maxX) / 2 - ((pad.left - pad.right) / 2) / k;
-    const cyLocal = (minY + maxY) / 2 + ((pad.top - pad.bottom) / 2) / k;
+    // Center so the box sits inside the padded area (relative to the projector's screen centre).
+    const [scx, scy] = centerOf(vp);
+    const cxLocal = (minX + maxX) / 2 - ((pad.left + (vp.width - pad.right)) / 2 - scx) / k;
+    const cyLocal = (minY + maxY) / 2 + ((pad.top + (vp.height - pad.bottom)) / 2 - scy) / k;
     const mt = transpose(m);
     const depth = local.reduce((s, l) => s + l[2], 0) / local.length;
     center = mulMatVec(mt, [cxLocal, cyLocal, depth]);

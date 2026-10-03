@@ -131,7 +131,7 @@ export function GuidePanel() {
           <InfoIcon size={18} />
           <span>
             <strong>Live Grok Voice is unavailable</strong>{" "}
-            {status.reachable ? "because no XAI_API_KEY is configured on the server." : "because the SpaceMaps API server isn't running."} You're using the <strong>offline scripted guide</strong>: keyword matching on the same validated map tools, <em>not an AI model</em>.
+            {status.reachable ? "because no XAI_API_KEY is configured on the server." : "because the GalaxyMaps API server isn't running."} You're using the <strong>offline scripted guide</strong>: keyword matching on the same validated map tools, <em>not an AI model</em>.
           </span>
         </div>
       )}
@@ -140,7 +140,7 @@ export function GuidePanel() {
           <button type="button" className="btn primary" onClick={startGrok} disabled={voice === "connecting"}>
             <MicIcon size={18} /> {voice === "connecting" ? "Connecting…" : "Talk to Grok"}
           </button>
-          <p className="muted small">Uses your microphone. Grok can only search the catalog and use SpaceMaps' own calculations.</p>
+          <p className="muted small">Uses your microphone. Grok can only search the catalog and use GalaxyMaps' own calculations.</p>
           {voice === "error" && <p className="hint error">{voiceDetail}</p>}
         </div>
       )}
@@ -182,9 +182,9 @@ export function GuidePanel() {
       {route?.ok && (
         <div className="guide-route">
           <div>
-            <strong>{formatDuration(route.totalSeconds)}</strong>
+            <strong>{formatDuration(route.modeledSeconds)}</strong>
             <span className="muted small">
-              {route.stops.map((o) => o.name).join(" → ")} · {route.mode.label}
+              {route.stops.map((o) => o.name).join(" → ")} · {route.kind === "orbital-transfer" ? "orbital transfer" : route.comparison.mode.label}
             </span>
           </div>
           <button type="button" className="btn small" onClick={() => setPanel("directions")}>

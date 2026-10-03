@@ -22,22 +22,22 @@ export function AboutDialog() {
     <dialog ref={ref} className="about" aria-labelledby="about-h" onClick={(e) => e.target === ref.current && ref.current?.close()}>
       <div className="about-inner">
         <header>
-          <h1 id="about-h">About SpaceMaps</h1>
+          <h1 id="about-h">About GalaxyMaps</h1>
           <button type="button" className="icon-btn" aria-label="Close" onClick={() => ref.current?.close()}>
             <CloseIcon />
           </button>
         </header>
-        <p>SpaceMaps puts real catalog positions on a familiar map so you can search, explore and get “directions” across the universe.</p>
+        <p>GalaxyMaps puts real catalog positions on a familiar map so you can search, explore and get “directions” across the universe.</p>
 
         <h2>How the numbers work</h2>
         <ul>
           <li>All positions are 3D vectors in the ICRF frame centered on the Sun, in kilometres. Distances are full 3D separations; the flat map is only a projection.</li>
-          <li>Travel time = distance ÷ speed: a hypothetical constant-speed comparison, not a mission plan.</li>
+          <li>Between two planets, directions use an idealized Hohmann transfer (circular, coplanar orbits; the Sun's gravity only), departing at the next real alignment. Everywhere else they use a straight line at constant speed. A separate benchmark always shows the direct distance at light speed or at Voyager 1's measured speed. None of these is a mission plan.</li>
           <li>Planets, moons and spacecraft come from JPL Horizons for the date shown at the bottom of the map.</li>
           <li>Star distances come from parallaxes only when the parallax error is at most 20%; otherwise we use published literature distances or mark routing unavailable.</li>
           <li>Galaxy distances are static (redshift-independent where available). We don't draw routes across cosmological distances, where expansion makes a straight-line trip meaningless.</li>
+          <li>The observable-universe view is schematic: directions are true, distances are compressed logarithmically, and the edge is the comoving particle horizon (≈ 46 billion light-years, Planck 2018).</li>
           <li>Symbols are enlarged so you can see them. Their size never affects distances.</li>
-          <li>Onboard (proper) time uses special relativity, τ = t·√(1 − v²/c²), only for speeds between 0 and c.</li>
         </ul>
 
         <h2>Imagery labels</h2>
@@ -52,12 +52,14 @@ export function AboutDialog() {
         <ul className="keys">
           <li><kbd>/</kbd> search</li>
           <li><kbd>+</kbd> <kbd>−</kbd> zoom</li>
-          <li><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> pan</li>
-          <li><kbd>H</kbd> back to Earth</li>
+          <li><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> orbit when locked, pan otherwise</li>
+          <li><kbd>H</kbd> home: Earth close-up</li>
+          <li><kbd>R</kbd> reset the locked view</li>
+          <li><kbd>Space</kbd> play / pause time</li>
           <li><kbd>F</kbd> fit route</li>
           <li><kbd>L</kbd> switch layer</li>
           <li><kbd>D</kbd> directions</li>
-          <li><kbd>Esc</kbd> close</li>
+          <li><kbd>Esc</kbd> close a menu, then leave the lock, then close panels</li>
         </ul>
 
         <h2>Data sources</h2>
@@ -83,7 +85,7 @@ export function AboutDialog() {
           </details>
         )}
         <p className="muted small">
-          Catalog {data?.catalog.version} · generated {data?.catalog.generated.slice(0, 10)} · {data?.catalog.stars.count.toLocaleString()} stars within {data?.catalog.stars.maxDistancePc} pc. The Milky Way backdrop is a schematic illustration based on published spiral-arm models, not a photograph.
+          Catalog {data?.catalog.version} · generated {data?.catalog.generated.slice(0, 10)} · {data?.catalog.stars.count.toLocaleString()} stars within {data?.catalog.stars.maxDistancePc} pc. The Milky Way seen from outside is a reconstruction based on published spiral-arm models, not a photograph; the sky panorama is NASA/Goddard SVS Deep Star Maps 2020.
         </p>
       </div>
     </dialog>

@@ -4,13 +4,13 @@
  * call these functions. Every ID and argument is validated before touching app state.
  */
 import { useStore, MAX_STOPS } from "../state/store";
-import { getEngine } from "../map/engineRef";
+import { focusObject } from "../state/actions";
 import { modesFor, routeFor } from "../state/selectors";
 import { search } from "../lib/search";
 import { evaluateDetour, isOnTheWay } from "../lib/itinerary";
 import { positionOf } from "../lib/route";
 import { distance } from "../lib/vec";
-import { formatDistance, formatDuration, formatSpeed, formatUncertainty, durationContext } from "../lib/format";
+import { formatDistance, formatDuration, formatSpeed, formatUncertainty, durationContext, jdToIsoDate } from "../lib/format";
 import { TYPE_LABEL } from "../lib/search";
 import type { CatalogObject } from "../lib/types";
 import type { DataBundle } from "../data/bundle";
@@ -22,16 +22,16 @@ export interface ToolDef {
   parameters: { type: "object"; properties: Record<string, unknown>; required: string[]; additionalProperties?: boolean };
 }
 
-const MODE_IDS = ["light", "voyager-1-speed", "new-horizons-speed", "parker-peak-speed", "custom", "enterprise", "falcon", "plane", "car", "bike", "walk"];
+const MODE_IDS = ["light", "voyager-1"];
 const FEATURES = ["rings", "exoplanets", "nearby-stars", "galaxies", "nebulae", "spacecraft", "moons", "black-holes"] as const;
 
 export const TOOL_DEFS: ToolDef[] = [
-  { type: "function", name: "searchObjects", description: "Search the SpaceMaps catalog by name or alias. Returns matching object IDs. Always use this to find IDs; never guess IDs.", parameters: { type: "object", properties: { query: { type: "string", description: "Name to look up, e.g. 'Polaris'" } }, required: ["query"], additionalProperties: false } },
+  { type: "function", name: "searchObjects", description: "Search the GalaxyMaps catalog by name or alias. Returns matching object IDs. Always use this to find IDs; never guess IDs.", parameters: { type: "object", properties: { query: { type: "string", description: "Name to look up, e.g. 'Polaris'" } }, required: ["query"], additionalProperties: false } },
   { type: "function", name: "getObjectDetails", description: "Get sourced facts, distance (with uncertainty) and route availability for one catalog object.", parameters: { type: "object", properties: { id: { type: "string" } }, required: ["id"], additionalProperties: false } },
   { type: "function", name: "showObject", description: "Select an object on the map and move the camera to it.", parameters: { type: "object", properties: { id: { type: "string" } }, required: ["id"], additionalProperties: false } },
-  { type: "function", name: "setRoute", description: "Show directions between two catalog objects with a transport mode. Returns the app's computed distance and travel time.", parameters: { type: "object", properties: { originId: { type: "string" }, destinationId: { type: "string" }, mode: { type: "string", enum: MODE_IDS } }, required: ["originId", "destinationId"], additionalProperties: false } },
+  { type: "function", name: "setRoute", description: "Show directions between two catalog objects. Planet pairs use an idealized orbital (Hohmann) transfer; everything else a straight line. The mode sets the comparison speed (light speed or Voyager 1). Returns the app's computed results.", parameters: { type: "object", properties: { originId: { type: "string" }, destinationId: { type: "string" }, mode: { type: "string", enum: MODE_IDS } }, required: ["originId", "destinationId"], additionalProperties: false } },
   { type: "function", name: "addStop", description: "Add a stop to the current journey at the position that adds the least distance. Returns the added distance.", parameters: { type: "object", properties: { objectId: { type: "string" } }, required: ["objectId"], additionalProperties: false } },
-  { type: "function", name: "compareTravelModes", description: "Compare travel times for the current journey across all transport modes.", parameters: { type: "object", properties: {}, required: [], additionalProperties: false } },
+  { type: "function", name: "compareTravelModes", description: "Compare the current journey's direct-distance time at light speed and at Voyager 1's speed.", parameters: { type: "object", properties: {}, required: [], additionalProperties: false } },
   { type: "function", name: "explainCurrentJourney", description: "Get the computed facts and assumptions for the current journey so you can explain them.", parameters: { type: "object", properties: {}, required: [], additionalProperties: false } },
   { type: "function", name: "suggestStops", description: "Rank catalog destinations by how little distance they add to the current journey (detour evaluated, not assumed).", parameters: { type: "object", properties: { limit: { type: "integer", minimum: 1, maximum: 5 } }, required: [], additionalProperties: false } },
   { type: "function", name: "recommendDestinations", description: "List catalog destinations with a feature.", parameters: { type: "object", properties: { feature: { type: "string", enum: [...FEATURES] } }, required: ["feature"], additionalProperties: false } },
@@ -74,32 +74,26 @@ function brief(o: CatalogObject) {
 function journeySummary() {
   const s = useStore.getState();
   const d = data();
-  const modes = modesFor(d, s.custom, s.fictional);
-  const mode = modes.find((m) => m.id === s.modeId);
-  if (!mode) return { active: false, error: "The custom speed is invalid; it must be above 0 and at most light speed." };
-  const r = routeFor(d, s.stops, mode, s.jd);
+  const mode = modesFor(d).find((m) => m.id === s.modeId) ?? modesFor(d)[0];
+  const r = routeFor(d, s.stops, mode, s.jd, s.routeModel);
   if (!r) return { active: false, message: "No complete journey yet. Use setRoute first." };
   if (!r.ok) return { active: false, error: r.error };
   return {
     active: true,
+    routeKind: r.kind === "orbital-transfer" ? "Idealized orbital transfer (Hohmann)" : "Straight-line cruise at constant speed",
     stops: r.stops.map((o) => o.name),
-    totalDistance: formatDistance(r.totalKm),
+    epoch: jdToIsoDate(r.epochJd),
+    straightLineDistance: formatDistance(r.totalKm),
     distanceUncertainty: r.totalSigmaKm != null ? formatUncertainty(r.totalSigmaKm, r.totalSigmaKm) : "not available for every stop",
-    mode: mode.label,
-    modeSpeed: formatSpeed(mode.speedKmS),
-    modeKind: mode.kind,
-    modeNote: mode.description,
-    travelTime: formatDuration(r.totalSeconds),
-    travelTimeContext: durationContext(r.totalSeconds),
-    travelerProperTime: r.proper ? formatDuration(r.proper.properSeconds) : null,
-    legs: r.legs.map((l) => ({ from: r.stops[l.fromIndex].name, to: r.stops[l.toIndex].name, distance: formatDistance(l.distanceKm), time: formatDuration(l.seconds) })),
+    modeledPathLength: formatDistance(r.pathKm),
+    modeledFlightTime: formatDuration(r.modeledSeconds),
+    modeledFlightTimeContext: durationContext(r.modeledSeconds),
+    transfer: r.transfer ? { departure: jdToIsoDate(r.transfer.departJd), arrival: jdToIsoDate(r.transfer.arriveJd), departureIsNextAlignment: r.transfer.windowFound, direction: r.transfer.inward ? "inward" : "outward" } : null,
+    comparison: { mode: mode.label, speed: formatSpeed(mode.speedKmS), modeKind: mode.kind, modeNote: mode.description, directDistanceTime: formatDuration(r.comparison.seconds) },
+    legs: r.legs.map((l) => ({ from: r.stops[l.fromIndex].name, to: r.stops[l.toIndex].name, distance: formatDistance(l.distanceKm), timeAtComparisonSpeed: formatDuration(l.seconds) })),
     distanceQuality: r.quality,
-    assumptions: [
-      "Hypothetical constant-speed straight line between catalog positions.",
-      "Excludes acceleration, braking, gravity and the targets' own motion.",
-      r.usesEphemeris ? "Solar System positions are for the map date from JPL Horizons; real trajectories follow curved orbits." : null,
-      mode.ftl ? "Faster-than-light travel is fictional; no relativistic proper time is computed." : null,
-    ].filter(Boolean),
+    assumptions: r.assumptions,
+    notes: r.notes,
   };
 }
 
@@ -111,7 +105,7 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
       case "searchObjects": {
         const q = str(args.query, "query");
         const hits = search(data().search, q, 6);
-        return { results: hits.map((h) => brief(h.obj)), note: hits.length ? undefined : `Nothing named "${q}" is in the SpaceMaps catalog.` };
+        return { results: hits.map((h) => brief(h.obj)), note: hits.length ? undefined : `Nothing named "${q}" is in the GalaxyMaps catalog.` };
       }
       case "getObjectDetails": {
         const o = lookup(args.id);
@@ -130,8 +124,7 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
       }
       case "showObject": {
         const o = lookup(args.id);
-        s.select(o.id);
-        getEngine()?.flyToObject(o.id);
+        focusObject(o.id);
         return { ok: true, shown: o.name };
       }
       case "setRoute": {
@@ -164,12 +157,12 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
       case "compareTravelModes": {
         const st = useStore.getState();
         const d = data();
-        const rows = modesFor(d, st.custom, st.fictional).map((m) => {
-          const r = routeFor(d, st.stops, m, st.jd);
-          return r && r.ok ? { mode: m.label, kind: m.kind, speed: formatSpeed(m.speedKmS), time: formatDuration(r.totalSeconds) } : null;
+        const rows = modesFor(d).map((m) => {
+          const r = routeFor(d, st.stops, m, st.jd, "straight-line");
+          return r && r.ok ? { mode: m.label, kind: m.kind, speed: formatSpeed(m.speedKmS), time: formatDuration(r.comparison.seconds) } : null;
         });
         if (rows.some((r) => !r)) return { error: "No complete, routable journey to compare." };
-        return { comparisons: rows, note: "Hypothetical constant-speed comparisons. Fictional speeds are adjustable story assumptions." };
+        return { comparisons: rows, note: "Direct-distance benchmarks: straight-line distance on the map date at a constant speed." };
       }
       case "explainCurrentJourney":
         return journeySummary();

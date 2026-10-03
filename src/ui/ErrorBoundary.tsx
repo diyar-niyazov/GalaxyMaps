@@ -8,7 +8,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode; label: strin
   }
 
   componentDidCatch(error: Error) {
-    console.error(`[SpaceMaps] ${this.props.label} crashed`, error);
+    console.error(`[GalaxyMaps] ${this.props.label} crashed`, error);
   }
 
   render() {

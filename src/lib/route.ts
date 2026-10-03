@@ -1,9 +1,11 @@
 import type { CatalogObject, DistanceQuality, Ephemeris, Vec3 } from "./types";
-import { ephemerisPosition, clampJd } from "./ephemeris";
+import { ephemerisPosition, ephemerisAccuracy } from "./ephemeris";
 import { computeItinerary, type Leg } from "./itinerary";
-import { properTime, type ProperTimeResult } from "./physics";
 import type { TransportMode } from "./transport";
-import { sub, dot, length, normalize } from "./vec";
+import { hohmann, transferArcLengthKm, type HohmannResult } from "./transfer";
+import { ICRF_TO_ECLIPTIC } from "./coords";
+import { sub, dot, length, normalize, mulMatVec } from "./vec";
+import { DAY_S } from "./units";
 
 export interface PositionContext {
   eph: Ephemeris;
@@ -15,7 +17,7 @@ export function positionOf(obj: CatalogObject, ctx: PositionContext): Vec3 | nul
   const p = obj.position;
   if (!p) return null;
   if (p.kind === "static") return p.xyz;
-  return ephemerisPosition(ctx.eph, p.key, clampJd(ctx.eph, ctx.jdTdb));
+  return ephemerisPosition(ctx.eph, p.key, ctx.jdTdb);
 }
 
 const QUALITY_ORDER: DistanceQuality[] = ["precise", "good", "approximate", "uncertain"];
@@ -44,32 +46,113 @@ export function legSigmaKm(a: Vec3, b: Vec3, sigmaA: number, sigmaB: number): nu
   return Math.hypot(dA * sigmaA, dB * sigmaB);
 }
 
+export type RouteKind = "orbital-transfer" | "straight-line";
+export type RouteModelPreference = "auto" | "straight-line";
+
+/** Idealized Hohmann transfer between two planets (circular, coplanar orbits). */
+export interface TransferPlan {
+  h: HohmannResult;
+  inward: boolean;
+  originId: string;
+  targetId: string;
+  /** Departure date: next date the real planets reach the required phase angle, if found. */
+  departJd: number;
+  arriveJd: number;
+  windowFound: boolean;
+  /** Ecliptic longitude of the origin planet at departure (rad). */
+  lon0: number;
+  /** Length of the half-ellipse flown, km. */
+  pathKm: number;
+}
+
 export type RouteResult =
   | {
       ok: true;
+      kind: RouteKind;
       stops: CatalogObject[];
+      /** Positions of the stops at the map date (straight-line geometry). */
       positions: Vec3[];
       legs: (Leg & { sigmaKm: number | null })[];
+      /** Straight-line distance through all stops at the map date, km. */
       totalKm: number;
-      totalSeconds: number;
       totalSigmaKm: number | null;
-      mode: TransportMode;
-      proper: Extract<ProperTimeResult, { ok: true }> | null;
+      /** Distance along the modeled path: the transfer arc, or the straight line. */
+      pathKm: number;
+      /** Primary modeled flight time, seconds. */
+      modeledSeconds: number;
+      /** Direct-distance benchmark: straight-line distance at the comparison speed. */
+      comparison: { mode: TransportMode; seconds: number; distanceKm: number };
+      /** Map date the geometry refers to (JD TDB). */
+      epochJd: number;
       quality: DistanceQuality;
       usesEphemeris: boolean;
       notes: string[];
+      assumptions: string[];
+      transfer?: TransferPlan;
     }
   | { ok: false; error: string; objectId?: string };
 
-export function computeRoute(stops: CatalogObject[], mode: TransportMode, ctx: PositionContext): RouteResult {
+const ORBITAL_TYPES = new Set(["planet"]);
+
+/** Planet pairs that the idealized heliocentric transfer covers. */
+export function supportsOrbitalTransfer(a: CatalogObject, b: CatalogObject, eph: Ephemeris): boolean {
+  return a.id !== b.id && ORBITAL_TYPES.has(a.type) && ORBITAL_TYPES.has(b.type) && !!eph.orbits[a.id] && !!eph.orbits[b.id] && (a.parentId ?? "sun") === "sun" && (b.parentId ?? "sun") === "sun";
+}
+
+const eclLon = (p: Vec3) => {
+  const e = mulMatVec(ICRF_TO_ECLIPTIC, p);
+  return Math.atan2(e[1], e[0]);
+};
+const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+
+/** Next date (within `horizonDays`) when the target leads the origin by the Hohmann phase angle. */
+export function findTransferWindow(eph: Ephemeris, originKey: string, targetKey: string, phase: number, startJd: number, horizonDays = 1100): number | null {
+  let prev: number | null = null;
+  for (let d = 0; d <= horizonDays; d++) {
+    const jd = startJd + d;
+    const po = ephemerisPosition(eph, originKey, jd), pt = ephemerisPosition(eph, targetKey, jd);
+    if (!po || !pt) return null;
+    const diff = wrap(eclLon(pt) - eclLon(po) - phase);
+    if (prev != null && Math.abs(diff - prev) < Math.PI && Math.sign(diff) !== Math.sign(prev)) {
+      const f = prev / (prev - diff);
+      return jd - 1 + f;
+    }
+    if (d === 0 && Math.abs(diff) < 1e-3) return jd;
+    prev = diff;
+  }
+  return null;
+}
+
+export function planTransfer(origin: CatalogObject, target: CatalogObject, eph: Ephemeris, jd: number): TransferPlan | null {
+  const r1 = eph.orbits[origin.id]?.aKm, r2 = eph.orbits[target.id]?.aKm;
+  if (!r1 || !r2 || r1 === r2) return null;
+  const h = hohmann(r1, r2);
+  const window = findTransferWindow(eph, origin.id, target.id, h.phaseAngleRad, jd);
+  const departJd = window ?? jd;
+  const po = ephemerisPosition(eph, origin.id, departJd);
+  if (!po) return null;
+  return {
+    h, inward: r2 < r1, originId: origin.id, targetId: target.id,
+    departJd, arriveJd: departJd + h.transferSeconds / DAY_S, windowFound: window != null,
+    lon0: eclLon(po), pathKm: transferArcLengthKm(h),
+  };
+}
+
+export function computeRoute(stops: CatalogObject[], mode: TransportMode, ctx: PositionContext, model: RouteModelPreference = "auto"): RouteResult {
   if (stops.length < 2) return { ok: false, error: "Choose a starting point and a destination." };
-  if (!(mode.speedKmS > 0) || !Number.isFinite(mode.speedKmS)) return { ok: false, error: "Choose a valid speed greater than zero." };
+  if (!(mode.speedKmS > 0) || !Number.isFinite(mode.speedKmS)) return { ok: false, error: "Choose a valid comparison speed." };
   const positions: Vec3[] = [];
   for (const s of stops) {
     if (!s.route.supported) return { ok: false, error: `${s.name}: ${s.route.reason}`, objectId: s.id };
     const p = positionOf(s, ctx);
     if (!p) return { ok: false, error: `${s.name} has no usable 3D position for this date.`, objectId: s.id };
     positions.push(p);
+  }
+  for (let i = 1; i < stops.length; i++) {
+    const a = stops[i - 1], b = stops[i];
+    if (a.parentId && a.parentId === b.parentId && a.position?.kind === "static" && a.position.depth === "host" && b.position?.kind === "static" && b.position.depth === "host") {
+      return { ok: false, error: `${a.name} and ${b.name} are both placed at the distance of their host galaxy; their true separation along the line of sight is unknown, so no route is offered between them.`, objectId: b.id };
+    }
   }
   const it = computeItinerary(positions, mode.speedKmS);
   const sigmas = stops.map(radialSigmaKm);
@@ -82,19 +165,31 @@ export function computeRoute(stops: CatalogObject[], mode: TransportMode, ctx: P
   const usesEphemeris = stops.some((s) => s.position?.kind === "ephemeris");
   const notes: string[] = [];
   for (const s of stops) if (s.route.supported && s.route.note && s.position?.kind !== "ephemeris") notes.push(`${s.name}: ${s.route.note}`);
-  const proper = mode.ftl ? null : properTime(it.totalSeconds, mode.speedKmS);
+  if (usesEphemeris && ephemerisAccuracy(ctx.eph, ctx.jdTdb) === "approximate") notes.push("This date is outside the JPL Horizons table; Solar System positions use approximate two-body orbits.");
+  const comparison = { mode, seconds: it.totalSeconds, distanceKm: it.totalKm };
+
+  const base = { stops, positions, legs, totalKm: it.totalKm, totalSigmaKm, comparison, epochJd: ctx.jdTdb, quality, usesEphemeris, notes };
+  if (model === "auto" && stops.length === 2 && supportsOrbitalTransfer(stops[0], stops[1], ctx.eph)) {
+    const plan = planTransfer(stops[0], stops[1], ctx.eph, ctx.jdTdb);
+    if (plan) {
+      return {
+        ok: true, kind: "orbital-transfer", ...base, pathKm: plan.pathKm, modeledSeconds: plan.h.transferSeconds, transfer: plan,
+        assumptions: [
+          "Idealized Hohmann transfer: both planets on circular, coplanar orbits with radii equal to their semi-major axes.",
+          "The Sun's gravity only; no planetary gravity, launch, capture or course corrections.",
+          plan.windowFound ? "Departure is the next date the real planets reach the required alignment." : "No alignment found within three years; the transfer is shown departing on the map date.",
+          `Comparison time is the straight-line distance on the map date at ${mode.label.toLowerCase()}, a benchmark rather than a trajectory.`,
+        ],
+      };
+    }
+  }
+  const crossesSolar = stops.some((s) => s.region === "solar-system") && stops.length === 2 && stops.every((s) => s.region === "solar-system");
   return {
-    ok: true,
-    stops,
-    positions,
-    legs,
-    totalKm: it.totalKm,
-    totalSeconds: it.totalSeconds,
-    totalSigmaKm,
-    mode,
-    proper: proper && proper.ok ? proper : null,
-    quality,
-    usesEphemeris,
-    notes,
+    ok: true, kind: "straight-line", ...base, pathKm: it.totalKm, modeledSeconds: it.totalSeconds,
+    assumptions: [
+      `Straight line through the stops at a constant ${mode.label.toLowerCase()} (${mode.kind === "measured" ? "measured" : "exact"} speed); no acceleration or gravity.`,
+      "Positions are frozen at the map date; real targets keep moving during the trip.",
+      ...(crossesSolar && model === "auto" ? ["The orbital-transfer model covers pairs of planets only (moons and small bodies need multi-body trajectories)."] : []),
+    ],
   };
 }

@@ -1,4 +1,4 @@
-# SpaceMaps architecture and stable interfaces
+# GalaxyMaps architecture and stable interfaces
 
 This document is the contract between the four work areas: UI, map, data/physics, and voice/content. If you change one of the interfaces below, update this file in the same commit.
 
@@ -66,7 +66,7 @@ All of these are pure TypeScript with no DOM access, covered by `src/lib/science
   - Modes: `setMode(id)`, `setCustom`, `setFictional`
   - Playback and view: `setPlaying`, `setProgress`, `requestFit()`
   - Guide: `pushGuide`
-- **Derived selectors** (`src/state/selectors.ts`): `useModes()`, `useMode()` (null when a custom speed is invalid), `useStopObjects()`, `useRoute()`, and the non-hook `routeFor(data, stops, mode, jd)`.
+- **Derived selectors** (`src/state/selectors.ts`): `useModes()` (Light speed and Voyager 1), `useMode()`, `useStopObjects()`, `useRoute()`, and the non-hook `routeFor(data, stops, mode, jd)`.
 - **URL sync** (`src/state/urlState.ts`): `route`, `mode`, `place`, `panel` (`transfer`/`guide`), `layer`, and `view` (scale preset id) are read once on load and written with `history.replaceState`.
 
 ## 4. Map engine (map area owns)

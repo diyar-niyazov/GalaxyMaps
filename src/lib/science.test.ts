@@ -9,9 +9,9 @@ import { mulMatVec, mulMat, IDENTITY } from "./vec";
 import { hohmann } from "./transfer";
 import { computeItinerary, evaluateDetour, isOnTheWay } from "./itinerary";
 import { formatDuration, formatDistance, durationContext } from "./format";
-import { customSpeedKmS, LIGHT_MODE, fictionalModes } from "./transport";
+import { LIGHT_MODE, travelModes } from "./transport";
 import { solveKepler, keplerPosition } from "./kepler";
-import type { Vec3 } from "./types";
+import type { SpeedReference, Vec3 } from "./types";
 
 describe("units", () => {
   it("one light-year at light speed takes one Julian year", () => {
@@ -61,19 +61,15 @@ describe("cruise physics", () => {
 });
 
 describe("transport", () => {
-  it("custom speeds are capped at light speed", () => {
-    expect(customSpeedKmS(0.5, "c")).toBeCloseTo(C_KM_S / 2);
-    expect(customSpeedKmS(1.5, "c")).toBeNull();
-    expect(customSpeedKmS(0, "km/s")).toBeNull();
-    expect(customSpeedKmS(3600, "km/h")).toBeCloseTo(1);
+  const refs: SpeedReference[] = [{ id: "voyager-1-speed", label: "Voyager 1", speedKmS: 16.9995, frame: "heliocentric", epoch: "2026", description: "measured", sourceId: "nasa" }];
+  it("offers exactly light speed and Voyager 1", () => {
+    const modes = travelModes(refs);
+    expect(modes.map((m) => m.label)).toEqual(["Light speed", "Voyager 1"]);
+    expect(LIGHT_MODE.speedKmS).toBe(C_KM_S);
+    expect(modes[1].speedKmS).toBeLessThan(20);
   });
-  it("fictional modes are flagged FTL and fictional", () => {
-    for (const m of fictionalModes()) {
-      expect(m.ftl).toBe(true);
-      expect(m.kind).toBe("fictional");
-      expect(m.description).toMatch(/fictional/i);
-    }
-    expect(LIGHT_MODE.ftl).toBe(false);
+  it("falls back to light speed alone without a Voyager reference", () => {
+    expect(travelModes([]).map((m) => m.id)).toEqual(["light"]);
   });
 });
 

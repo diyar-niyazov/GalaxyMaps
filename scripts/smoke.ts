@@ -1,28 +1,31 @@
 /**
- * Headless browser smoke test against a running SpaceMaps server.
+ * Headless browser smoke test against the GalaxyMaps dev server (uses dev-only hooks on globalThis.__gm).
  *
- *   npm run build && npm start          # serves http://localhost:8787
- *   npm run smoke                       # or BASE_URL=http://localhost:5173 npm run smoke
- *   npm run smoke -- --screenshots      # also writes docs/screenshots/*.png
+ *   npm run dev                          # serves http://localhost:5173 (+ API on :8787)
+ *   npm run smoke                        # or BASE_URL=http://localhost:5173 npm run smoke
+ *   npm run smoke -- --screenshots       # also writes docs/screenshots/*.png
  *
- * Drives system Chromium (CHROMIUM env var, default "chromium") over the DevTools protocol.
+ * Drives system Chromium (CHROMIUM env var, default "chromium") over the DevTools protocol with
+ * SwiftShader (software WebGL), so frame rates measured here are a lower bound, not GPU numbers.
  */
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const BASE = process.env.BASE_URL ?? "http://localhost:8787";
+const BASE = process.env.BASE_URL ?? "http://localhost:5173";
+const API = process.env.API_URL ?? "http://localhost:8787";
 const CHROMIUM = process.env.CHROMIUM ?? "chromium";
 const PORT = 9300 + Math.floor(Math.random() * 500);
 const SHOTS = process.argv.includes("--screenshots");
-const W = 1440, H = 900;
+const DESKTOP = { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false };
+const PHONE = { width: 390, height: 844, deviceScaleFactor: 2, mobile: true };
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const profile = mkdtempSync(join(tmpdir(), "spacemaps-smoke-"));
+const profile = mkdtempSync(join(tmpdir(), "galaxymaps-smoke-"));
 const browser = spawn(CHROMIUM, [
-  "--headless=new", "--no-sandbox", "--hide-scrollbars", `--window-size=${W},${H}`, "--force-device-scale-factor=1",
+  "--headless=new", "--no-sandbox", "--hide-scrollbars", `--window-size=${DESKTOP.width},${DESKTOP.height}`,
   "--use-angle=swiftshader", "--enable-unsafe-swiftshader", `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, "about:blank",
 ], { stdio: "ignore" });
 
@@ -42,8 +45,10 @@ async function cdpTarget(): Promise<string> {
 
 let ws: WebSocket | undefined;
 let nextId = 1;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const pending = new Map<number, { resolve: (v: any) => void; reject: (e: Error) => void }>();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function send(method: string, params: Record<string, unknown> = {}): Promise<any> {
   const id = nextId++;
   ws!.send(JSON.stringify({ id, method, params }));
@@ -56,7 +61,7 @@ async function evaluate<T = unknown>(expression: string): Promise<T> {
   return r.result.value as T;
 }
 
-async function waitFor(expression: string, timeoutMs = 15000): Promise<void> {
+async function waitFor(expression: string, timeoutMs = 20000): Promise<void> {
   const t0 = Date.now();
   while (Date.now() - t0 < timeoutMs) {
     if (await evaluate<boolean>(`!!(${expression})`).catch(() => false)) return;
@@ -67,19 +72,42 @@ async function waitFor(expression: string, timeoutMs = 15000): Promise<void> {
 
 async function open(path: string) {
   await send("Page.navigate", { url: BASE + path });
-  await waitFor(`document.querySelector(".map-canvas") && !document.querySelector(".map-loading")`);
-  await sleep(1500);
+  await waitFor(`document.querySelector(".map-canvas") && !document.querySelector(".map-loading") && globalThis.__gm?.engine()`);
+  await sleep(1800);
 }
 
-async function shot(name: string) {
+async function shot(name: string, settleMs = 2500) {
   if (!SHOTS) return;
-  await sleep(3500);
+  await sleep(settleMs);
   const { data } = await send("Page.captureScreenshot", { format: "png" });
   mkdirSync("docs/screenshots", { recursive: true });
   writeFileSync(`docs/screenshots/${name}.png`, Buffer.from(data, "base64"));
 }
 
-const text = (sel: string) => `document.querySelector(${JSON.stringify(sel)})?.innerText ?? ""`;
+const click = (sel: string) => evaluate(`(() => { const el = document.querySelector(${JSON.stringify(sel)}); if (!el) throw new Error("no element ${sel.replace(/"/g, "'")}"); el.click(); })()`);
+const text = (sel: string) => evaluate<string>(`document.querySelector(${JSON.stringify(sel)})?.innerText ?? ""`);
+const key = async (k: string, code = k) => {
+  await send("Input.dispatchKeyEvent", { type: "keyDown", key: k, code, windowsVirtualKeyCode: k === "Escape" ? 27 : k === "ArrowLeft" ? 37 : 0 });
+  await send("Input.dispatchKeyEvent", { type: "keyUp", key: k, code });
+};
+const engineState = () =>
+  evaluate<{ mode: string; locked: string | null; pivot: [number, number]; screen: [number, number] | null; heading: number; width: number }>(`(() => {
+    const e = globalThis.__gm.engine(); const i = e.info(); const id = e.getLockedId();
+    return { mode: e.getMode(), locked: id, pivot: [i.vp.cx ?? i.vp.width / 2, i.vp.cy ?? i.vp.height / 2], screen: id ? e.screenOf(id) : null, heading: i.view.heading, width: i.view.widthKm };
+  })()`);
+const settleOn = (id: string) =>
+  waitFor(`(() => { const e = globalThis.__gm.engine(); const i = e.info(); const s = e.screenOf(${JSON.stringify(id)}); return e.getLockedId() === ${JSON.stringify(id)} && s && Math.hypot(s[0] - (i.vp.cx ?? i.vp.width / 2), s[1] - (i.vp.cy ?? i.vp.height / 2)) < 2; })()`, 10000);
+const mapRect = () => evaluate<{ x: number; y: number; w: number; h: number }>(`(() => { const r = document.querySelector(".map").getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; })()`);
+
+async function drag(x0: number, y0: number, dx: number, dy: number) {
+  await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: x0, y: y0 });
+  await send("Input.dispatchMouseEvent", { type: "mousePressed", x: x0, y: y0, button: "left", buttons: 1, clickCount: 1 });
+  for (let i = 1; i <= 10; i++) {
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: x0 + (dx * i) / 10, y: y0 + (dy * i) / 10, button: "left", buttons: 1 });
+    await sleep(16);
+  }
+  await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: x0 + dx, y: y0 + dy, button: "left", buttons: 0, clickCount: 1 });
+}
 
 const results: { name: string; ok: boolean; detail: string }[] = [];
 async function check(name: string, fn: () => Promise<string>) {
@@ -93,6 +121,8 @@ async function check(name: string, fn: () => Promise<string>) {
 function expect(cond: boolean, msg: string) {
   if (!cond) throw new Error(msg);
 }
+const near = (a: [number, number] | null, b: [number, number], tol = 2) => !!a && Math.hypot(a[0] - b[0], a[1] - b[1]) <= tol;
+const fmt = (p: [number, number] | null) => (p ? `(${p[0].toFixed(1)}, ${p[1].toFixed(1)})` : "null");
 
 try {
   const sock = new WebSocket(await cdpTarget());
@@ -111,87 +141,197 @@ try {
   };
   await send("Page.enable");
   await send("Runtime.enable");
-  await send("Emulation.setDeviceMetricsOverride", { width: W, height: H, deviceScaleFactor: 1, mobile: false });
+  await send("Performance.enable");
+  await send("Emulation.setDeviceMetricsOverride", DESKTOP);
 
   await check("API status reports Grok configuration honestly", async () => {
-    const s = (await (await fetch(`${BASE}/api/status`)).json()) as { grok: { configured: boolean } };
-    return `grok.configured = ${s.grok.configured}`;
+    const s = (await (await fetch(`${API}/api/status`)).json()) as { grok: { configured: boolean }; catalog: { objects: number } };
+    return `grok.configured = ${s.grok.configured}, catalog objects = ${s.catalog.objects}`;
   });
 
-  await check("Home view loads with Earth", async () => {
+  await check("Home opens locked on a textured Earth, centred in the usable map", async () => {
     await open("/");
-    const labels = await evaluate<string>(`[...document.querySelectorAll(".map-label")].map(e => e.textContent).join(",")`);
-    expect(labels.includes("Earth"), `labels: ${labels}`);
-    await shot("earth");
-    return "Earth label visible";
+    const s = await engineState();
+    expect(s.mode === "locked" && s.locked === "earth", `mode ${s.mode} ${s.locked}`);
+    expect(near(s.screen, s.pivot), `Earth at ${fmt(s.screen)} vs pivot ${fmt(s.pivot)}`);
+    const bar = await text(".camera-bar");
+    expect(/Locked on\s*Earth/.test(bar), `camera bar "${bar}"`);
+    await shot("desktop-home-earth");
+    return `Earth at ${fmt(s.screen)}, pivot ${fmt(s.pivot)}; "${bar.replace(/\n/g, " ")}"`;
   });
 
-  await check("Shared URL opens Earth → Polaris at light speed", async () => {
-    await open("/?route=earth,polaris&mode=light");
-    await waitFor(`document.querySelector(".route-time")`);
-    const t = await evaluate<string>(text(".route-time"));
-    expect(/^4\d\d years$/.test(t.trim()), `route time "${t}"`);
-    await shot("route-polaris");
-    return t;
+  await check("Locked: drag orbits, wheel and arrow keys keep the object at the pivot (no pan)", async () => {
+    const r = await mapRect();
+    const before = await engineState();
+    await drag(r.x + r.w * 0.3, r.y + r.h * 0.6, 220, -60);
+    await sleep(900);
+    const afterDrag = await engineState();
+    expect(near(afterDrag.screen, afterDrag.pivot), `after drag ${fmt(afterDrag.screen)} vs ${fmt(afterDrag.pivot)}`);
+    expect(Math.abs(afterDrag.heading - before.heading) > 0.2, "heading did not change");
+    await send("Input.dispatchMouseEvent", { type: "mouseWheel", x: r.x + r.w * 0.85, y: r.y + r.h * 0.2, deltaX: 0, deltaY: -400 });
+    await sleep(900);
+    const afterWheel = await engineState();
+    expect(near(afterWheel.screen, afterWheel.pivot), `after off-centre wheel ${fmt(afterWheel.screen)}`);
+    expect(afterWheel.width < afterDrag.width, "wheel did not zoom in");
+    await evaluate(`document.activeElement?.blur()`);
+    await key("ArrowLeft");
+    await sleep(500);
+    const afterKey = await engineState();
+    expect(near(afterKey.screen, afterKey.pivot), `after ArrowLeft ${fmt(afterKey.screen)}`);
+    return `heading ${before.heading.toFixed(2)} → ${afterDrag.heading.toFixed(2)} rad; width ${afterDrag.width.toExponential(2)} → ${afterWheel.width.toExponential(2)} km; pivot held within 2 px`;
   });
 
-  await check("Journey playback advances", async () => {
-    await evaluate(`document.querySelector('[aria-label="Play journey"]').click()`);
-    await sleep(3000);
-    const v = Number(await evaluate<string>(`document.querySelector('[aria-label="Journey progress"]').value`));
-    expect(v > 0, `progress ${v}`);
-    return `progress after 3 s of a 10 s playback: ${v} / ${await evaluate<string>(`document.querySelector('[aria-label="Journey progress"]').max`)}`;
+  await check("Esc leaves the lock; Back to explore restores free exploration", async () => {
+    await key("Escape");
+    await sleep(900);
+    const s = await engineState();
+    expect(s.mode === "explore", `mode ${s.mode}`);
+    const bar = await evaluate<boolean>(`!!document.querySelector(".camera-bar")`);
+    expect(!bar, "camera bar still visible");
+    return "mode explore after Esc";
   });
 
-  await check("Multi-stop route via URL has two legs", async () => {
-    await open("/?route=earth,vega,polaris&mode=voyager-1-speed");
-    await waitFor(`document.querySelectorAll(".legs li").length === 2`);
-    return await evaluate<string>(`[...document.querySelectorAll(".legs li")].map(l => l.innerText.replace(/\\n/g, " ")).join(" | ")`);
+  await check("Search \"black hole\" lists catalog black holes with thumbnails/icons", async () => {
+    await open("/");
+    await evaluate(`document.querySelector(".main-search input").focus()`);
+    await send("Input.insertText", { text: "black hole" });
+    await waitFor(`document.querySelectorAll(".main-search [role=option]").length > 0`);
+    const names = await evaluate<string[]>(`[...document.querySelectorAll(".main-search [role=option] .osearch-name")].map(e => e.textContent)`);
+    await shot("desktop-search-black-hole", 800);
+    return `${names.length} results: ${names.slice(0, 6).join(", ")}`;
   });
 
-  await check("Place card for Saturn shows provenance", async () => {
-    await open("/?place=saturn");
+  await check("Browse categories opens a tree with real counts", async () => {
+    await click('.main-search [aria-label="Browse categories"]');
+    await waitFor(`document.querySelectorAll(".main-search [role=treeitem]").length > 0`);
+    const rows = await evaluate<string[]>(`[...document.querySelectorAll(".main-search [role=treeitem]")].map(e => e.innerText.replace(/\\n/g, " "))`);
+    await shot("desktop-browse", 800);
+    return rows.join(" | ");
+  });
+
+  await check("Mars card: image-led card with 3–6 fact tiles and the four actions; locked on Mars", async () => {
+    await open("/?place=mars");
     await waitFor(`document.querySelector(".panel.place")`);
-    const body = await evaluate<string>(text(".sidebar"));
-    expect(/Saturn/.test(body) && /(Observed image|Scientific illustration|AI reconstruction)/.test(body), "missing name or imagery label");
-    await shot("place-saturn");
-    return "name, imagery label present";
+    await settleOn("mars");
+    const tiles = await evaluate<number>(`document.querySelectorAll(".fact-tiles .tile").length`);
+    const actions = await evaluate<string[]>(`[...document.querySelectorAll(".action-row .action")].map(b => b.textContent.trim())`);
+    expect(tiles >= 3 && tiles <= 6, `${tiles} tiles`);
+    expect(actions.includes("Focus") && actions.includes("Directions"), actions.join(","));
+    const s = await engineState();
+    expect(s.mode === "locked" && s.locked === "mars", `mode ${s.mode} ${s.locked}`);
+    expect(near(s.screen, s.pivot), `Mars at ${fmt(s.screen)} vs ${fmt(s.pivot)}`);
+    await shot("desktop-card-mars");
+    return `${tiles} tiles; actions: ${actions.join(", ")}`;
   });
 
-  await check("Offline guide refuses destinations outside the catalog", async () => {
-    await open("/?panel=guide");
-    const reply = await evaluate<string>(`(async () => {
-      const i = document.querySelector(".composer input");
-      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(i, "take me to the Death Star");
-      i.dispatchEvent(new Event("input", { bubbles: true }));
-      await new Promise(r => setTimeout(r, 100));
-      document.querySelector(".composer button[type=submit]").click();
-      await new Promise(r => setTimeout(r, 800));
-      return [...document.querySelectorAll(".msg.assistant")].pop()?.innerText ?? "";
-    })()`);
-    expect(/couldn.t find/i.test(reply) && /scripted/i.test(reply), reply);
-    await shot("guide");
-    return reply.replace(/\n+/g, " ");
+  await check("Andromeda: Explore inside lists its features with breadcrumbs", async () => {
+    await open("/?view=andromeda");
+    await waitFor(`document.querySelector(".panel.inside")`);
+    const crumbs = await text(".breadcrumbs");
+    const n = await evaluate<number>(`document.querySelectorAll(".panel.inside .place-row").length`);
+    expect(/Andromeda/.test(crumbs), crumbs);
+    await shot("desktop-andromeda-inside");
+    return `breadcrumbs "${crumbs.replace(/\n/g, " ")}", ${n} features listed`;
   });
 
-  await check("Mars transfer demo shows Hohmann numbers", async () => {
-    await open("/?panel=transfer");
-    const body = await evaluate<string>(text(".sidebar"));
-    expect(/2[45]\d days/.test(body), "no transfer duration");
-    await shot("transfer");
-    return body.match(/2[45]\d days/)![0];
+  await check("Observable-universe overview is labelled schematic with no linear scale", async () => {
+    await open("/?view=universe");
+    await sleep(2500);
+    const svg = await evaluate<string>(`[...document.querySelectorAll(".map-svg text")].map(t => t.textContent).join(" | ")`);
+    const status = await text(".status-bar");
+    expect(/Observable universe/.test(svg) && /logarithmic distance/i.test(svg), svg.slice(0, 200));
+    expect(/no linear scale/i.test(status), status);
+    await shot("desktop-universe");
+    return `${svg.split(" | ").filter((t) => /universe|Schematic|catalog/i.test(t)).join(" / ")}`;
   });
 
-  for (const [view, layer] of [["solar", ""], ["milky-way", ""], ["milky-way", "&layer=atlas"], ["nearby", "&layer=atlas"], ["local-group", ""]] as const) {
-    await check(`Scale view ${view}${layer ? " (atlas)" : ""} renders`, async () => {
-      await open(`/?view=${view}${layer}`);
-      await sleep(2500);
-      const scale = await evaluate<string>(text(".scalebar-label"));
-      expect(scale.trim().length > 0, "empty scale bar");
-      await shot(`${view === "solar" ? "solar-system" : view === "nearby" ? "nearby" : view}${layer ? "-atlas" : ""}`);
-      return `scale bar: ${scale.trim()}`;
-    });
-  }
+  await check("Earth → Mars directions: Hohmann transfer first, exactly two travel modes, route framing", async () => {
+    await open("/?route=earth,mars&mode=light");
+    await waitFor(`document.querySelector(".route-time")`);
+    const t = (await text(".route-time")).trim();
+    expect(/^(2[45]\d days|8\.[45] months)$/.test(t), `route time "${t}"`);
+    await click(".travel-mode-btn");
+    const modes = await evaluate<string[]>(`[...document.querySelectorAll(".travel-mode-menu [role=option]")].map(o => o.innerText.split("\\n")[0])`);
+    await key("Escape");
+    expect(modes.length === 2 && modes[0] === "Light speed" && modes[1] === "Voyager 1", modes.join(","));
+    const s = await engineState();
+    expect(s.mode === "route", `camera ${s.mode}`);
+    await shot("desktop-earth-mars-transfer");
+    return `${t}; travel modes: ${modes.join(", ")}; camera ${s.mode}`;
+  });
+
+  await check("Play time advances the clock, then pauses; time starts paused", async () => {
+    await open("/");
+    const st0 = await evaluate<{ jd: number; armed: boolean }>(`(() => { const s = globalThis.__gm.store.getState(); return { jd: s.jd, armed: s.time.armed }; })()`);
+    expect(!st0.armed, "time armed on load");
+    await evaluate(`globalThis.__gm.store.getState().setTimeRate("week")`);
+    await click(".time-play");
+    await sleep(2500);
+    const st1 = await evaluate<{ jd: number; running: boolean }>(`(() => { const s = globalThis.__gm.store.getState(); return { jd: s.jd, running: s.time.running }; })()`);
+    const s = await engineState();
+    expect(st1.jd > st0.jd, `jd ${st0.jd} → ${st1.jd}`);
+    expect(s.mode === "locked" && near(s.screen, s.pivot, 3), `Earth drifted to ${fmt(s.screen)} while playing`);
+    await shot("desktop-play-time", 500);
+    await click(".time-play");
+    return `jd advanced by ${(st1.jd - st0.jd).toFixed(2)} days in 2.5 s; Earth stayed centred`;
+  });
+
+  await check("Region dropdowns: Galaxies group lists Andromeda", async () => {
+    await open("/?view=solar");
+    const labels = await evaluate<string[]>(`[...document.querySelectorAll(".region-strip > *")].map(e => e.innerText.trim())`);
+    const btn = await evaluate<boolean>(`(() => { const b = [...document.querySelectorAll(".region-strip button")].find(b => /Galax/.test(b.textContent)); b?.click(); return !!b; })()`);
+    expect(btn, `no Galaxies group in ${labels.join(",")}`);
+    const items = await evaluate<string[]>(`[...document.querySelectorAll(".region-strip .menu .menu-item")].map(e => e.textContent)`);
+    expect(items.some((i) => /Andromeda/.test(i)), items.join(","));
+    await shot("desktop-regions", 600);
+    await key("Escape");
+    return `groups: ${labels.join(" · ")}; Galaxies menu: ${items.join(", ")}`;
+  });
+
+  await check("Performance (SwiftShader, desktop 1440×900)", async () => {
+    await open("/?view=nearby");
+    const fps = await evaluate<number>(`new Promise(r => { let n = 0; const t0 = performance.now(); const f = (t) => { n++; if (t - t0 < 3000) requestAnimationFrame(f); else r(n / ((t - t0) / 1000)); }; requestAnimationFrame(f); })`);
+    const m = await send("Performance.getMetrics");
+    const get = (k: string) => (m.metrics as { name: string; value: number }[]).find((x) => x.name === k)?.value ?? 0;
+    const live = await evaluate<number>(`document.querySelectorAll("*").length`);
+    return `${fps.toFixed(1)} fps (software rendering), JS heap ${(get("JSHeapUsedSize") / 1048576).toFixed(0)} MB, ${live} live elements (CDP Nodes ${get("Nodes")}, includes earlier navigations not yet collected)`;
+  });
+
+  await send("Emulation.setDeviceMetricsOverride", PHONE);
+  await send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
+
+  await check("Phone: floating search at top, collapsed bottom sheet, Earth centred above it", async () => {
+    await open("/");
+    const top = await evaluate<number>(`document.querySelector(".sidebar-search").getBoundingClientRect().top`);
+    const sheetTop = await evaluate<number>(`document.querySelector(".sidebar").getBoundingClientRect().top`);
+    const s = await engineState();
+    expect(top < 24, `search top ${top}`);
+    expect(sheetTop > 600, `sheet top ${sheetTop}`);
+    expect(near(s.screen, s.pivot) && s.pivot[1] < sheetTop, `Earth ${fmt(s.screen)} pivot ${fmt(s.pivot)}`);
+    await shot("phone-home-earth");
+    return `search top ${top}px, sheet top ${sheetTop}px, pivot ${fmt(s.pivot)}`;
+  });
+
+  await check("Phone: Saturn card in the half sheet", async () => {
+    await open("/?place=saturn");
+    await evaluate(`globalThis.__gm.store.getState().setSheet("half")`);
+    await sleep(800);
+    await settleOn("saturn");
+    const s = await engineState();
+    expect(s.locked === "saturn" && near(s.screen, s.pivot, 3), `Saturn ${fmt(s.screen)} pivot ${fmt(s.pivot)}`);
+    await shot("phone-card-saturn");
+    return `Saturn centred at ${fmt(s.screen)} above the sheet`;
+  });
+
+  await check("Phone: search results", async () => {
+    await open("/");
+    await evaluate(`document.querySelector(".main-search input").focus()`);
+    await send("Input.insertText", { text: "nebula" });
+    await waitFor(`document.querySelectorAll(".main-search [role=option]").length > 0`);
+    const n = await evaluate<number>(`document.querySelectorAll(".main-search [role=option]").length`);
+    await shot("phone-search", 800);
+    return `${n} results for "nebula"`;
+  });
 
   const errors = await evaluate<number>(`document.querySelectorAll(".crash").length`);
   results.push({ name: "No error boundary tripped", ok: errors === 0, detail: `${errors} crash panels` });

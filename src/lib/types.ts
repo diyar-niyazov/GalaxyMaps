@@ -1,5 +1,5 @@
 /**
- * Shared types for the SpaceMaps catalog, routing, map and AI tools.
+ * Shared types for the GalaxyMaps catalog, routing, map and AI tools.
  *
  * Physical frame used everywhere: ICRF axes (equatorial, J2000-aligned),
  * origin at the Sun's center, units in kilometres. Display/projection
@@ -20,7 +20,13 @@ export type ObjectType =
   | "nebula"
   | "galaxy"
   | "black-hole"
-  | "quasar";
+  | "quasar"
+  | "exoplanet"
+  | "white-dwarf"
+  | "neutron-star"
+  | "supernova-remnant"
+  | "galaxy-group"
+  | "mission";
 
 export type Region =
   | "solar-system"
@@ -50,6 +56,11 @@ export interface StaticPosition {
   unit: "km";
   xyz: Vec3;
   method: string;
+  /**
+   * "measured": the object's own distance. "host": sky position placed at its host galaxy's
+   * distance because its own depth is unknown (fine for display, not for internal travel).
+   */
+  depth?: "measured" | "host";
 }
 
 export interface EphemerisPosition {
@@ -91,6 +102,8 @@ export type ImageryKind = "observed" | "illustration" | "ai-reconstruction" | "t
 
 export interface ImageRecord {
   src: string;
+  /** Small local thumbnail for lists and search results. */
+  thumb?: string;
   width?: number;
   height?: number;
   kind: ImageryKind;
@@ -99,6 +112,18 @@ export interface ImageRecord {
   license: string;
   licenseUrl?: string;
   sourceUrl: string;
+  alt?: string;
+}
+
+/** Distances for objects at cosmological redshift, Planck 2018 flat ΛCDM. Never used for routes. */
+export interface CosmoDistance {
+  z: number;
+  /** Unit sky direction (ICRF); these objects have no 3D position. */
+  dir: Vec3;
+  comovingLy: number;
+  lightTravelYears: number;
+  model: string;
+  sourceId: string;
 }
 
 export interface DisplayInfo {
@@ -114,6 +139,10 @@ export interface DisplayInfo {
   extentKm?: number;
   /** Axis ratio (minor/major) for extended-object symbols. */
   axisRatio?: number;
+  /** Position angle of the major axis on the sky, degrees east of north (SIMBAD). */
+  positionAngle?: number;
+  /** Morphology code (e.g. "SA(s)b") used to choose a schematic galaxy glyph. */
+  morphology?: string;
 }
 
 export interface ExoplanetInfo {
@@ -127,17 +156,32 @@ export interface CatalogObject {
   name: string;
   aliases: string[];
   type: ObjectType;
+  /** Primary taxonomy leaf (see src/lib/taxonomy.ts). */
+  category: string;
+  /** Additional taxonomy leaves. */
+  tags?: string[];
   /** Short human readable category, e.g. "Yellow-white supergiant · Ursa Minor". */
   subtitle: string;
   region: Region;
   parentId?: string;
+  /** How this object relates to its parent, e.g. a companion galaxy vs. an internal feature. */
+  relation?: "orbits" | "member" | "satellite" | "nucleus" | "feature" | "planet";
   position?: PositionRecord;
   distance?: DistanceRecord;
+  cosmo?: CosmoDistance;
   route: RouteCapability;
   radiusKm?: number;
   facts: Fact[];
-  summary?: { text: string; sourceId: string; url: string };
+  /**
+   * Sourced text. `text` is one sentence; `more` holds up to three further sentences from the same
+   * source (shown as highlights); `details` is the remaining lead section. Never AI-generated.
+   */
+  summary?: { text: string; more?: string[]; details?: string; sourceId: string; url: string };
   image?: ImageRecord;
+  /** Additional real images (remote Wikimedia Commons thumbnails), each with its own credit. */
+  gallery?: ImageRecord[];
+  /** Mission/vehicle content: operator, status and dates, kept separate from astronomical facts. */
+  mission?: { operator: string; status: "active" | "retired" | "historic" | "in-development" | "plan"; statusNote?: string; destinations?: string[] };
   exoplanets?: ExoplanetInfo;
   /** HYG id, so the star point cloud can highlight it. */
   hygId?: number;
@@ -146,6 +190,8 @@ export interface CatalogObject {
   sourceIds: string[];
   /** True for curated destination cards (vs. lightweight catalog entries). */
   featured: boolean;
+  /** Image-rich highlight shown prominently in browse lists. */
+  highlight?: boolean;
 }
 
 export interface SpeedReference {

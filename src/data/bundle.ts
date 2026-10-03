@@ -58,6 +58,7 @@ export function objectForStar(bundle: DataBundle, index: number): CatalogObject 
     name,
     aliases: hip ? [`HIP ${hip}`] : [],
     type: "star",
+    category: "st-stars",
     subtitle: [desc ?? "Star", con].filter(Boolean).join(" · "),
     region: distPc <= 300 ? "stellar-neighborhood" : "milky-way",
     position: { kind: "static", frame: "ICRF", origin: "Sun", epoch: "J2000.0 (HYG v4.4)", unit: "km", xyz: [x * PC_KM, y * PC_KM, z * PC_KM], method: "HYG Cartesian coordinates (Hipparcos parallax)" },

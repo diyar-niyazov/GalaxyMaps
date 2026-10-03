@@ -1,4 +1,5 @@
 import type { CatalogObject, ObjectType } from "./types";
+import { leafLabel, inCategory } from "./taxonomy";
 
 const GREEK: Record<string, string> = {
   α: "alpha", β: "beta", γ: "gamma", δ: "delta", ε: "epsilon", ζ: "zeta", η: "eta", θ: "theta", ι: "iota", κ: "kappa", λ: "lambda", μ: "mu", ν: "nu", ξ: "xi", ο: "omicron", π: "pi", ρ: "rho", σ: "sigma", τ: "tau", υ: "upsilon", φ: "phi", χ: "chi", ψ: "psi", ω: "omega",
@@ -29,11 +30,19 @@ export const TYPE_LABEL: Record<ObjectType, string> = {
   galaxy: "Galaxy",
   "black-hole": "Black hole",
   quasar: "Quasar",
+  exoplanet: "Exoplanet",
+  "white-dwarf": "White dwarf",
+  "neutron-star": "Neutron star",
+  "supernova-remnant": "Supernova remnant",
+  "galaxy-group": "Galaxy group",
+  mission: "Mission",
 };
 
 interface Entry {
   obj: CatalogObject;
   keys: string[];
+  /** Object type and category names ("black hole", "globular clusters"), matched with lower rank. */
+  typeKeys: string[];
 }
 
 export interface SearchIndex {
@@ -45,6 +54,7 @@ export function buildSearchIndex(objects: CatalogObject[]): SearchIndex {
     entries: objects.map((obj) => ({
       obj,
       keys: [obj.name, ...obj.aliases].map(normalize).filter(Boolean),
+      typeKeys: [obj.type, obj.category, ...(obj.tags ?? [])].filter(Boolean).map((k, i) => normalize(i ? leafLabel(k) : TYPE_LABEL[obj.type])).filter(Boolean),
     })),
   };
 }
@@ -83,15 +93,25 @@ export interface SearchResult {
   score: number;
 }
 
-export function search(index: SearchIndex, query: string, limit = 8): SearchResult[] {
+/** Singular/plural-insensitive match of a query against a type or category name. */
+function typeScore(key: string, q: string): number {
+  const stem = (w: string) => w.replace(/(es|s)$/, "");
+  const kw = key.split(" ").map(stem), qw = q.split(" ").map(stem);
+  if (qw.length && qw.every((w) => w.length >= 3 && kw.some((k) => k.startsWith(w)))) return 160;
+  return 0;
+}
+
+export function search(index: SearchIndex, query: string, limit = 8, category?: string | null): SearchResult[] {
   const q = normalize(query);
   if (!q) return [];
   const tokens = q.split(" ");
   const out: SearchResult[] = [];
   for (const e of index.entries) {
+    if (category && !inCategory(e.obj, category)) continue;
     let best = 0;
     for (const k of e.keys) best = Math.max(best, scoreKey(k, q, tokens));
-    if (best > 0) out.push({ obj: e.obj, score: best + e.obj.display.priority * 2 + (e.obj.featured ? 60 : 0) });
+    if (best < 160) for (const k of e.typeKeys) best = Math.max(best, typeScore(k, q));
+    if (best > 0) out.push({ obj: e.obj, score: best + e.obj.display.priority * 2 + (e.obj.featured ? 60 : 0) + (e.obj.image ? 20 : 0) });
   }
   out.sort((a, b) => b.score - a.score || a.obj.name.localeCompare(b.obj.name));
   return out.slice(0, limit);
@@ -103,4 +123,12 @@ export function resolveOne(index: SearchIndex, query: string): CatalogObject | n
   if (!r.length) return null;
   if (r.length === 1 || r[0].score >= 900 || r[0].score - r[1].score > 150) return r[0].obj;
   return r[0].score >= 600 ? r[0].obj : null;
+}
+
+/** All records in a category, best first (featured, imaged, priority). */
+export function browse(index: SearchIndex, category: string): CatalogObject[] {
+  return index.entries
+    .filter((e) => inCategory(e.obj, category))
+    .map((e) => e.obj)
+    .sort((a, b) => Number(b.featured) - Number(a.featured) || Number(!!b.image) - Number(!!a.image) || b.display.priority - a.display.priority || a.name.localeCompare(b.name));
 }

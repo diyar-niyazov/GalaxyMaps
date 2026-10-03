@@ -2,8 +2,59 @@
  "retrieved": "2026-10-03",
  "endpoint": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",
  "table": "pscomppars",
- "query": "select hostname,pl_name,pl_letter,sy_dist,sy_disterr1,sy_disterr2,sy_pnum,pl_orbper,pl_rade,pl_bmasse,pl_eqt,disc_year,discoverymethod from pscomppars where hostname in ('Proxima Cen','Barnard''s star','GJ 273','eps Eri','Ross 128','tau Cet','Teegarden''s Star','GJ 581','TRAPPIST-1','bet Gem','51 Peg','LHS 1140','HD 189733','K2-18','HD 209458','Kepler-186','Kepler-22','Kepler-452')",
+ "query": "select hostname,pl_name,pl_letter,sy_dist,sy_disterr1,sy_disterr2,sy_pnum,pl_orbper,pl_orbsmax,pl_rade,pl_bmasse,pl_eqt,disc_year,discoverymethod,disc_facility from pscomppars where hostname in ('Proxima Cen','Barnard''s star','GJ 273','eps Eri','Ross 128','tau Cet','Teegarden''s Star','GJ 581','TRAPPIST-1','51 Peg','LHS 1140','HD 189733','K2-18','HD 209458','Kepler-186','Kepler-22','Kepler-452','PSR B1257+12','WD 1856+534','HR 8799','bet Pic','55 Cnc','WASP-12','WASP-39','Kepler-16','TOI-700','GJ 1214','Kepler-90')",
  "rows": [
+  {
+   "hostname": "PSR B1257+12",
+   "pl_name": "PSR B1257+12 b",
+   "pl_letter": "b",
+   "sy_dist": "600.00000000",
+   "sy_disterr1": "100.00000000",
+   "sy_disterr2": "-100.00000000",
+   "sy_pnum": "3",
+   "pl_orbper": "25.26200000000",
+   "pl_orbsmax": "0.1900000000",
+   "pl_rade": "0.33800000",
+   "pl_bmasse": "0.02000000",
+   "pl_eqt": "",
+   "disc_year": "1994",
+   "discoverymethod": "Pulsar Timing",
+   "disc_facility": "Arecibo Observatory"
+  },
+  {
+   "hostname": "PSR B1257+12",
+   "pl_name": "PSR B1257+12 c",
+   "pl_letter": "c",
+   "sy_dist": "600.00000000",
+   "sy_disterr1": "100.00000000",
+   "sy_disterr2": "-100.00000000",
+   "sy_pnum": "3",
+   "pl_orbper": "66.54190000000",
+   "pl_orbsmax": "0.3600000000",
+   "pl_rade": "1.91000000",
+   "pl_bmasse": "4.30000000",
+   "pl_eqt": "",
+   "disc_year": "1992",
+   "discoverymethod": "Pulsar Timing",
+   "disc_facility": "Arecibo Observatory"
+  },
+  {
+   "hostname": "55 Cnc",
+   "pl_name": "55 Cnc b",
+   "pl_letter": "b",
+   "sy_dist": "12.58550000",
+   "sy_disterr1": "0.01240000",
+   "sy_disterr2": "-0.01230000",
+   "sy_pnum": "7",
+   "pl_orbper": "14.65155200000",
+   "pl_orbsmax": "0.1180000000",
+   "pl_rade": "13.90000000",
+   "pl_bmasse": "263.97850000",
+   "pl_eqt": "700.00",
+   "disc_year": "1996",
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Lick Observatory"
+  },
   {
    "hostname": "K2-18",
    "pl_name": "K2-18 b",
@@ -13,11 +64,115 @@
    "sy_disterr2": "-0.07955000",
    "sy_pnum": "2",
    "pl_orbper": "32.93962300000",
+   "pl_orbsmax": "0.1429000000",
    "pl_rade": "2.37000000",
    "pl_bmasse": "8.92000000",
    "pl_eqt": "284.00",
    "disc_year": "2015",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "K2"
+  },
+  {
+   "hostname": "55 Cnc",
+   "pl_name": "55 Cnc c",
+   "pl_letter": "c",
+   "sy_dist": "12.58550000",
+   "sy_disterr1": "0.01240000",
+   "sy_disterr2": "-0.01230000",
+   "sy_pnum": "7",
+   "pl_orbper": "44.39360000000",
+   "pl_orbsmax": "0.2470000000",
+   "pl_rade": "8.51000000",
+   "pl_bmasse": "54.47380000",
+   "pl_eqt": "499.27",
+   "disc_year": "2004",
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "McDonald Observatory"
+  },
+  {
+   "hostname": "55 Cnc",
+   "pl_name": "55 Cnc d",
+   "pl_letter": "d",
+   "sy_dist": "12.58550000",
+   "sy_disterr1": "0.01240000",
+   "sy_disterr2": "-0.01230000",
+   "sy_pnum": "7",
+   "pl_orbper": "4799.00000000000",
+   "pl_orbsmax": "5.6000000000",
+   "pl_rade": "13.00000000",
+   "pl_bmasse": "1232.49300000",
+   "pl_eqt": "104.85",
+   "disc_year": "2002",
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Lick Observatory"
+  },
+  {
+   "hostname": "55 Cnc",
+   "pl_name": "55 Cnc e",
+   "pl_letter": "e",
+   "sy_dist": "12.58550000",
+   "sy_disterr1": "0.01240000",
+   "sy_disterr2": "-0.01230000",
+   "sy_pnum": "7",
+   "pl_orbper": "0.73654740000",
+   "pl_orbsmax": "0.0154400000",
+   "pl_rade": "1.87500000",
+   "pl_bmasse": "7.99000000",
+   "pl_eqt": "1958.00",
+   "disc_year": "2004",
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "McDonald Observatory"
+  },
+  {
+   "hostname": "55 Cnc",
+   "pl_name": "55 Cnc f",
+   "pl_letter": "f",
+   "sy_dist": "12.58550000",
+   "sy_disterr1": "0.01240000",
+   "sy_disterr2": "-0.01230000",
+   "sy_pnum": "7",
+   "pl_orbper": "260.58000000000",
+   "pl_orbsmax": "0.8020000000",
+   "pl_rade": "7.59000000",
+   "pl_bmasse": "44.81200000",
+   "pl_eqt": "277.07",
+   "disc_year": "2007",
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Multiple Observatories"
+  },
+  {
+   "hostname": "bet Pic",
+   "pl_name": "bet Pic b",
+   "pl_letter": "b",
+   "sy_dist": "19.74420000",
+   "sy_disterr1": "0.13200000",
+   "sy_disterr2": "-0.13030000",
+   "sy_pnum": "3",
+   "pl_orbper": "8682.00000000000",
+   "pl_orbsmax": "10.0700000000",
+   "pl_rade": "18.49485000",
+   "pl_bmasse": "2765.10714090",
+   "pl_eqt": "1612.00",
+   "disc_year": "2008",
+   "discoverymethod": "Imaging",
+   "disc_facility": "Paranal Observatory"
+  },
+  {
+   "hostname": "GJ 1214",
+   "pl_name": "GJ 1214 b",
+   "pl_letter": "b",
+   "sy_dist": "14.64270000",
+   "sy_disterr1": "0.03720000",
+   "sy_disterr2": "-0.03720000",
+   "sy_pnum": "1",
+   "pl_orbper": "1.58040453100",
+   "pl_orbsmax": "0.0150500000",
+   "pl_rade": "2.73300000",
+   "pl_bmasse": "8.41000000",
+   "pl_eqt": "567.00",
+   "disc_year": "2009",
+   "discoverymethod": "Transit",
+   "disc_facility": "MEarth Project"
   },
   {
    "hostname": "HD 189733",
@@ -28,11 +183,13 @@
    "sy_disterr2": "-0.01270000",
    "sy_pnum": "1",
    "pl_orbper": "2.21857567000",
+   "pl_orbsmax": "0.0312600000",
    "pl_rade": "12.66617000",
    "pl_bmasse": "359.14790000",
    "pl_eqt": "1209.00",
    "disc_year": "2005",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Haute-Provence Observatory"
   },
   {
    "hostname": "HD 209458",
@@ -43,11 +200,47 @@
    "sy_disterr2": "-0.12340000",
    "sy_pnum": "1",
    "pl_orbper": "3.52474859000",
+   "pl_orbsmax": "0.0470700000",
    "pl_rade": "15.58051000",
    "pl_bmasse": "232.01590000",
    "pl_eqt": "1459.00",
    "disc_year": "1999",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "W. M. Keck Observatory"
+  },
+  {
+   "hostname": "WASP-12",
+   "pl_name": "WASP-12 b",
+   "pl_letter": "b",
+   "sy_dist": "427.24600000",
+   "sy_disterr1": "6.06800000",
+   "sy_disterr2": "-5.90300000",
+   "sy_pnum": "1",
+   "pl_orbper": "1.09141890100",
+   "pl_orbsmax": "0.0234000000",
+   "pl_rade": "22.02564708",
+   "pl_bmasse": "467.21010000",
+   "pl_eqt": "2601.00",
+   "disc_year": "2008",
+   "discoverymethod": "Transit",
+   "disc_facility": "SuperWASP"
+  },
+  {
+   "hostname": "WASP-39",
+   "pl_name": "WASP-39 b",
+   "pl_letter": "b",
+   "sy_dist": "213.98200000",
+   "sy_disterr1": "1.76000000",
+   "sy_disterr2": "-1.73100000",
+   "sy_pnum": "1",
+   "pl_orbper": "4.05529410000",
+   "pl_orbsmax": "0.0482800000",
+   "pl_rade": "14.33631100",
+   "pl_bmasse": "89.31023000",
+   "pl_eqt": "1166.00",
+   "disc_year": "2011",
+   "discoverymethod": "Transit",
+   "disc_facility": "SuperWASP"
   },
   {
    "hostname": "TRAPPIST-1",
@@ -58,11 +251,13 @@
    "sy_disterr2": "-0.01870661",
    "sy_pnum": "7",
    "pl_orbper": "1.51082600000",
+   "pl_orbsmax": "0.0115400000",
    "pl_rade": "1.11600000",
    "pl_bmasse": "1.37400000",
    "pl_eqt": "397.60",
    "disc_year": "2016",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "TRAPPIST-1",
@@ -73,11 +268,13 @@
    "sy_disterr2": "-0.01870661",
    "sy_pnum": "7",
    "pl_orbper": "2.42193700000",
+   "pl_orbsmax": "0.0158000000",
    "pl_rade": "1.09700000",
    "pl_bmasse": "1.30800000",
    "pl_eqt": "339.70",
    "disc_year": "2016",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "TRAPPIST-1",
@@ -88,11 +285,13 @@
    "sy_disterr2": "-0.01870661",
    "sy_pnum": "7",
    "pl_orbper": "4.04921900000",
+   "pl_orbsmax": "0.0222700000",
    "pl_rade": "0.78800000",
    "pl_bmasse": "0.38800000",
    "pl_eqt": "286.20",
    "disc_year": "2016",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "TRAPPIST-1",
@@ -103,11 +302,13 @@
    "sy_disterr2": "-0.01870661",
    "sy_pnum": "7",
    "pl_orbper": "6.10101300000",
+   "pl_orbsmax": "0.0292500000",
    "pl_rade": "0.92000000",
    "pl_bmasse": "0.69200000",
    "pl_eqt": "249.70",
    "disc_year": "2017",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "TRAPPIST-1",
@@ -118,11 +319,13 @@
    "sy_disterr2": "-0.01870661",
    "sy_pnum": "7",
    "pl_orbper": "9.20754000000",
+   "pl_orbsmax": "0.0384900000",
    "pl_rade": "1.04500000",
    "pl_bmasse": "1.03900000",
    "pl_eqt": "217.70",
    "disc_year": "2017",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "TRAPPIST-1",
@@ -133,11 +336,13 @@
    "sy_disterr2": "-0.01870661",
    "sy_pnum": "7",
    "pl_orbper": "12.35244600000",
+   "pl_orbsmax": "0.0468300000",
    "pl_rade": "1.12900000",
    "pl_bmasse": "1.32100000",
    "pl_eqt": "197.30",
    "disc_year": "2017",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "TRAPPIST-1",
@@ -148,11 +353,13 @@
    "sy_disterr2": "-0.01870661",
    "sy_pnum": "7",
    "pl_orbper": "18.77286600000",
+   "pl_orbsmax": "0.0618900000",
    "pl_rade": "0.75500000",
    "pl_bmasse": "0.32600000",
    "pl_eqt": "171.70",
    "disc_year": "2017",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "LHS 1140",
@@ -163,11 +370,13 @@
    "sy_disterr2": "-0.01520000",
    "sy_pnum": "2",
    "pl_orbper": "24.73723000000",
+   "pl_orbsmax": "0.0946000000",
    "pl_rade": "1.73000000",
    "pl_bmasse": "5.60000000",
    "pl_eqt": "226.00",
    "disc_year": "2017",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "MEarth Project"
   },
   {
    "hostname": "K2-18",
@@ -178,11 +387,13 @@
    "sy_disterr2": "-0.07955000",
    "sy_pnum": "2",
    "pl_orbper": "8.96200000000",
+   "pl_orbsmax": "0.0600000000",
    "pl_rade": "2.65000000",
    "pl_bmasse": "7.51000000",
    "pl_eqt": "363.00",
    "disc_year": "2017",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "LHS 1140",
@@ -193,11 +404,132 @@
    "sy_disterr2": "-0.01520000",
    "sy_pnum": "2",
    "pl_orbper": "3.77794000000",
+   "pl_orbsmax": "0.0270000000",
    "pl_rade": "1.27200000",
    "pl_bmasse": "1.91000000",
    "pl_eqt": "422.00",
    "disc_year": "2018",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Multiple Observatories"
+  },
+  {
+   "hostname": "bet Pic",
+   "pl_name": "bet Pic c",
+   "pl_letter": "c",
+   "sy_dist": "19.74420000",
+   "sy_disterr1": "0.13200000",
+   "sy_disterr2": "-0.13030000",
+   "sy_pnum": "3",
+   "pl_orbper": "1202.00000000000",
+   "pl_orbsmax": "2.7000000000",
+   "pl_rade": "12.50000000",
+   "pl_bmasse": "2765.10714090",
+   "pl_eqt": "1250.00",
+   "disc_year": "2019",
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
+  },
+  {
+   "hostname": "TOI-700",
+   "pl_name": "TOI-700 b",
+   "pl_letter": "b",
+   "sy_dist": "31.12650000",
+   "sy_disterr1": "0.02060000",
+   "sy_disterr2": "-0.02060000",
+   "sy_pnum": "4",
+   "pl_orbper": "9.97722000000",
+   "pl_orbsmax": "0.0678000000",
+   "pl_rade": "0.96300000",
+   "pl_bmasse": "0.84900000",
+   "pl_eqt": "417.00",
+   "disc_year": "2020",
+   "discoverymethod": "Transit",
+   "disc_facility": "Transiting Exoplanet Survey Satellite (TESS)"
+  },
+  {
+   "hostname": "TOI-700",
+   "pl_name": "TOI-700 c",
+   "pl_letter": "c",
+   "sy_dist": "31.12650000",
+   "sy_disterr1": "0.02060000",
+   "sy_disterr2": "-0.02060000",
+   "sy_pnum": "4",
+   "pl_orbper": "16.05110390000",
+   "pl_orbsmax": "0.0931000000",
+   "pl_rade": "2.53500000",
+   "pl_bmasse": "6.96000000",
+   "pl_eqt": "356.00",
+   "disc_year": "2020",
+   "discoverymethod": "Transit",
+   "disc_facility": "Transiting Exoplanet Survey Satellite (TESS)"
+  },
+  {
+   "hostname": "TOI-700",
+   "pl_name": "TOI-700 d",
+   "pl_letter": "d",
+   "sy_dist": "31.12650000",
+   "sy_disterr1": "0.02060000",
+   "sy_disterr2": "-0.02060000",
+   "sy_pnum": "4",
+   "pl_orbper": "37.42345700000",
+   "pl_orbsmax": "0.1642000000",
+   "pl_rade": "1.14500000",
+   "pl_bmasse": "1.58000000",
+   "pl_eqt": "268.80",
+   "disc_year": "2020",
+   "discoverymethod": "Transit",
+   "disc_facility": "Transiting Exoplanet Survey Satellite (TESS)"
+  },
+  {
+   "hostname": "WD 1856+534",
+   "pl_name": "WD 1856+534 b",
+   "pl_letter": "b",
+   "sy_dist": "24.73590000",
+   "sy_disterr1": "0.04350000",
+   "sy_disterr2": "-0.04330000",
+   "sy_pnum": "1",
+   "pl_orbper": "1.40794050000",
+   "pl_orbsmax": "0.0204000000",
+   "pl_rade": "10.40000000",
+   "pl_bmasse": "4386.05400000",
+   "pl_eqt": "163.00",
+   "disc_year": "2020",
+   "discoverymethod": "Transit",
+   "disc_facility": "Transiting Exoplanet Survey Satellite (TESS)"
+  },
+  {
+   "hostname": "TOI-700",
+   "pl_name": "TOI-700 e",
+   "pl_letter": "e",
+   "sy_dist": "31.12650000",
+   "sy_disterr1": "0.02060000",
+   "sy_disterr2": "-0.02060000",
+   "sy_pnum": "4",
+   "pl_orbper": "27.81012400000",
+   "pl_orbsmax": "0.1336000000",
+   "pl_rade": "0.91900000",
+   "pl_bmasse": "0.71800000",
+   "pl_eqt": "272.90",
+   "disc_year": "2023",
+   "discoverymethod": "Transit",
+   "disc_facility": "Transiting Exoplanet Survey Satellite (TESS)"
+  },
+  {
+   "hostname": "bet Pic",
+   "pl_name": "bet Pic d",
+   "pl_letter": "d",
+   "sy_dist": "19.74420000",
+   "sy_disterr1": "0.13200000",
+   "sy_disterr2": "-0.13030000",
+   "sy_pnum": "3",
+   "pl_orbper": "33200.00000000000",
+   "pl_orbsmax": "26.0000000000",
+   "pl_rade": "14.12331568",
+   "pl_bmasse": "762.78817680",
+   "pl_eqt": "600.00",
+   "disc_year": "2026",
+   "discoverymethod": "Imaging",
+   "disc_facility": "Paranal Observatory"
   },
   {
    "hostname": "tau Cet",
@@ -208,11 +540,13 @@
    "sy_disterr2": "-0.00675000",
    "sy_pnum": "3",
    "pl_orbper": "20.00000000000",
+   "pl_orbsmax": "0.1330000000",
    "pl_rade": "1.18000000",
    "pl_bmasse": "1.75000000",
    "pl_eqt": "639.65",
    "disc_year": "2017",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "Barnard's star",
@@ -223,11 +557,13 @@
    "sy_disterr2": "-0.00097500",
    "sy_pnum": "4",
    "pl_orbper": "2.34020000000",
+   "pl_orbsmax": "0.0188000000",
    "pl_rade": "0.69400000",
    "pl_bmasse": "0.26300000",
    "pl_eqt": "483.00",
    "disc_year": "2025",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Gemini Observatory"
   },
   {
    "hostname": "Teegarden's Star",
@@ -238,11 +574,13 @@
    "sy_disterr2": "-0.00397000",
    "sy_pnum": "3",
    "pl_orbper": "11.41600000000",
+   "pl_orbsmax": "0.0455000000",
    "pl_rade": "1.02000000",
    "pl_bmasse": "1.05000000",
    "pl_eqt": "209.00",
    "disc_year": "2019",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Calar Alto Observatory"
   },
   {
    "hostname": "GJ 581",
@@ -253,11 +591,30 @@
    "sy_disterr2": "-0.00209500",
    "sy_pnum": "3",
    "pl_orbper": "5.36860000000",
+   "pl_orbsmax": "0.0399000000",
    "pl_rade": "4.79000000",
    "pl_bmasse": "20.50000000",
    "pl_eqt": "464.32",
    "disc_year": "2005",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
+  },
+  {
+   "hostname": "HR 8799",
+   "pl_name": "HR 8799 c",
+   "pl_letter": "c",
+   "sy_dist": "41.24410000",
+   "sy_disterr1": "0.15150000",
+   "sy_disterr2": "-0.15050000",
+   "sy_pnum": "4",
+   "pl_orbper": "69000.00000000000",
+   "pl_orbsmax": "38.0000000000",
+   "pl_rade": "13.00000000",
+   "pl_bmasse": "3000.00000000",
+   "pl_eqt": "1200.00",
+   "disc_year": "2008",
+   "discoverymethod": "Imaging",
+   "disc_facility": "Gemini Observatory"
   },
   {
    "hostname": "Kepler-186",
@@ -268,11 +625,64 @@
    "sy_disterr2": "-0.77400000",
    "sy_pnum": "5",
    "pl_orbper": "3.88679070000",
+   "pl_orbsmax": "0.0343000000",
    "pl_rade": "1.07000000",
    "pl_bmasse": "1.24000000",
    "pl_eqt": "571.00",
    "disc_year": "2014",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Kepler"
+  },
+  {
+   "hostname": "Kepler-16",
+   "pl_name": "Kepler-16 b",
+   "pl_letter": "b",
+   "sy_dist": "75.08520000",
+   "sy_disterr1": "0.15410000",
+   "sy_disterr2": "-0.15360000",
+   "sy_pnum": "1",
+   "pl_orbper": "228.77600000000",
+   "pl_orbsmax": "0.7048000000",
+   "pl_rade": "8.44930000",
+   "pl_bmasse": "105.83300000",
+   "pl_eqt": "205.90",
+   "disc_year": "2011",
+   "discoverymethod": "Transit",
+   "disc_facility": "Kepler"
+  },
+  {
+   "hostname": "HR 8799",
+   "pl_name": "HR 8799 b",
+   "pl_letter": "b",
+   "sy_dist": "41.24410000",
+   "sy_disterr1": "0.15150000",
+   "sy_disterr2": "-0.15050000",
+   "sy_pnum": "4",
+   "pl_orbper": "170000.00000000000",
+   "pl_orbsmax": "68.0000000000",
+   "pl_rade": "13.00000000",
+   "pl_bmasse": "2000.00000000",
+   "pl_eqt": "1200.00",
+   "disc_year": "2008",
+   "discoverymethod": "Imaging",
+   "disc_facility": "Gemini Observatory"
+  },
+  {
+   "hostname": "HR 8799",
+   "pl_name": "HR 8799 d",
+   "pl_letter": "d",
+   "sy_dist": "41.24410000",
+   "sy_disterr1": "0.15150000",
+   "sy_disterr2": "-0.15050000",
+   "sy_pnum": "4",
+   "pl_orbper": "37000.00000000000",
+   "pl_orbsmax": "24.0000000000",
+   "pl_rade": "13.00000000",
+   "pl_bmasse": "3000.00000000",
+   "pl_eqt": "1300.00",
+   "disc_year": "2008",
+   "discoverymethod": "Imaging",
+   "disc_facility": "W. M. Keck Observatory"
   },
   {
    "hostname": "Kepler-186",
@@ -283,11 +693,13 @@
    "sy_disterr2": "-0.77400000",
    "sy_pnum": "5",
    "pl_orbper": "22.40770400000",
+   "pl_orbsmax": "0.1100000000",
    "pl_rade": "1.27000000",
    "pl_bmasse": "2.15000000",
    "pl_eqt": "319.00",
    "disc_year": "2014",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Kepler"
   },
   {
    "hostname": "Kepler-186",
@@ -298,11 +710,13 @@
    "sy_disterr2": "-0.77400000",
    "sy_pnum": "5",
    "pl_orbper": "7.26730200000",
+   "pl_orbsmax": "0.0451000000",
    "pl_rade": "1.25000000",
    "pl_bmasse": "2.10000000",
    "pl_eqt": "464.00",
    "disc_year": "2014",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Kepler"
   },
   {
    "hostname": "Kepler-186",
@@ -313,11 +727,13 @@
    "sy_disterr2": "-0.77400000",
    "sy_pnum": "5",
    "pl_orbper": "13.34299600000",
+   "pl_orbsmax": "0.0781000000",
    "pl_rade": "1.40000000",
    "pl_bmasse": "2.54000000",
    "pl_eqt": "379.00",
    "disc_year": "2014",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Kepler"
   },
   {
    "hostname": "Kepler-186",
@@ -328,11 +744,13 @@
    "sy_disterr2": "-0.77400000",
    "sy_pnum": "5",
    "pl_orbper": "129.94410000000",
+   "pl_orbsmax": "0.4320000000",
    "pl_rade": "1.17000000",
    "pl_bmasse": "1.71000000",
    "pl_eqt": "177.00",
    "disc_year": "2014",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Kepler"
   },
   {
    "hostname": "Ross 128",
@@ -343,11 +761,13 @@
    "sy_disterr2": "-0.00080500",
    "sy_pnum": "1",
    "pl_orbper": "9.86580000000",
+   "pl_orbsmax": "0.0496000000",
    "pl_rade": "1.11000000",
    "pl_bmasse": "1.40000000",
    "pl_eqt": "301.00",
    "disc_year": "2017",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "tau Cet",
@@ -358,11 +778,13 @@
    "sy_disterr2": "-0.00675000",
    "sy_pnum": "3",
    "pl_orbper": "636.13000000000",
+   "pl_orbsmax": "1.3340000000",
    "pl_rade": "1.81000000",
    "pl_bmasse": "3.93000000",
    "pl_eqt": "201.97",
    "disc_year": "2017",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "Teegarden's Star",
@@ -373,11 +795,13 @@
    "sy_disterr2": "-0.00397000",
    "sy_pnum": "3",
    "pl_orbper": "26.13000000000",
+   "pl_orbsmax": "0.0791000000",
    "pl_rade": "0.95400000",
    "pl_bmasse": "0.82000000",
    "pl_eqt": "159.00",
    "disc_year": "2024",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "Proxima Cen",
@@ -388,11 +812,13 @@
    "sy_disterr2": "-0.00035000",
    "sy_pnum": "2",
    "pl_orbper": "5.12338000000",
+   "pl_orbsmax": "0.0288100000",
    "pl_rade": "0.69200000",
    "pl_bmasse": "0.26000000",
    "pl_eqt": "282.00",
    "disc_year": "2025",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "Proxima Cen",
@@ -403,11 +829,13 @@
    "sy_disterr2": "-0.00035000",
    "sy_pnum": "2",
    "pl_orbper": "11.18465000000",
+   "pl_orbsmax": "0.0484800000",
    "pl_rade": "1.02000000",
    "pl_bmasse": "1.05500000",
    "pl_eqt": "218.00",
    "disc_year": "2016",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "European Southern Observatory"
   },
   {
    "hostname": "GJ 581",
@@ -418,11 +846,13 @@
    "sy_disterr2": "-0.00209500",
    "sy_pnum": "3",
    "pl_orbper": "12.92110000000",
+   "pl_orbsmax": "0.0718000000",
    "pl_rade": "2.50000000",
    "pl_bmasse": "6.81000000",
    "pl_eqt": "346.13",
    "disc_year": "2007",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "eps Eri",
@@ -433,11 +863,13 @@
    "sy_disterr2": "-0.00483000",
    "sy_pnum": "1",
    "pl_orbper": "2680.00000000000",
+   "pl_orbsmax": "3.5300000000",
    "pl_rade": "13.80000000",
    "pl_bmasse": "317.82840700",
    "pl_eqt": "112.26",
    "disc_year": "2000",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "51 Peg",
@@ -448,11 +880,13 @@
    "sy_disterr2": "-0.02970000",
    "sy_pnum": "1",
    "pl_orbper": "4.23079660000",
+   "pl_orbsmax": "0.0520000000",
    "pl_rade": "14.10000000",
    "pl_bmasse": "193.87532827",
    "pl_eqt": "1328.93",
    "disc_year": "1995",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Haute-Provence Observatory"
   },
   {
    "hostname": "GJ 581",
@@ -463,11 +897,30 @@
    "sy_disterr2": "-0.00209500",
    "sy_pnum": "3",
    "pl_orbper": "3.14810000000",
+   "pl_orbsmax": "0.0279900000",
    "pl_rade": "1.38000000",
    "pl_bmasse": "2.48000000",
    "pl_eqt": "554.37",
    "disc_year": "2009",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
+  },
+  {
+   "hostname": "HR 8799",
+   "pl_name": "HR 8799 e",
+   "pl_letter": "e",
+   "sy_dist": "41.24410000",
+   "sy_disterr1": "0.15150000",
+   "sy_disterr2": "-0.15050000",
+   "sy_pnum": "4",
+   "pl_orbper": "20815.60000000000",
+   "pl_orbsmax": "16.4000000000",
+   "pl_rade": "13.11453000",
+   "pl_bmasse": "3178.30000000",
+   "pl_eqt": "1150.00",
+   "disc_year": "2010",
+   "discoverymethod": "Imaging",
+   "disc_facility": "W. M. Keck Observatory"
   },
   {
    "hostname": "tau Cet",
@@ -478,11 +931,13 @@
    "sy_disterr2": "-0.00675000",
    "sy_pnum": "3",
    "pl_orbper": "49.41000000000",
+   "pl_orbsmax": "0.2430000000",
    "pl_rade": "1.19000000",
    "pl_bmasse": "1.83000000",
    "pl_eqt": "473.22",
    "disc_year": "2017",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Multiple Observatories"
   },
   {
    "hostname": "Barnard's star",
@@ -493,11 +948,13 @@
    "sy_disterr2": "-0.00097500",
    "sy_pnum": "4",
    "pl_orbper": "4.12440000000",
+   "pl_orbsmax": "0.0274000000",
    "pl_rade": "0.74300000",
    "pl_bmasse": "0.33500000",
    "pl_eqt": "400.00",
    "disc_year": "2025",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Gemini Observatory"
   },
   {
    "hostname": "Barnard's star",
@@ -508,11 +965,13 @@
    "sy_disterr2": "-0.00097500",
    "sy_pnum": "4",
    "pl_orbper": "3.15420000000",
+   "pl_orbsmax": "0.0229000000",
    "pl_rade": "0.72000000",
    "pl_bmasse": "0.29900000",
    "pl_eqt": "438.00",
    "disc_year": "2024",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Paranal Observatory"
   },
   {
    "hostname": "Barnard's star",
@@ -523,11 +982,13 @@
    "sy_disterr2": "-0.00097500",
    "sy_pnum": "4",
    "pl_orbper": "6.73920000000",
+   "pl_orbsmax": "0.0381000000",
    "pl_rade": "0.63700000",
    "pl_bmasse": "0.19300000",
    "pl_eqt": "340.00",
    "disc_year": "2025",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Gemini Observatory"
   },
   {
    "hostname": "Kepler-22",
@@ -538,11 +999,13 @@
    "sy_disterr2": "-0.91800000",
    "sy_pnum": "1",
    "pl_orbper": "289.86387600000",
+   "pl_orbsmax": "0.8120000000",
    "pl_rade": "2.10000000",
    "pl_bmasse": "9.10000000",
    "pl_eqt": "279.00",
    "disc_year": "2011",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Kepler"
   },
   {
    "hostname": "Teegarden's Star",
@@ -553,11 +1016,30 @@
    "sy_disterr2": "-0.00397000",
    "sy_pnum": "3",
    "pl_orbper": "4.90634000000",
+   "pl_orbsmax": "0.0259000000",
    "pl_rade": "1.05000000",
    "pl_bmasse": "1.16000000",
    "pl_eqt": "277.00",
    "disc_year": "2019",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "Calar Alto Observatory"
+  },
+  {
+   "hostname": "PSR B1257+12",
+   "pl_name": "PSR B1257+12 d",
+   "pl_letter": "d",
+   "sy_dist": "600.00000000",
+   "sy_disterr1": "100.00000000",
+   "sy_disterr2": "-100.00000000",
+   "sy_pnum": "3",
+   "pl_orbper": "98.21140000000",
+   "pl_orbsmax": "0.4600000000",
+   "pl_rade": "1.80000000",
+   "pl_bmasse": "3.90000000",
+   "pl_eqt": "",
+   "disc_year": "1992",
+   "discoverymethod": "Pulsar Timing",
+   "disc_facility": "Arecibo Observatory"
   },
   {
    "hostname": "GJ 273",
@@ -568,11 +1050,13 @@
    "sy_disterr2": "-0.02063320",
    "sy_pnum": "2",
    "pl_orbper": "18.64980000000",
+   "pl_orbsmax": "0.0911010000",
    "pl_rade": "1.51000000",
    "pl_bmasse": "2.89000000",
    "pl_eqt": "292.47",
    "disc_year": "2017",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "GJ 273",
@@ -583,11 +1067,13 @@
    "sy_disterr2": "-0.02063320",
    "sy_pnum": "2",
    "pl_orbper": "4.72340000000",
+   "pl_orbsmax": "0.0364670000",
    "pl_rade": "1.06000000",
    "pl_bmasse": "1.18000000",
    "pl_eqt": "462.26",
    "disc_year": "2017",
-   "discoverymethod": "Radial Velocity"
+   "discoverymethod": "Radial Velocity",
+   "disc_facility": "La Silla Observatory"
   },
   {
    "hostname": "Kepler-452",
@@ -598,11 +1084,13 @@
    "sy_disterr2": "-5.14100000",
    "sy_pnum": "1",
    "pl_orbper": "384.84300000000",
+   "pl_orbsmax": "1.0460000000",
    "pl_rade": "1.63000000",
    "pl_bmasse": "3.29000000",
    "pl_eqt": "265.00",
    "disc_year": "2015",
-   "discoverymethod": "Transit"
+   "discoverymethod": "Transit",
+   "disc_facility": "Kepler"
   }
  ]
 }

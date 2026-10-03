@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { RAW, fetchJson, writeJson, today } from "./lib";
+import { RAW, fetchJson, writeJson, readJson, exists, today } from "./lib";
 import { SOLAR_BODIES, EPHEMERIS_START, EPHEMERIS_STOP, REFERENCE_EPOCH, PARKER, SPEED_PRESETS } from "./config";
 
 const API = "https://ssd.jpl.nasa.gov/api/horizons.api";
@@ -63,34 +63,53 @@ function header(result: string) {
 }
 
 export async function fetchHorizons() {
-  const keyCenter: Record<string, string> = { earth: "500@399", mars: "500@499", jupiter: "500@599", saturn: "500@699", neptune: "500@899", pluto: "500@999" };
+  const keyCenter: Record<string, string> = { earth: "500@399", mars: "500@499", jupiter: "500@599", saturn: "500@699", uranus: "500@799", neptune: "500@899", pluto: "500@999" };
+  const dest = join(RAW, "horizons.json");
+  // Incremental: reuse bodies already fetched for the same window so adding a body doesn't refetch everything.
+  const previous = (await exists(dest)) ? await readJson<{ range: { start: string; stop: string }; referenceEpoch: string; bodies: Record<string, unknown> }>(dest) : null;
+  const reusable = previous && previous.range.start === EPHEMERIS_START && previous.range.stop === EPHEMERIS_STOP && previous.referenceEpoch === REFERENCE_EPOCH ? previous.bodies : {};
   const out: Record<string, unknown> = {};
+  const failed: string[] = [];
   for (const b of SOLAR_BODIES) {
-    if (b.id === "sun") {
-      const r = await horizons({ COMMAND: "10", OBJ_DATA: "YES", MAKE_EPHEM: "NO" });
-      out[b.id] = { header: header(r) };
+    if (reusable[b.id] && process.env.HORIZONS_REFRESH !== "1") {
+      out[b.id] = reusable[b.id];
       continue;
     }
-    process.stdout.write(`  Horizons ${b.name}… `);
-    if (b.parent) {
-      // Moons: weekly osculating elements relative to the parent, plus one heliocentric vector set for validation.
-      const center = keyCenter[b.parent];
-      const el = await horizons(elementParams(b.horizons, center, EPHEMERIS_START, EPHEMERIS_STOP, "7 d"));
-      const vec = await horizons(vectorParams(b.horizons, center, REFERENCE_EPOCH, `${REFERENCE_EPOCH} 12:00`, "1 h"));
-      out[b.id] = { parent: b.parent, elements: parseElementsCsv(el), check: parseVectorCsv(vec), header: header(vec) };
-      console.log("ok");
-      continue;
+    try {
+      if (b.id === "sun") {
+        const r = await horizons({ COMMAND: "10", OBJ_DATA: "YES", MAKE_EPHEM: "NO" });
+        out[b.id] = { header: header(r) };
+        continue;
+      }
+      process.stdout.write(`  Horizons ${b.name}… `);
+      if (b.parent) {
+        // Moons: weekly osculating elements relative to the parent, plus one parent-centred vector set for validation.
+        const center = keyCenter[b.parent];
+        if (!center) throw new Error(`no Horizons center for parent ${b.parent}`);
+        const el = await horizons(elementParams(b.horizons, center, EPHEMERIS_START, EPHEMERIS_STOP, "7 d"));
+        const vec = await horizons(vectorParams(b.horizons, center, REFERENCE_EPOCH, `${REFERENCE_EPOCH} 12:00`, "1 h"));
+        const elements = parseElementsCsv(el);
+        if (!elements.length) throw new Error("no element rows");
+        out[b.id] = { parent: b.parent, elements, check: parseVectorCsv(vec), header: header(vec) };
+        console.log("ok");
+        continue;
+      }
+      const vec = await horizons(vectorParams(b.horizons, "500@10", EPHEMERIS_START, EPHEMERIS_STOP, "1 d"));
+      const rows = parseVectorCsv(vec);
+      if (!rows.length) throw new Error(`no vector rows: ${vec.slice(0, 300).replace(/\s+/g, " ")}`);
+      let orbit = null;
+      if (b.type !== "spacecraft") {
+        const el = await horizons(elementParams(b.horizons, "500@10", REFERENCE_EPOCH, `${REFERENCE_EPOCH} 00:01`, "1 d"));
+        orbit = parseElementsCsv(el)[0] ?? null;
+      }
+      out[b.id] = { vectors: rows, orbit, header: header(vec) };
+      console.log(`${rows.length} rows`);
+    } catch (e) {
+      failed.push(b.id);
+      console.log(`FAILED (${(e as Error).message.slice(0, 200)})`);
     }
-    const vec = await horizons(vectorParams(b.horizons, "500@10", EPHEMERIS_START, EPHEMERIS_STOP, "1 d"));
-    const rows = parseVectorCsv(vec);
-    let orbit = null;
-    if (b.type !== "spacecraft") {
-      const el = await horizons(elementParams(b.horizons, "500@10", REFERENCE_EPOCH, `${REFERENCE_EPOCH} 00:01`, "1 d"));
-      orbit = parseElementsCsv(el)[0] ?? null;
-    }
-    out[b.id] = { vectors: rows, orbit, header: header(vec) };
-    console.log(`${rows.length} rows`);
   }
+  if (failed.length) console.warn(`  Horizons: ${failed.length} bodies failed and will be omitted: ${failed.join(", ")}`);
 
   // Parker Solar Probe record perihelion speed.
   process.stdout.write("  Horizons Parker Solar Probe perihelion… ");
@@ -102,7 +121,7 @@ export async function fetchHorizons() {
   }
   console.log(`${best.speed.toFixed(2)} km/s`);
 
-  await writeJson(join(RAW, "horizons.json"), {
+  await writeJson(dest, {
     retrieved: today(),
     api: API,
     frame: "ICRF, center 500@10 (Sun body center), TDB, km & km/s",

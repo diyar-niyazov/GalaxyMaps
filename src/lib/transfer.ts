@@ -15,7 +15,7 @@ export interface HohmannResult {
   /** Speed change at departure and arrival (heliocentric, km/s). */
   dv1KmS: number;
   dv2KmS: number;
-  /** Required lead angle of the target at departure (rad): target ahead of origin. */
+  /** Required lead angle of the target at departure (rad, wrapped to (−π, π]). */
   phaseAngleRad: number;
   originPeriodDays: number;
   targetPeriodDays: number;
@@ -23,13 +23,16 @@ export interface HohmannResult {
   synodicDays: number;
 }
 
+const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+
 export function hohmann(r1Km: number, r2Km: number, mu = GM_SUN_KM3_S2): HohmannResult {
   if (!(r1Km > 0 && r2Km > 0) || r1Km === r2Km) throw new Error("Orbit radii must be positive and different");
   const a = (r1Km + r2Km) / 2;
   const t = Math.PI * Math.sqrt(a ** 3 / mu);
   const v1 = Math.sqrt(mu / r1Km), v2 = Math.sqrt(mu / r2Km);
-  const vp = Math.sqrt(mu * (2 / r1Km - 1 / a));
-  const va = Math.sqrt(mu * (2 / r2Km - 1 / a));
+  // Speed on the transfer ellipse at the departure and arrival radii (vis-viva).
+  const vDep = Math.sqrt(mu * (2 / r1Km - 1 / a));
+  const vArr = Math.sqrt(mu * (2 / r2Km - 1 / a));
   const n2 = Math.sqrt(mu / r2Km ** 3);
   const T1 = 2 * Math.PI * Math.sqrt(r1Km ** 3 / mu);
   const T2 = 2 * Math.PI * Math.sqrt(r2Km ** 3 / mu);
@@ -40,32 +43,56 @@ export function hohmann(r1Km: number, r2Km: number, mu = GM_SUN_KM3_S2): Hohmann
     eTransfer: Math.abs(r2Km - r1Km) / (r1Km + r2Km),
     transferSeconds: t,
     transferDays: t / DAY_S,
-    dv1KmS: Math.abs(vp - v1),
-    dv2KmS: Math.abs(v2 - va),
-    phaseAngleRad: Math.PI - n2 * t,
+    dv1KmS: Math.abs(vDep - v1),
+    dv2KmS: Math.abs(v2 - vArr),
+    phaseAngleRad: wrap(Math.PI - n2 * t),
     originPeriodDays: T1 / DAY_S,
     targetPeriodDays: T2 / DAY_S,
     synodicDays: 1 / Math.abs(1 / (T1 / DAY_S) - 1 / (T2 / DAY_S)),
   };
 }
 
-/** State of the idealized scenario at time t (s) after departure, angles in the orbital plane. */
+/**
+ * State of the idealized scenario at time t (s) after departure. Angles are measured in the
+ * orbital plane from the departure direction, in the direction of orbital motion.
+ * Outward transfers depart at perihelion; inward transfers depart at aphelion.
+ */
 export function hohmannState(h: HohmannResult, tSeconds: number, mu = GM_SUN_KM3_S2) {
   const n1 = Math.sqrt(mu / h.r1Km ** 3), n2 = Math.sqrt(mu / h.r2Km ** 3);
-  const originAngle = n1 * tSeconds;
-  const targetAngle = h.phaseAngleRad + n2 * tSeconds;
-  // Transfer ellipse: perihelion at r1 (angle 0), aphelion at r2 (angle π) for outward transfers.
+  const inward = h.r2Km < h.r1Km;
   const tt = Math.min(Math.max(tSeconds, 0), h.transferSeconds);
   const e = h.eTransfer;
   const nT = Math.sqrt(mu / h.aKm ** 3);
-  const M = nT * tt;
+  const M = (inward ? Math.PI : 0) + nT * tt;
   let E = M;
-  for (let i = 0; i < 30; i++) E -= (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+  for (let i = 0; i < 40; i++) E -= (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
   const nu = 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
   const r = h.aKm * (1 - e * Math.cos(E));
+  const craftAngle = inward ? (nu < 0 ? nu + 2 * Math.PI : nu) - Math.PI : nu < 0 ? nu + 2 * Math.PI : nu;
   return {
-    origin: { angle: originAngle, r: h.r1Km },
-    target: { angle: targetAngle, r: h.r2Km },
-    craft: { angle: nu, r },
+    origin: { angle: n1 * tSeconds, r: h.r1Km },
+    target: { angle: h.phaseAngleRad + n2 * tSeconds, r: h.r2Km },
+    craft: { angle: craftAngle, r },
   };
+}
+
+/** Radius on the transfer ellipse at angle θ ∈ [0, π] from the departure point. */
+export function transferRadius(h: HohmannResult, theta: number) {
+  const e = h.eTransfer;
+  const nu = h.r2Km < h.r1Km ? theta + Math.PI : theta;
+  return (h.aKm * (1 - e * e)) / (1 + e * Math.cos(nu));
+}
+
+/** Arc length of the half ellipse flown, km (numerical). */
+export function transferArcLengthKm(h: HohmannResult, n = 720): number {
+  let s = 0;
+  let prev = [transferRadius(h, 0), 0];
+  for (let i = 1; i <= n; i++) {
+    const th = (i / n) * Math.PI;
+    const r = transferRadius(h, th);
+    const p = [r * Math.cos(th), r * Math.sin(th)];
+    s += Math.hypot(p[0] - prev[0], p[1] - prev[1]);
+    prev = p;
+  }
+  return s;
 }

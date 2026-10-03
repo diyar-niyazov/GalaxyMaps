@@ -1,92 +1,96 @@
-# SpaceMaps demo scripts
+# GalaxyMaps demo script
 
-All numbers below come from the app on the bundled dataset, with the map date set to 2026-10-04. Solar System distances change daily; star and galaxy numbers do not.
+Numbers below come from the bundled dataset (catalog 1.1.0). Solar System distances change with the map date; star and galaxy distances do not.
 
-## Setup (do this before judging)
+## Setup
 
 ```bash
 npm run build && npm start        # http://localhost:8787, one process, no dev overlay
 ```
 
-- Use Chrome or Edge at full screen (1440×900 or larger) and zoom the browser to 100%.
-- Open http://localhost:8787. Click **Earth & Moon** so you start at home.
-- **If an xAI key is configured:** open the Guide once and check that the pill says "Grok Voice available". Check the microphone permission.
-- **If no key is configured:** the Guide shows "Offline guide". Present it honestly as the scripted fallback; do not call it Grok.
-- Keep these tabs ready as fallbacks:
-  - `http://localhost:8787/?route=earth,polaris&mode=light`
-  - `http://localhost:8787/?panel=transfer`
-  - `http://localhost:8787/?route=earth,sirius,vega,polaris&mode=light`
-- Close Slack, notifications and other heavy tabs. The Milky Way views use WebGL.
+- Use Chrome or Edge, full screen (1440×900 or larger), browser zoom at 100%.
+- Open http://localhost:8787. The app opens locked on Earth.
+- **With an xAI key:** open the Guide once and check that it says Grok Voice is available, and allow the microphone.
+- **Without a key:** the Guide shows "Offline guide (scripted)". Present it as the scripted fallback, not as Grok.
+- Fallback tabs:
+  - `http://localhost:8787/?route=earth,mars&mode=light` (Earth → Mars transfer)
+  - `http://localhost:8787/?route=earth,polaris&mode=voyager-1`
+  - `http://localhost:8787/?view=andromeda` (Andromeda, Explore inside)
+  - `http://localhost:8787/?view=universe`
+- Close heavy tabs and notifications; the map uses WebGL.
 
 ---
 
-## Two-minute preliminary demo
+## Two-minute demo
 
 | Time | On screen | Say |
 | --- | --- | --- |
-| 0:00–0:15 | Earth & Moon view | "Everyone knows how to use Google Maps. SpaceMaps is that same interface for the universe: search a place, get directions, compare how you'd get there, using real astronomical data." |
-| 0:15–0:45 | Click the scale chips **Inner planets → Solar System → Nearby stars**, or scroll to zoom out | "This is one continuous map, from the Earth–Moon system to the planets at today's JPL Horizons positions, out to the nearest stars. Labels declutter as you zoom, and the map plane switches from the Solar System's plane to the galaxy's." |
-| 0:45–1:10 | Search **Polaris** → **Directions**. The camera fits Earth and Polaris. Click the **Voyager 1** tab, then **More → USS Enterprise** | "Polaris is 433 light-years away. That's a real 3D distance from catalog positions, with its uncertainty shown. At light speed it's 433 years. At Voyager 1's actual speed it's 7.7 million years. The Enterprise at warp 9 makes it in 3.4 months, and we label that as fiction." |
-| 1:10–1:35 | Back to **Light**. Under "Add a stop along the way?" click **Add** next to **Vega**. Press **Play** | "Multi-stop trips work like Google Maps. We don't just call something 'on the way'; we compute the detour. Vega adds 2.3%. Playback is always ten seconds, whatever the speed." |
-| 1:35–1:50 | **Ask the guide**: "Why don't rockets fly straight to Mars?" (voice if Grok is live, typed otherwise). Optionally open **Earth → Mars transfer** from Explore | With Grok: "Grok can only use our validated tools; it can't invent destinations or numbers." Offline: "Without an API key it falls back to a clearly labeled scripted guide that calls the same tools." |
-| 1:50–2:00 | Click a destination card's source line, or open ⓘ About | "Every number has a source: JPL Horizons, SIMBAD, HYG, the NASA Exoplanet Archive. Assumptions are always on screen. It's a navigation app that teaches scale honestly." |
+| 0:00–0:15 | Home: Earth close-up, "Locked on Earth" | "GalaxyMaps is a map app for the universe: search a place, open its card, get directions, using real catalog data." |
+| 0:15–0:35 | Drag to orbit Earth, scroll to zoom. Press **Back to explore**, then pick **Solar System** from the region pills | "Locked on an object, dragging orbits it and zoom goes toward it; you can't accidentally pan away. Back to explore gives the free map back." |
+| 0:35–1:00 | Search `mars`, open the card, press **Directions** | "Planet to planet, the primary answer is an orbital transfer: an idealized Hohmann ellipse, about 259 days, with the next alignment window. Straight lines are just a benchmark." |
+| 1:00–1:20 | Press play on the route preview, then **Play time** on the map | "The preview runs on its own clock. Play time moves every planet; it pauses while I interact and resumes when I stop." |
+| 1:20–1:40 | Region **Galaxies → Andromeda**. Show the Explore-inside list | "Andromeda has 21 features here: companions, the central black hole, globular clusters, novae, a supernova, with breadcrumbs back up to the universe." |
+| 1:40–2:00 | Region **Observable universe** | "At the largest scale we switch to a schematic: logarithmic distance, labelled as such, no fake linear scale bar. Every number in GalaxyMaps has a source, and every assumption is on screen." |
 
 ---
 
-## Four-minute finalist demo
+## Four-minute demo
 
 ### 0:00–0:20 Hook
 
-"Space distances are numbers nobody can feel. But everyone already knows how to read a map, a route and an ETA. SpaceMaps turns the universe into a map you already know how to use."
+"Space distances are numbers nobody can feel, but everyone can read a map, a route and an ETA. GalaxyMaps puts the universe in a map you already know how to use."
 
-### 0:20–1:00 Continuous zoom (Earth → Milky Way)
+### 0:20–1:00 Locked camera and cards
 
-- Start at **Earth & Moon**. Scroll out slowly, or use the scale chips up to **Milky Way**.
-- "Same map, same camera. Earth, the Moon's orbit, the inner planets at today's real positions from NASA JPL Horizons, the Kuiper belt, then 109,000 real stars from the HYG catalog."
-- At **Milky Way**: "This disk is a scientific illustration built from published spiral-arm models, and the map says so in the corner. No one has photographed our galaxy from outside. The 'You are here' marker is where the Sun really sits, about 8 kiloparsecs from the center."
-- Press **L** to toggle the **Atlas** layer: "Atlas is the clean 'map' style. Both layers share the same positions and routes."
+- The app opens **Locked on Earth**: a textured Earth with night lights and clouds.
+- Drag (orbit with inertia), scroll (zoom toward Earth), arrow keys (orbit). "No panning while locked; the object stays centred in the part of the map you can see."
+- Press **/**, type `black hole`, and choose **Sagittarius A***. "Search covers names, aliases, catalog IDs and type words. Results have thumbnails and real distances."
+- Open the **Browse** grid button: "Eight categories with real counts; choosing one emphasizes those markers on the map."
 
-### 1:00–1:50 Directions: Earth → Polaris
+### 1:00–1:50 Directions: Earth → Mars, then Earth → Polaris
 
-- Press **H** (home), then **/**, type `polaris`, and choose **Directions**.
-- "Directions from Earth. The camera fits both ends. 433 light-years, ± 6.4, computed as a full 3D distance between catalog positions. The map is a projection, but the math never is."
-- Click through the modes:
-  - **Light**: 433 years. "Even light needs five human lifetimes."
-  - **Voyager 1**: 7.7 million years. "That's Voyager's real speed from JPL, relative to the Sun, on a stated date. We say clearly that rockets don't have one fixed speed."
-  - **Custom** at 0.99 c: "437 years for people on Earth, but only 62 onboard. That's special relativity, and we only show it below light speed."
-  - **More → Enterprise**: 3.4 months, labeled fictional.
-- Open **Show assumptions**: "Constant speed, straight line, no acceleration or gravity. A comparison, not a mission plan."
+- Search `mars` → **Directions**.
+  - "Orbital transfer first: an idealized Hohmann transfer, about 259 days (8.5 months), departure and arrival dates for the next window, Δv, and the transfer arc on the map."
+  - "Below it is the speed comparison: the straight-line distance today, at light speed. That's a benchmark, not a flight path."
+- Change the destination to `polaris`.
+  - "Beyond planets we use a straight-line cruise. The Travel mode dropdown has exactly two options."
+  - **Light speed**: about 433 years. **Voyager 1** (16.92 km/s, measured by JPL Horizons): about 7.7 million years.
+- Press **Back to explore** or **Focus Polaris** to show the route camera and the way back to the lock.
 
-### 1:50–2:30 Why not a straight line? Earth → Mars transfer
+### 1:50–2:30 Play time
 
-- From Explore choose **Why not straight to Mars?** (or open `?panel=transfer`). Press **Play**.
-- "Real spacecraft don't drive in straight lines; they coast on orbits. This is the classic Hohmann transfer: about 259 days, launched when Mars is about 44° ahead, which is why windows open every 26 months. It's an idealized textbook model with circular, coplanar orbits, and the assumptions are listed right here."
+- Back to Earth (**H**), pick **Solar System**, and press **Play time** at **1 week / s**.
+- "Planets move on JPL Horizons positions and spin on IAU rotation models. Start dragging and it pauses; let go and it resumes. Hide the tab and it pauses."
+- Lock on Jupiter while it plays: "A locked moving body stays centred."
 
-### 2:30–3:10 Multi-stop journey + grounded guide
+### 2:30–3:10 Andromeda and the observable universe
 
-- Open the **Multi-stop star tour** card (Earth → Sirius → Vega → Polaris, 459 light-years).
-- "Each leg is computed and summed. Suggested stops are ranked by the extra distance they actually add."
+- Region **Galaxies → Andromeda**, then **Explore inside**: breadcrumbs Universe › Local Group › Andromeda Galaxy, with companions, the M31* nucleus and its clusters.
+- "Galaxies are drawn as discs at their measured position angle and axis ratio. The features' depth inside Andromeda isn't measured, and the panel says so."
+- Region **Observable universe**: "A schematic, logarithmic overview of a sphere about 46 billion light-years in radius. Click any catalog dot and we fly back to its local frame."
+
+### 3:10–3:40 Honest data and the guide
+
+- Search **Alnilam**: "Its parallax is 27% uncertain, so we don't invert it and offer no route; the card explains why."
 - Open the Guide.
-  - **If Grok is live**, say: "Take me from Earth to Betelgeuse, then suggest a stop on the way." Point out the "Map action" lines: Grok called `searchObjects`, `setRoute` and `suggestStops`, and read back our numbers.
-  - **If offline**: type `take me to the Death Star`. "It refuses, because it's not in the catalog. The AI layer, live or scripted, can't make things up. It can only call validated tools."
-
-### 3:10–3:40 Data honesty
-
-- Search **Betelgeuse** and show the card: 498 light-years, +72/−56, quality "Approximate", Hipparcos parallax with its bibcode.
-- Search **3C 273**: "Route unavailable. At cosmological redshift a constant-speed trip isn't meaningful, so we explain why instead of faking a number."
+  - **If Grok is live**: "Take me from Earth to Betelgeuse." Point out the tool calls; Grok reads back our numbers.
+  - **If offline**: type `take me to the Death Star`. "It refuses: it's not in the catalog. Live or scripted, the guide can only call validated tools."
 
 ### 3:40–4:00 Close
 
-"SpaceMaps is a real-data space atlas with a familiar interface. 618 catalog objects, 109,000 stars, live-date planet positions, every number sourced, every assumption visible. Navigation that teaches the true scale of the universe. Thank you!"
+"GalaxyMaps: 374 curated destinations, 919 catalog objects, 109,000 stars, planets at real positions, every number sourced and every assumption visible. Directions across the universe."
 
 ---
 
+## Phone (optional, 20 seconds)
+
+Open the same URL on a phone or with device emulation at 390×844: floating search at the top, a bottom sheet you can drag between collapsed, half and full, pinch to zoom and two-finger rotate.
+
 ## Likely Q&A
 
-- **Where does the data come from?** NASA/JPL Horizons, the NASA fact sheets, the HYG v4.4 star catalog, SIMBAD, the NASA Exoplanet Archive, and cited papers for galaxy distances. It is preprocessed into a bundle, so the demo runs offline. See `docs/DATA.md`.
-- **How do you handle bad parallaxes?** We only invert a parallax when its error is at most 20%. Otherwise the object is searchable but has no route. Example: Alnilam.
-- **Is the 2D map distorting distances?** No. Distances are always full 3D. The map is a projection, and enlarged markers are display only.
-- **Is the Milky Way image real?** It's a procedural illustration from published arm models, labeled as such.
-- **What does Grok actually do?** It talks and decides which tool to call. SpaceMaps does every lookup and calculation, and Grok reads the results back. The API key never reaches the browser; the server hands out a 5-minute ephemeral token.
-- **Why not show the fastest route?** We have no optimization model for interstellar trajectories, so we never claim "fastest". The Hohmann demo shows what an actual orbital model looks like.
-- **What was hardest?** One map that spans view widths from 6,000 km to about 2.5 × 10²¹ km (17 orders of magnitude) without float precision problems: everything is computed in float64, relative to the camera. Also making zoom flights across that range feel smooth, and keeping every number honest.
+- **Where does the data come from?** NASA/JPL Horizons and SBDB, NASA fact sheets, HYG v4.4, SIMBAD, the NASA Exoplanet Archive, cited papers for galaxy distances, Wikipedia/Wikimedia Commons for text and images. Preprocessed into a bundle so the demo runs offline. See `docs/DATA.md`.
+- **Why is Earth → Mars not a straight line?** Spacecraft coast on orbits. The Hohmann ellipse is the textbook minimum-energy transfer between circular, coplanar orbits; the straight line is only a benchmark.
+- **Why only light speed and Voyager 1?** One physical limit and one real, measured spacecraft speed. More modes invited invented numbers.
+- **Is the Milky Way real?** It's a reconstruction from published spiral-arm models, labelled as such. Nobody has photographed our galaxy from outside.
+- **VR?** Enter VR appears on browsers that support immersive WebXR. The code is in place, but headset validation is still pending.
+- **What does Grok do?** It talks and chooses tools; GalaxyMaps does every lookup and calculation. The API key never reaches the browser.

@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import type { DataBundle } from "../data/bundle";
-import type { Layer, ViewInfo } from "../map/MapEngine";
+import type { Layer, ViewInfo, CameraMode } from "../map/MapEngine";
 import { jdTdb } from "../lib/units";
-import { clampJd } from "../lib/ephemeris";
-import { FICTIONAL_DEFAULTS, type CustomSpeedUnit } from "../lib/transport";
+import { clampPlayJd } from "../lib/ephemeris";
+import type { RouteModelPreference } from "../lib/route";
 
-export type Panel = "explore" | "place" | "directions" | "guide" | "transfer";
+export type Panel = "explore" | "place" | "directions" | "guide";
+export type SheetState = "collapsed" | "half" | "full";
+export type ModeId = "light" | "voyager-1";
 
 export interface GuideMessage {
   id: number;
@@ -13,6 +15,26 @@ export interface GuideMessage {
   text: string;
   /** Where the text came from, shown to the user. */
   origin?: "grok" | "offline" | "app";
+}
+
+/** Simulation-clock rates, in simulated days per real second. */
+export const TIME_RATES = [
+  { id: "hour", label: "1 hour / s", daysPerSecond: 1 / 24 },
+  { id: "day", label: "1 day / s", daysPerSecond: 1 },
+  { id: "week", label: "1 week / s", daysPerSecond: 7 },
+  { id: "month", label: "1 month / s", daysPerSecond: 30.4375 },
+  { id: "year", label: "1 year / s", daysPerSecond: 365.25 },
+] as const;
+export type TimeRateId = (typeof TIME_RATES)[number]["id"];
+
+export interface TimeState {
+  /** The user pressed Play and has not pressed Pause. */
+  armed: boolean;
+  /** Clock currently advancing (armed and not suspended by interaction or a hidden page). */
+  running: boolean;
+  rate: TimeRateId;
+  /** Date the clock started from, for Reset and the elapsed readout. */
+  startJd: number;
 }
 
 export interface AppState {
@@ -23,9 +45,8 @@ export interface AppState {
   panel: Panel;
   selectedId: string | null;
   stops: (string | null)[];
-  modeId: string;
-  custom: { value: number; unit: CustomSpeedUnit };
-  fictional: { enterprise: number; falcon: number };
+  modeId: ModeId;
+  routeModel: RouteModelPreference;
   playing: boolean;
   progress: number;
   playbackSeconds: number;
@@ -33,9 +54,18 @@ export interface AppState {
   viewInfo: ViewInfo | null;
   aboutOpen: boolean;
   guide: GuideMessage[];
-  transfer: { t: number; playing: boolean };
   /** Incremented to request the map to fit the current route. */
   fitRequest: number;
+  camera: { mode: CameraMode; lockedId: string | null };
+  time: TimeState;
+  orbitCamera: boolean;
+  sidebarCollapsed: boolean;
+  sheet: SheetState;
+  /** Category filter emphasizing matching markers on the map (null = none). */
+  categoryFilter: string | null;
+  xr: { supported: boolean | null; active: boolean };
+  /** Galaxy or system whose children the sidebar lists (Explore inside). */
+  inside: string | null;
 
   setData(d: DataBundle): void;
   setLoadError(e: string): void;
@@ -49,8 +79,7 @@ export interface AppState {
   removeStop(index: number): void;
   moveStop(index: number, dir: -1 | 1): void;
   setMode(id: string): void;
-  setCustom(c: { value: number; unit: CustomSpeedUnit }): void;
-  setFictional(f: Partial<{ enterprise: number; falcon: number }>): void;
+  setRouteModel(m: RouteModelPreference): void;
   setPlaying(p: boolean): void;
   setProgress(p: number): void;
   setPlaybackSeconds(s: number): void;
@@ -59,24 +88,36 @@ export interface AppState {
   setAboutOpen(o: boolean): void;
   pushGuide(m: Omit<GuideMessage, "id">): void;
   clearGuide(): void;
-  setTransfer(t: Partial<{ t: number; playing: boolean }>): void;
   requestFit(): void;
+  setCamera(c: { mode: CameraMode; lockedId: string | null }): void;
+  setJd(jd: number): void;
+  playTime(): void;
+  pauseTime(): void;
+  suspendTime(suspended: boolean): void;
+  resetTime(): void;
+  setTimeRate(r: TimeRateId): void;
+  setOrbitCamera(o: boolean): void;
+  setSidebarCollapsed(c: boolean): void;
+  setSheet(s: SheetState): void;
+  setCategoryFilter(id: string | null): void;
+  setXr(x: Partial<{ supported: boolean | null; active: boolean }>): void;
+  setInside(id: string | null): void;
 }
 
 let msgId = 1;
 export const MAX_STOPS = 5;
+const now = jdTdb(new Date());
 
 export const useStore = create<AppState>((set, get) => ({
   data: null,
   loadError: null,
-  jd: jdTdb(new Date()),
+  jd: now,
   layer: "realistic",
   panel: "explore",
   selectedId: null,
   stops: [null, null],
   modeId: "light",
-  custom: { value: 0.1, unit: "c" },
-  fictional: { ...FICTIONAL_DEFAULTS },
+  routeModel: "auto",
   playing: false,
   progress: 0,
   playbackSeconds: 10,
@@ -84,21 +125,28 @@ export const useStore = create<AppState>((set, get) => ({
   viewInfo: null,
   aboutOpen: false,
   guide: [],
-  transfer: { t: 0, playing: false },
   fitRequest: 0,
+  camera: { mode: "explore", lockedId: null },
+  time: { armed: false, running: false, rate: "day", startJd: now },
+  orbitCamera: false,
+  sidebarCollapsed: false,
+  sheet: "collapsed",
+  categoryFilter: null,
+  xr: { supported: null, active: false },
+  inside: null,
 
-  setData: (d) => set({ data: d, jd: clampJd(d.eph, get().jd) }),
+  setData: (d) => set({ data: d, jd: clampPlayJd(get().jd) }),
   setLoadError: (e) => set({ loadError: e }),
   setLayer: (l) => set({ layer: l }),
   setPanel: (p) => set({ panel: p, ...(p !== "directions" ? { playing: false } : {}) }),
-  select: (id) => set((s) => ({ selectedId: id, panel: id ? (s.panel === "directions" || s.panel === "guide" ? s.panel : "place") : s.panel === "place" ? "explore" : s.panel })),
+  select: (id) => set((s) => ({ selectedId: id, panel: id ? (s.panel === "directions" || s.panel === "guide" ? s.panel : "place") : s.panel === "place" ? "explore" : s.panel, sheet: id && s.sheet === "collapsed" ? "half" : s.sheet })),
   openDirections: (destinationId, originId) =>
     set((s) => {
       const stops = [...s.stops];
       if (destinationId !== undefined) stops[stops.length - 1] = destinationId;
       if (originId !== undefined) stops[0] = originId;
       else if (!stops[0] && destinationId !== "earth") stops[0] = "earth";
-      return { panel: "directions", stops, progress: 0, playing: false, fitRequest: s.fitRequest + 1 };
+      return { panel: "directions", stops, progress: 0, playing: false, fitRequest: s.fitRequest + 1, sheet: s.sheet === "collapsed" ? "half" : s.sheet };
     }),
   setStop: (i, id) => set((s) => {
     const stops = [...s.stops];
@@ -127,9 +175,8 @@ export const useStore = create<AppState>((set, get) => ({
     [stops[i], stops[j]] = [stops[j], stops[i]];
     return { stops, progress: 0, playing: false, fitRequest: s.fitRequest + 1 };
   }),
-  setMode: (id) => set({ modeId: id }),
-  setCustom: (c) => set({ custom: c, modeId: "custom" }),
-  setFictional: (f) => set((s) => ({ fictional: { ...s.fictional, ...f } })),
+  setMode: (id) => set({ modeId: id === "voyager-1" || id === "voyager-1-speed" ? "voyager-1" : "light" }),
+  setRouteModel: (m) => set({ routeModel: m, progress: 0, playing: false }),
   setPlaying: (p) => set((s) => ({ playing: p, progress: p && s.progress >= 1 ? 0 : s.progress })),
   setProgress: (p) => set({ progress: p }),
   setPlaybackSeconds: (sec) => set({ playbackSeconds: sec }),
@@ -138,6 +185,18 @@ export const useStore = create<AppState>((set, get) => ({
   setAboutOpen: (o) => set({ aboutOpen: o }),
   pushGuide: (m) => set((s) => ({ guide: [...s.guide, { ...m, id: msgId++ }] })),
   clearGuide: () => set({ guide: [] }),
-  setTransfer: (t) => set((s) => ({ transfer: { ...s.transfer, ...t } })),
   requestFit: () => set((s) => ({ fitRequest: s.fitRequest + 1 })),
+  setCamera: (c) => set({ camera: c }),
+  setJd: (jd) => set({ jd: clampPlayJd(jd) }),
+  playTime: () => set((s) => ({ time: { ...s.time, armed: true, running: true, startJd: s.time.armed || s.time.running ? s.time.startJd : s.jd } })),
+  pauseTime: () => set((s) => ({ time: { ...s.time, armed: false, running: false } })),
+  suspendTime: (suspended) => set((s) => (s.time.armed ? { time: { ...s.time, running: !suspended } } : {})),
+  resetTime: () => set((s) => ({ jd: s.time.startJd, time: { ...s.time, armed: false, running: false } })),
+  setTimeRate: (r) => set((s) => ({ time: { ...s.time, rate: r } })),
+  setOrbitCamera: (o) => set({ orbitCamera: o }),
+  setSidebarCollapsed: (c) => set({ sidebarCollapsed: c }),
+  setSheet: (sheet) => set({ sheet }),
+  setCategoryFilter: (id) => set({ categoryFilter: id }),
+  setXr: (x) => set((s) => ({ xr: { ...s.xr, ...x } })),
+  setInside: (id) => set({ inside: id }),
 }));

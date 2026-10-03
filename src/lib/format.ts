@@ -95,3 +95,8 @@ export function formatUncertainty(plusKm?: number, minusKm?: number): string | n
   if (Math.abs(p - m) / ref < 0.15) return `± ${f(ref)}`;
   return `+${f(p)} / −${f(m)}`;
 }
+
+/** Calendar date (UTC, ISO yyyy-mm-dd) for a Julian date; TDB−UTC (~69 s) is irrelevant at this precision. */
+export function jdToIsoDate(jd: number): string {
+  return new Date((jd - 2_440_587.5) * 86_400_000).toISOString().slice(0, 10);
+}

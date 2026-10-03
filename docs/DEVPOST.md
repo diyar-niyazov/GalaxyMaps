@@ -10,17 +10,17 @@ Space numbers don't land. "Polaris is 433 light-years away" is a fact nobody can
 
 ## What it does
 
-SpaceMaps is a continuously zoomable space atlas with a Google-Maps-style sidebar.
+GalaxyMaps is a continuously zoomable space atlas with a Google-Maps-style sidebar.
 
 - **Explore one map from Earth to other galaxies.** Zoom from the Earth–Moon system through the planets, shown at their real positions for the selected date, out to 109,000 catalog stars, the Milky Way and the Local Group.
-- **Search 618 objects.** Planets, moons, spacecraft, named stars, nebulae and galaxies, with typo-tolerant search.
+- **Search and browse 919 objects.** Planets, moons, spacecraft, named stars, black holes, clusters, nebulae and galaxies, with typo-tolerant search over names, aliases, catalog IDs and types, and a nested category browser with real counts.
 - **Read destination cards.** Each card has sourced facts, a distance with its uncertainty and quality rating, a citation, exoplanets, and an image labeled "Observed image", "Scientific illustration" or "AI reconstruction".
-- **Get directions.** Directions between any two supported objects use the true 3D distance and a constant-speed time.
-  - Modes: light speed, real spacecraft speeds (Voyager 1, New Horizons, Parker Solar Probe, from JPL), a custom speed with relativistic onboard time below *c*, and, under "More", sci-fi ships and everyday comparisons. Fiction is labeled as fiction.
+- **Get directions.** Planet pairs get an idealized Hohmann transfer first (Earth → Mars: about 259 days), with a separate straight-line benchmark. Everything else uses the true 3D distance and a constant-speed cruise.
+  - Travel mode: exactly two options, light speed and Voyager 1's measured speed (from JPL Horizons).
   - Earth → Polaris: 433 years at light speed, 7.7 million years at Voyager 1's speed.
 - **Plan multi-stop trips.** Add up to 5 stops, reorder or remove them. Suggested stops are ranked by the extra distance they actually add, so "on the way" is computed, never guessed.
-- **See why real rockets don't fly straight.** An idealized Earth → Mars Hohmann transfer (about 259 days) is animated with its assumptions shown.
-- **Ask the guide.** Grok Voice can search the catalog, set routes, add stops and explain the journey, but only through validated tools. SpaceMaps computes every number. [Grok Voice and Grok Imagine are implemented against the xAI API; without an API key the app shows a clearly labeled offline scripted guide instead.]
+- **Lock onto any object.** Selecting a destination locks the camera: drag orbits it, zoom goes toward it, panning is disabled, and "Back to explore" restores your view. Play time moves the planets while the locked body stays centred.
+- **Ask the guide.** Grok Voice can search the catalog, set routes, add stops and explain the journey, but only through validated tools. GalaxyMaps computes every number. [Grok Voice and Grok Imagine are implemented against the xAI API; without an API key the app shows a clearly labeled offline scripted guide instead.]
 - **Switch layers.** Realistic (planet textures and a star field) and Atlas (clean symbols and orbits) share the same positions and routes.
 
 ## How we built it

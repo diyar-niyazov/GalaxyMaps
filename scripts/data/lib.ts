@@ -6,7 +6,7 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 export const RAW = join(ROOT, "data", "raw");
 export const PUBLIC_DATA = join(ROOT, "public", "data");
 
-export const USER_AGENT = "SpaceMaps/1.0 (BigRed//Hacks 2026 student project; data ingestion script)";
+export const USER_AGENT = "GalaxyMaps/1.0 (BigRed//Hacks 2026 student project; data ingestion script)";
 
 export async function exists(p: string) {
   try {

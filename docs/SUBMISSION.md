@@ -9,9 +9,9 @@
   - `node_modules/`, `dist/` and `.env` are git-ignored. **Never commit `.env`.**
   - Repository: https://github.com/diyar-niyazov/GalaxyMaps (public). Push final changes before the deadline.
   - `public/media` is about 30 MB, which is fine for GitHub (no file is over 50 MB).
-- [ ] **Google Drive link to the PDF deck.** Upload `docs/SpaceMaps-deck.pdf` to Google Drive, set sharing to "Anyone with the link can view", and paste the link on Devpost. Open the link in a private window to confirm it works.
+- [ ] **Google Drive link to the PDF deck.** Upload `docs/GalaxyMaps-deck.pdf` to Google Drive, set sharing to "Anyone with the link can view", and paste the link on Devpost. Open the link in a private window to confirm it works.
 - [ ] Devpost text: paste the sections from `docs/DEVPOST.md`. Re-read the bracketed Grok sentence and make it match what was actually tested.
-- [ ] Screenshots for the Devpost gallery are in `docs/screenshots/` (route-polaris, place-saturn, milky-way, transfer, guide, …).
+- [ ] Screenshots for the Devpost gallery are in `docs/screenshots/` (desktop-home-earth, desktop-card-mars, desktop-earth-mars-transfer, desktop-andromeda-inside, desktop-universe, phone-card-saturn, …).
 - [ ] Select tracks (see the eligibility notes below).
 - [ ] All four team members are added to the Devpost project.
 
