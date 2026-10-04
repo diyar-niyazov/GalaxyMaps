@@ -10,8 +10,9 @@ import { TOOL_DEFS, runTool } from "./tools";
 import { MISSION_CONTROL_INSTRUCTIONS } from "./toolDefs";
 import { useStore } from "../state/store";
 import { sourcedGuideContext } from "../lib/learning";
-import { MicCapture, micErrorMessage, primeAudio } from "./audio";
+import { MicCapture, encodeWav, micErrorMessage, primeAudio, rms } from "./audio";
 import { xrView } from "../xr/bridge";
+import { wakeCommand } from "./wakeWord";
 
 export { micErrorMessage } from "./audio";
 
@@ -31,6 +32,12 @@ export interface VoiceCallbacks {
   onMic?(label: string): void;
   /** Smoothed microphone input level, 0–1. */
   onLevel?(level: number): void;
+  /** Wake-word mode: speech detected (not yet known to be for Grok). */
+  onHearing?(hearing: boolean): void;
+  /** Wake-word mode: "armed" after a bare "Grok", "sent" when a command went to Grok. */
+  onWake?(state: "armed" | "sent" | "idle"): void;
+  /** A non-fatal server message; the session stays live. */
+  onNotice?(message: string): void;
 }
 
 const INSTRUCTIONS = `${MISSION_CONTROL_INSTRUCTIONS}
@@ -38,14 +45,21 @@ const INSTRUCTIONS = `${MISSION_CONTROL_INSTRUCTIONS}
 - The user may control the whole app by voice. When they ask for anything the app can do (open a panel, change layer, play time, share, go back, quiet view, accessibility settings, tours, comparisons, the sky view), call the matching tool instead of describing how to do it.
 - If they say goodbye or ask you to stop listening, call endVoiceSession.`;
 
-const XR_INSTRUCTIONS = `The user is inside the immersive VR map. They unmute the microphone with a look-and-pinch toggle, speak, then pinch again to send. Reply only to that finished utterance.
+const XR_INSTRUCTIONS = `The user is inside the immersive VR map. They address you by saying "Grok" first; you receive only the command that followed.
 - One short spoken sentence. Do not narrate travel, announce arrival, or start a second turn after tools.
-- Do not greet, repeat, or speak unless they just sent an utterance.
+- Do not greet, repeat, or speak unless they just gave you a command.
 - selectObject flies them to that object; setRegion flies to a region; setZoomTarget in/out/home zooms; resetView returns to Earth.
 - "This", "that", "it" or "what am I looking at" means the object they are looking at, described below. Call describeView or getSelectedObjectContext if you need a fresh look.
 - Panels, sharing and layers only appear after they leave VR; say so if asked.`;
 
 const RATE = 24000;
+/** Wake-word speech detection: pre-roll kept before speech, silence that ends an utterance, limits. */
+const PREROLL_MS = 350;
+const END_SILENCE_MS = 750;
+const MIN_VOICED_MS = 350;
+const MAX_UTTERANCE_MS = 12_000;
+const WAKE_FOLLOWUP_MS = 6000;
+const LOOKUP = /^(search|get|describe|compare)/;
 
 function floatToPcm16Base64(f: Float32Array): string {
   const bytes = new Uint8Array(f.length * 2);
@@ -85,20 +99,37 @@ export class GrokVoiceSession {
   /** Audio of the most recent spoken answer, for Replay. */
   private lastAudio: Float32Array[] = [];
   private responseAudio: Float32Array[] = [];
-  private ptt = false;
-  private holding = false;
   private pending: Float32Array[] = [];
-  private heard = 0;
+  /** Hands-free VR mode: audio stays local until an utterance starts with "Grok". */
+  private wake = false;
+  private responding = false;
+  private responseId: string | null = null;
+  private responseSpoke = false;
+  /** This response called a lookup tool, so it needs a follow-up turn to act on or speak the result. */
+  private lookups = false;
+  private retries = 0;
+  private sttNoticeAt = 0;
+  private followups = 0;
+  private preroll: Float32Array[] = [];
+  private prerollMs = 0;
+  private utterance: Float32Array[] | null = null;
+  private uttMs = 0;
+  private voicedMs = 0;
+  private quietMs = 0;
+  private uttLevel = 0;
+  private noiseFloor = 0.004;
+  private armedUntil = 0;
+  private transcribing: Promise<void> = Promise.resolve();
 
   constructor(private cb: VoiceCallbacks) {}
 
-  get pushToTalk() {
-    return this.ptt;
+  get wakeWord() {
+    return this.wake;
   }
 
   /** Call from a click or key handler: the audio context must be created inside the gesture. */
-  async connect(withMic: boolean, opts?: { pushToTalk?: boolean }) {
-    this.ptt = !!opts?.pushToTalk;
+  async connect(withMic: boolean, opts?: { wakeWord?: boolean }) {
+    this.wake ||= !!opts?.wakeWord;
     this.ctx = primeAudio();
     if (!this.ctx) throw new Error("Web Audio is not supported in this browser");
     this.cb.onStatus("connecting");
@@ -133,7 +164,7 @@ export class GrokVoiceSession {
       session: {
         voice: body.voice,
         instructions: this.instructions(),
-        turn_detection: this.ptt ? null : { type: "server_vad" },
+        turn_detection: this.wake ? null : { type: "server_vad" },
         tools: TOOL_DEFS,
         audio: {
           input: { format: { type: "audio/pcm", rate: RATE }, transcription: { keyterms: names } },
@@ -142,7 +173,6 @@ export class GrokVoiceSession {
       },
     });
     this.cb.onStatus("live");
-    if (this.ptt) this.setMuted(true);
     const micError = await micReady;
     if (micError) this.cb.onMicError?.(micErrorMessage(micError));
   }
@@ -163,39 +193,88 @@ export class GrokVoiceSession {
     this.send({ type: "session.update", session: { instructions: this.instructions() } });
   }
 
-  setPushToTalk(on: boolean) {
-    this.ptt = on;
-    this.send({ type: "session.update", session: { turn_detection: on ? null : { type: "server_vad" }, instructions: this.instructions() } });
-    if (on && !this.holding) this.setMuted(true);
-  }
-
-  /** Push-to-talk: start sending microphone audio. */
-  beginTalk() {
-    if (this.closed) return;
-    this.holding = true;
+  /**
+   * Hands-free wake word (VR). The microphone stays on, but nothing reaches Grok Voice until a
+   * locally detected utterance transcribes as "Grok, …". Turning it off mutes the microphone.
+   */
+  setWakeWord(on: boolean) {
+    if (on === this.wake) return;
+    this.wake = on;
+    this.resetUtterance();
+    this.armedUntil = 0;
     this.pending = [];
-    this.heard = 0;
     this.send({ type: "input_audio_buffer.clear" });
-    this.setMuted(false);
-    this.cb.onListening?.(true);
+    this.send({ type: "session.update", session: { turn_detection: on ? null : { type: "server_vad" }, instructions: this.instructions() } });
+    this.setMuted(!on);
+    this.cb.onWake?.("idle");
   }
 
-  /** Push-to-talk: mute. `send` (default true) commits audio and asks for one reply. */
-  endTalk(opts?: { send?: boolean }) {
-    if (!this.holding) return;
-    this.holding = false;
-    this.flushAudio();
-    const heard = this.heard;
-    this.heard = 0;
-    this.setMuted(true);
-    this.cb.onListening?.(false);
-    if (!this.ptt) return;
-    if (opts?.send !== false && heard >= RATE * 0.2) {
-      this.send({ type: "input_audio_buffer.commit" });
-      this.send({ type: "response.create" });
+  private resetUtterance() {
+    if (this.utterance) this.cb.onHearing?.(false);
+    this.utterance = null;
+    this.preroll = [];
+    this.prerollMs = this.uttMs = this.voicedMs = this.quietMs = this.uttLevel = 0;
+  }
+
+  /** Energy-based speech detection with an adaptive noise floor; Grok's own playback raises the bar. */
+  private detectSpeech(s: Float32Array) {
+    const level = rms(s), ms = (s.length / RATE) * 1000;
+    const threshold = Math.max(0.014, this.noiseFloor * 3) * (this.sources.size ? 2.5 : 1);
+    if (!this.utterance) {
+      if (level < threshold) this.noiseFloor = this.noiseFloor * 0.98 + level * 0.02;
+      this.preroll.push(s);
+      this.prerollMs += ms;
+      while (this.prerollMs > PREROLL_MS && this.preroll.length > 1) this.prerollMs -= (this.preroll.shift()!.length / RATE) * 1000;
+      if (level < threshold) return;
+      this.utterance = this.preroll;
+      this.uttMs = this.prerollMs;
+      this.preroll = [];
+      this.prerollMs = this.voicedMs = this.quietMs = 0;
+      this.cb.onHearing?.(true);
     } else {
-      this.send({ type: "input_audio_buffer.clear" });
+      this.utterance.push(s);
+      this.uttMs += ms;
     }
+    if (level >= threshold * 0.6) { this.voicedMs += ms; this.quietMs = 0; } else this.quietMs += ms;
+    this.uttLevel += level * ms;
+    if (this.quietMs < END_SILENCE_MS && this.uttMs < MAX_UTTERANCE_MS) return;
+    const chunks = this.utterance, voiced = this.voicedMs;
+    // A clip that never went quiet is probably steady noise: raise the floor toward it.
+    if (this.uttMs >= MAX_UTTERANCE_MS) this.noiseFloor = Math.max(this.noiseFloor, (this.uttLevel / this.uttMs) * 0.5);
+    this.resetUtterance();
+    if (voiced >= MIN_VOICED_MS) this.transcribing = this.transcribing.then(() => this.handleUtterance(chunks));
+  }
+
+  private sttFailed(message: string) {
+    if (performance.now() - this.sttNoticeAt < 20_000) return;
+    this.sttNoticeAt = performance.now();
+    this.cb.onNotice?.(message);
+  }
+
+  private async handleUtterance(chunks: Float32Array[]) {
+    if (this.closed || !this.wake) return;
+    let text = "";
+    try {
+      const r = await fetch("/api/stt", { method: "POST", headers: { "Content-Type": "audio/wav" }, body: encodeWav(chunks, RATE) });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) { this.sttFailed(r.status === 429 ? "Too many voice requests; wait a minute." : body.error ?? `Transcription failed (HTTP ${r.status})`); return; }
+      text = String(body.text ?? "");
+    } catch {
+      this.sttFailed("Couldn't reach transcription.");
+      return;
+    }
+    if (this.closed || !this.wake) return;
+    const cmd = wakeCommand(text, performance.now() < this.armedUntil);
+    if (cmd === null) return;
+    if (!cmd) {
+      this.armedUntil = performance.now() + WAKE_FOLLOWUP_MS;
+      this.cb.onWake?.("armed");
+      return;
+    }
+    this.armedUntil = 0;
+    this.cb.onUserText(cmd);
+    this.cb.onWake?.("sent");
+    this.sendText(cmd);
   }
 
   private flushAudio() {
@@ -211,11 +290,12 @@ export class GrokVoiceSession {
     if (this.mic) return;
     const mic = await MicCapture.open({
       rate: RATE,
-      onLevel: (l) => this.cb.onLevel?.(this.muted ? 0 : l),
+      // Wake mode never meters: a constant level stream would re-render the desktop UI under VR.
+      onLevel: (l) => { if (!this.wake) this.cb.onLevel?.(this.muted ? 0 : l); },
       onSilent: (label) => this.cb.onMicError?.(`No sound is coming from "${label}". Check that it isn't muted, or choose another microphone in Voice settings.`),
       onChunk: (s) => {
         if (this.muted || this.closed) return;
-        this.heard += s.length;
+        if (this.wake) { this.detectSpeech(s); return; }
         // Batch ~100 ms per message; the socket may still be connecting during the first chunks.
         this.pending.push(s);
         if (this.pending.reduce((n, c) => n + c.length, 0) < RATE / 10 || this.ws?.readyState !== WebSocket.OPEN) {
@@ -259,9 +339,9 @@ export class GrokVoiceSession {
     return this.muted;
   }
 
-  /** Stop Grok mid-answer. */
+  /** Stop Grok mid-answer. Cancelling with no response in flight is a server error, so only cancel a live one. */
   interrupt() {
-    this.send({ type: "response.cancel" });
+    if (this.responding) this.send({ type: "response.cancel" });
     this.stopPlayback();
   }
 
@@ -284,13 +364,25 @@ export class GrokVoiceSession {
   }
 
   sendText(text: string) {
+    this.interrupt();
     this.refreshContext();
+    this.followups = 0;
     this.send({ type: "conversation.item.create", item: { type: "message", role: "user", content: [{ type: "input_text", text }] } });
     this.send({ type: "response.create" });
+    this.responding = true;
+    this.retries = 0;
   }
 
-  /** Speak a reply without adding a user turn (headset welcome, context nudges). */
+  /** The new command raced a response that was still finishing: cancel it and ask again once. */
+  private retryCommand() {
+    if (this.retries++ >= 1 || this.closed) return;
+    this.send({ type: "response.cancel" });
+    setTimeout(() => { if (!this.closed) { this.send({ type: "response.create" }); this.responding = true; } }, 250);
+  }
+
+  /** Speak a reply without adding a user turn (context nudges). */
   speakAsGuide(instructions: string) {
+    if (this.responding) return;
     this.refreshContext();
     this.send({ type: "response.create", response: { instructions } });
   }
@@ -335,8 +427,15 @@ export class GrokVoiceSession {
 
   private async onEvent(ev: any) {
     switch (ev.type) {
+      case "response.created":
+        this.responding = true;
+        this.responseId = ev.response?.id ?? null;
+        this.responseSpoke = false;
+        this.lookups = false;
+        break;
       case "response.output_audio.delta":
       case "response.audio.delta":
+        this.responseSpoke = true;
         this.play(ev.delta);
         break;
       case "response.output_audio_transcript.delta":
@@ -353,6 +452,7 @@ export class GrokVoiceSession {
         if (ev.transcript) this.cb.onUserText(ev.transcript);
         break;
       case "input_audio_buffer.speech_started":
+        this.followups = 0;
         this.stopPlayback();
         this.cb.onListening?.(true);
         break;
@@ -360,6 +460,7 @@ export class GrokVoiceSession {
         this.cb.onListening?.(false);
         break;
       case "response.function_call_arguments.done": {
+        if (LOOKUP.test(ev.name ?? "")) this.lookups = true;
         let args: unknown = {};
         try {
           args = JSON.parse(ev.arguments || "{}");
@@ -375,6 +476,10 @@ export class GrokVoiceSession {
         break;
       }
       case "response.done": {
+        // A cancelled response can report done after its replacement was created.
+        const id = ev.response?.id ?? null;
+        if (!id || !this.responseId || id === this.responseId) { this.responding = false; this.responseId = null; }
+        const spoke = this.responseSpoke, lookups = this.lookups;
         if (this.responseAudio.length) {
           this.lastAudio = this.responseAudio;
           this.responseAudio = [];
@@ -383,20 +488,28 @@ export class GrokVoiceSession {
         const calls = this.calls;
         this.calls = [];
         await Promise.all(calls);
-        // Desktop VAD: one follow-up after tools. VR push-to-talk: that extra turn is how Grok
-        // repeats itself, so the original utterance is the only spoken reply.
-        if (this.ptt) break;
-        setTimeout(() => this.send({ type: "response.create" }), this.remainingPlaybackMs());
+        // One follow-up turn so tool results get spoken (and a search can lead to an action). In VR,
+        // skip it after actions Grok already spoke about: that second turn is how it repeats itself.
+        if ((this.wake && spoke && !lookups) || ++this.followups > 3) break;
+        this.responding = true;
+        setTimeout(() => { if (!this.closed && !this.responseId) this.send({ type: "response.create" }); else this.responding = !!this.responseId; }, this.remainingPlaybackMs());
         break;
       }
-      case "error":
-        this.cb.onStatus("error", ev.error?.message ?? "Grok Voice error");
+      case "error": {
+        // Server errors arrive on a live socket and do not end the session (a closed socket does).
+        const message: string = ev.error?.message ?? "Grok Voice error";
+        if (/no active response|cancel/i.test(message)) break;
+        if (/already has an active response/i.test(message)) { this.retryCommand(); break; }
+        if (!this.responseId) this.responding = false;
+        this.cb.onNotice?.(message);
         break;
+      }
     }
   }
 
   close() {
     this.closed = true;
+    this.resetUtterance();
     this.stopMic();
     this.stopPlayback();
     this.ws?.close();

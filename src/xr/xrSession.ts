@@ -5,7 +5,7 @@
  * gives true parallax and stereo depth. Galaxies are 3D particle discs, nebulae and clusters
  * volumetric particle clouds, planets and stars lit spheres. Look at something and pinch to fly
  * there; pinch and drag to turn the world around it; spread two pinching hands to zoom; hold your
- * gaze on an object for its details. Grok Voice is a look-and-pinch mic toggle on a HUD below the line of sight.
+ * gaze on an object for its details. Grok Voice is hands-free: say "Grok, …" (status pill at the bottom of the view).
  * Head tracking is owned by the runtime; the scene never writes the viewer pose.
  */
 import * as THREE from "three";
@@ -24,13 +24,14 @@ import { TYPE_LABEL } from "../lib/search";
 import { PC_KM } from "../lib/units";
 import { canvasFont } from "../lib/fonts";
 import { buildCloudParticles, cloudKind, type CloudKind } from "./cloudModel";
+import type { ParticleJob } from "./particleWorker";
 import { setXrNav, setXrView, xrContextChanged, type XrView } from "./bridge";
 import { VoiceHud } from "./voiceHud";
 import { useVoice } from "../state/voice";
 import { useStore } from "../state/store";
 import { reducedMotion } from "../lib/motion";
 import {
-  Dwell, FAR_M, FOCUS_M, LINEAR_M, LOG_MAX, LOG_REF_M, MIN_ANGLE, ORBIT_RAD_PER_M, displayDistance, displayRadius, flightAt, fromXr, objectZoomLimits, pickGaze, pinchFactor,
+  Dwell, FAR_M, FOCUS_M, GAZE_TOLERANCE, LINEAR_M, LOG_MAX, LOG_REF_M, MIN_ANGLE, ORBIT_RAD_PER_M, STICKY, displayDistance, displayRadius, flightAt, fromXr, objectZoomLimits, pickGaze, pinchFactor,
   planFlight, toXr, zoomVantage, type Flight, type GazeCandidate, type Vantage,
 } from "./spaceView";
 
@@ -44,12 +45,19 @@ export interface XrCallbacks {
 const SPHERE_TYPES = new Set(["star", "planet", "dwarf-planet", "moon", "exoplanet", "white-dwarf", "neutron-star"]);
 /** Models (spheres, particle galaxies and clouds) drawn at once, of which particle models. */
 const PROMOTED = 36;
-const PARTICLE_MODELS = 18;
+const PARTICLE_MODELS = 12;
 const MODEL_CACHE = 48;
 const GALAXY_COUNT = 40_000;
 const CLOUD_COUNT = 16_000;
+/** Additive particles drawn across all models at once; dense fields share it (GPU fill rate). */
+const PARTICLE_FILL = 150_000;
+/** Spheres built per layout pass; the rest stay markers until the next frame. */
+const SPHERE_BUILDS = 3;
 const LABELS = 12;
-const LABEL_CACHE = 48;
+const LABEL_CACHE = 96;
+/** Labels are re-chosen at this interval (or on a large head turn) and repositioned every frame. */
+const LABEL_PICK_MS = 120;
+const NEW_LABELS_PER_PICK = 2;
 const SKY_M = 1500;
 const TAP_MOVE_M = 0.028;
 const TAP_MS = 500;
@@ -92,7 +100,6 @@ interface Cached { node: THREE.Object3D; res: { dispose(): void }[]; used: numbe
 
 interface Pinch {
   target: string | null;
-  hud: boolean;
   /** ICRF direction of the ray at pinch start. */
   dir: Vec3;
   origin: THREE.Vector3 | null;
@@ -164,7 +171,7 @@ const POINT_VERT = /* glsl */ `
   void main() {
     vColor = color;
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = clamp(aSize * 2.0 * uPx / max(-mv.z, 0.01), 0.0, 96.0);
+    gl_PointSize = clamp(aSize * 2.0 * uPx / max(-mv.z, 0.01), 0.0, 64.0);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -197,7 +204,7 @@ const PARTICLE_VERT = /* glsl */ `
     float s = uDiam * uPx / z / 1000.0;
     float px = aSize * (aSize < 12.0 ? min(s, uStarCap) : min(s, 36.0));
     vEnergy = min(1.0, px * px);
-    gl_PointSize = -mv.z < 0.1 ? 0.0 : clamp(px, 1.0, 48.0);
+    gl_PointSize = -mv.z < 0.1 ? 0.0 : clamp(px, 1.0, 28.0);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -343,8 +350,16 @@ export class XrPresentation {
   private lastJd = 0;
   private lastLook = new THREE.Vector3(0, 0, -1);
   private faceLook: THREE.Vector3 | null = null;
-  private hudAimed = false;
   private lastPinch = new Map<XRInputSource, Pinch>();
+  private worker: Worker | null = null;
+  private building = new Set<string>();
+  private labelPick: Body[] = [];
+  private labelPickAt = -Infinity;
+  private labelPickDir = new THREE.Vector3();
+  private gazeCands: GazeCandidate[] = [];
+  private tmpA = new THREE.Vector3();
+  private tmpB = new THREE.Vector3();
+  private tmpQ = new THREE.Quaternion();
 
   constructor(session: XRSession, engine: MapEngine, data: DataBundle, focusId: string | null, jd: number, cb: XrCallbacks) {
     this.session = session;
@@ -373,6 +388,7 @@ export class XrPresentation {
     try {
       await r.xr.setSession(this.session);
       if (this.disposed) return;
+      r.xr.setFoveation?.(1);
       this.refSpace = r.xr.getReferenceSpace();
       this.buildScene();
       this.lastJd = 0;
@@ -381,7 +397,7 @@ export class XrPresentation {
       this.session.addEventListener("selectend", this.onSelectEnd);
       this.session.addEventListener("select", this.onSelect);
       setXrView(this.view);
-      useVoice.getState().setPushToTalk(true);
+      useVoice.getState().setWakeWord(true);
       r.setAnimationLoop(this.frame);
     } catch (error) {
       this.dispose();
@@ -407,8 +423,11 @@ export class XrPresentation {
     this.session.removeEventListener("end", this.onEnd);
     setXrView(null);
     setXrNav({ phase: "idle", id: null, name: null });
-    useVoice.getState().setPushToTalk(false);
-    useVoice.getState().endTalk({ send: false });
+    if (useVoice.getState().wakeWord) useVoice.getState().setWakeWord(false);
+    this.worker?.terminate();
+    this.worker = null;
+    this.building.clear();
+    this.labelPick = [];
     this.restoreRenderer();
     const all = [...this.disposables];
     for (const c of [...this.models.values(), ...this.labels.values()]) all.push(...c.res);
@@ -535,6 +554,12 @@ export class XrPresentation {
 
     this.buildStars();
     this.markers = this.pointCloud(this.bodies.length, 1);
+    const col = this.markers.geometry.attributes.color.array as Float32Array, c = new THREE.Color();
+    this.bodies.forEach((b, i) => {
+      c.set(b.obj.display.color).multiplyScalar(b.obj.featured ? 1 : 0.7);
+      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+    });
+    this.markers.geometry.attributes.color.needsUpdate = true;
 
     const reticleMat = this.track(new THREE.ShaderMaterial({ vertexShader: UV_VERT, fragmentShader: RETICLE_FRAG, uniforms: { uProgress: { value: 0 } }, transparent: true, depthTest: false, depthWrite: false }));
     this.reticle = new THREE.Mesh(this.track(new THREE.PlaneGeometry(1, 1)), reticleMat);
@@ -568,12 +593,17 @@ export class XrPresentation {
     this.space.add(this.stars);
   }
 
-  /** Re-centre the star buffer near the viewer whenever float precision would start to show. */
+  /**
+   * Re-centre the star buffer near the viewer whenever float precision would start to show. The
+   * offset that float32 tolerates grows as the scale shrinks (about a millimetre of display error),
+   * so zooming through interstellar space does not rewrite and re-upload every star each frame.
+   */
   private placeStars() {
     if (!this.stars || !this.starMat) return;
     const p: Vec3 = [this.vantage.p[0] / PC_KM, this.vantage.p[1] / PC_KM, this.vantage.p[2] / PC_KM];
     const o = this.starOrigin;
-    if (!o || Math.hypot(p[0] - o[0], p[1] - o[1], p[2] - o[2]) > 1e-3) {
+    const mPerPc = this.vantage.mPerKm * PC_KM;
+    if (!o || Math.hypot(p[0] - o[0], p[1] - o[1], p[2] - o[2]) > Math.max(1e-3, 4000 / mPerPc)) {
       const s = this.data.stars, stride = this.data.starStride;
       const pos = this.stars.geometry.attributes.position.array as Float32Array;
       for (let i = 0; i < pos.length / 3; i++) {
@@ -586,7 +616,7 @@ export class XrPresentation {
     }
     const origin = this.starOrigin!;
     this.starMat.uniforms.uVantage.value.set(p[0] - origin[0], p[1] - origin[1], p[2] - origin[2]);
-    this.starMat.uniforms.uMPerPc.value = this.vantage.mPerKm * PC_KM;
+    this.starMat.uniforms.uMPerPc.value = mPerPc;
   }
 
   private pointCloud(n: number, order: number) {
@@ -625,34 +655,47 @@ export class XrPresentation {
     const ranked = this.bodies
       .filter((b) => !b.hidden && b.kind !== "point" && b.angle > (b.kind === "sphere" ? 0.002 : 0.003))
       .sort((a, b) => b.angle - a.angle);
-    const promoted = new Set<string>();
+    const wanted = new Set<string>();
     let particles = 0;
     for (const b of ranked) {
-      if (promoted.size >= PROMOTED) break;
+      if (wanted.size >= PROMOTED) break;
       if (b.kind !== "sphere" && ++particles > PARTICLE_MODELS) continue;
-      promoted.add(b.obj.id);
+      wanted.add(b.obj.id);
+    }
+
+    // Models are built a few per frame (particles in a worker); until then a body stays a marker.
+    const promoted = new Set<string>();
+    let sphereBuilds = 0, syncBuilds = 0, deferred = false;
+    for (const id of wanted) {
+      const b = this.byId.get(id)!;
+      if (this.models.has(id)) promoted.add(id);
+      else if (b.kind === "sphere") {
+        if (sphereBuilds++ < SPHERE_BUILDS) { this.sphereModel(b); promoted.add(id); } else deferred = true;
+      } else if (this.worker || this.startWorker()) this.requestParticles(b);
+      else if (syncBuilds++ < 1) { this.particleModel(b, this.buildParticles(this.particleJob(b))); promoted.add(id); }
+      else deferred = true;
     }
 
     const m = this.markers!.geometry;
-    const pos = m.attributes.position.array as Float32Array, col = m.attributes.color.array as Float32Array, size = m.attributes.aSize.array as Float32Array;
-    const c = new THREE.Color();
+    const pos = m.attributes.position.array as Float32Array, size = m.attributes.aSize.array as Float32Array;
     this.bodies.forEach((b, i) => {
       b.promoted = promoted.has(b.obj.id);
-      pos.set([b.local.x, b.local.y, b.local.z], i * 3);
-      c.set(b.obj.display.color).multiplyScalar(b.obj.featured ? 1 : 0.7);
-      col.set([c.r, c.g, c.b], i * 3);
+      pos[i * 3] = b.local.x; pos[i * 3 + 1] = b.local.y; pos[i * 3 + 2] = b.local.z;
       const marker = Math.max(b.kind === "galaxy" || b.kind === "cloud" ? b.drawR * 0.6 : b.drawR, MIN_ANGLE * b.d) * (b.obj.featured ? 1.3 : 1);
       b.shownR = b.promoted ? b.drawR : marker;
       size[i] = b.promoted || b.hidden ? 0 : marker;
     });
-    for (const a of ["position", "color", "aSize"]) m.attributes[a].needsUpdate = true;
+    m.attributes.position.needsUpdate = true;
+    m.attributes.aSize.needsUpdate = true;
 
     for (const [id, cached] of this.models) cached.node.visible = promoted.has(id);
     const now = performance.now();
     const sun = this.byId.get("sun");
+    const fills: { cached: Cached; n: number; opacity: number }[] = [];
+    let fillTotal = 0;
     for (const id of promoted) {
       const b = this.byId.get(id)!;
-      const cached = this.models.get(id) ?? (b.kind === "sphere" ? this.sphereModel(b) : this.particleModel(b));
+      const cached = this.models.get(id)!;
       cached.used = now;
       cached.node.visible = true;
       cached.node.position.copy(b.local);
@@ -671,11 +714,9 @@ export class XrPresentation {
           n = Math.max(80, Math.floor(n * 0.28));
           opacity *= 0.4;
         }
-        cached.particles.light.geometry.setDrawRange(0, n);
-        for (const mat of cached.particles.mats) {
-          mat.uniforms.uDiam.value = b.drawR * 2;
-          mat.uniforms.uOpacity.value = mat === cached.particles.light.material ? opacity * Math.sqrt(cached.particles.max / n) * 0.7 : opacity;
-        }
+        for (const mat of cached.particles.mats) mat.uniforms.uDiam.value = b.drawR * 2;
+        fills.push({ cached, n, opacity });
+        fillTotal += n;
       } else {
         cached.node.scale.setScalar(b.drawR);
         const spin = cached.node.userData.spin as THREE.Object3D | undefined;
@@ -684,13 +725,66 @@ export class XrPresentation {
         if (sunDir && sun) sunDir.copy(v3(toXr(normalize([sun.pos[0] - b.pos[0], sun.pos[1] - b.pos[1], sun.pos[2] - b.pos[2]])))).applyQuaternion(R);
       }
     }
+    // Many overlapping additive models are fill-rate bound: share one particle budget among them.
+    const share = fillTotal > PARTICLE_FILL ? PARTICLE_FILL / fillTotal : 1;
+    for (const { cached, n: want, opacity } of fills) {
+      const p = cached.particles!;
+      const n = Math.max(80, Math.floor(want * share));
+      p.light.geometry.setDrawRange(0, n);
+      for (const mat of p.mats) mat.uniforms.uOpacity.value = mat === p.light.material ? opacity * Math.min(2.4, Math.sqrt(p.max / n) * 0.7) : opacity;
+    }
     this.evict(this.models, MODEL_CACHE);
     this.placeStars();
     if (this.stars) {
       const focus = this.focusId ? this.byId.get(this.focusId) : undefined;
       this.stars.visible = !focus || focus.drawR < 7;
     }
-    this.dirty = false;
+    this.dirty = deferred;
+  }
+
+  private workerFailed = false;
+
+  /** The particle worker, or null where module workers are unavailable (then builds run inline). */
+  private startWorker(): Worker | null {
+    if (this.workerFailed || typeof Worker === "undefined") return null;
+    try {
+      const w = new Worker(new URL("./particleWorker.ts", import.meta.url), { type: "module" });
+      w.onmessage = (e: MessageEvent<{ id: string; parts: GalaxyParticles }>) => {
+        const { id, parts } = e.data;
+        if (this.disposed || !this.building.delete(id)) return;
+        const b = this.byId.get(id);
+        if (b && !this.models.has(id)) { this.particleModel(b, parts); this.dirty = true; }
+      };
+      w.onerror = () => {
+        // Fall back to inline builds; pending requests are retried by the next layout.
+        this.workerFailed = true;
+        w.terminate();
+        if (this.worker === w) this.worker = null;
+        this.building.clear();
+        this.dirty = true;
+      };
+      this.worker = w;
+      return w;
+    } catch {
+      this.workerFailed = true;
+      return null;
+    }
+  }
+
+  private particleJob(b: Body): ParticleJob {
+    return b.kind === "galaxy"
+      ? { id: b.obj.id, kind: "galaxy", params: b.obj.id === "milky-way" ? milkyWayParams(b.obj) : galaxyParams(b.obj), count: GALAXY_COUNT }
+      : { id: b.obj.id, kind: "cloud", obj: b.obj, cloud: b.cloud!, count: CLOUD_COUNT };
+  }
+
+  private buildParticles(job: ParticleJob): GalaxyParticles {
+    return job.kind === "galaxy" ? buildGalaxyParticles(job.params, job.count) : buildCloudParticles(job.obj, job.cloud, job.count);
+  }
+
+  private requestParticles(b: Body) {
+    if (this.building.has(b.obj.id) || !this.worker) return;
+    this.building.add(b.obj.id);
+    this.worker.postMessage(this.particleJob(b));
   }
 
   /** Shared Play-time clock: XR reads the same jd the desktop store advances. */
@@ -758,11 +852,8 @@ export class XrPresentation {
   }
 
   /** A galaxy, nebula, cluster or remnant as a real 3D particle model, in its true orientation. */
-  private particleModel(b: Body): Cached {
+  private particleModel(b: Body, parts: GalaxyParticles): Cached {
     const res: { dispose(): void }[] = [];
-    const parts: GalaxyParticles = b.kind === "galaxy"
-      ? buildGalaxyParticles(b.obj.id === "milky-way" ? milkyWayParams(b.obj) : galaxyParams(b.obj), GALAXY_COUNT)
-      : buildCloudParticles(b.obj, b.cloud!, CLOUD_COUNT);
     const group = new THREE.Group();
     group.quaternion.copy(b.frame!);
     const mats: THREE.ShaderMaterial[] = [];
@@ -776,8 +867,8 @@ export class XrPresentation {
         vertexShader: PARTICLE_VERT, fragmentShader, transparent: true, depthWrite: false, blending,
       }), res);
       mats.push(mat);
+      // Culled against the combined eye frustum: off-view models cost no fill while looking around.
       const pts = new THREE.Points(geo, mat);
-      pts.frustumCulled = false;
       pts.renderOrder = order;
       group.add(pts);
       return pts;
@@ -806,9 +897,9 @@ export class XrPresentation {
   }
 
   /** Release the least recently used hidden models or labels beyond the cache size. */
-  private evict(cache: Map<string, Cached>, max: number) {
+  private evict(cache: Map<string, Cached>, max: number, inUse = (c: Cached, _id: string) => c.node.visible) {
     if (cache.size <= max) return;
-    const hidden = [...cache.entries()].filter(([, c]) => !c.node.visible).sort((a, b) => a[1].used - b[1].used);
+    const hidden = [...cache.entries()].filter(([id, c]) => !inUse(c, id)).sort((a, b) => a[1].used - b[1].used);
     for (const [id, c] of hidden.slice(0, cache.size - max)) {
       c.node.removeFromParent();
       for (const d of c.res) d.dispose();
@@ -1007,30 +1098,43 @@ export class XrPresentation {
 
   /** The body a ray rests on, with generous hitboxes and occlusion by nearer planets. */
   private aim(origin: THREE.Vector3, worldDir: THREE.Vector3, sticky: string | null = null) {
-    const cands: GazeCandidate[] = [];
-    const to = new THREE.Vector3();
+    return { icrf: this.icrfOf(worldDir), target: this.gazeAt(origin, worldDir, sticky) };
+  }
+
+  private icrfOf(worldDir: THREE.Vector3): Vec3 {
+    const local = this.tmpB.copy(worldDir).applyQuaternion(this.tmpQ.copy(this.space.quaternion).invert());
+    return normalize(fromXr([local.x, local.y, local.z]));
+  }
+
+  /**
+   * Only bodies whose hitbox could contain the ray become candidates (pickGaze's widest reach is
+   * max(angle·1.85, tolerance)·STICKY), so a dense field costs no per-body allocations.
+   */
+  private gazeAt(origin: THREE.Vector3, worldDir: THREE.Vector3, sticky: string | null): string | null {
+    const cands = this.gazeCands;
+    cands.length = 0;
+    const to = this.tmpA;
     for (const b of this.bodies) {
       if (b.hidden || (b.obj.id === "milky-way" && b.rKm < b.radiusKm * 1.2)) continue;
       to.copy(b.world).sub(origin);
       const dist = to.length();
       if (dist < 1e-6) continue;
-      to.divideScalar(dist);
       const pad = b.obj.featured ? 1.25 : 1;
-      cands.push({ id: b.obj.id, dir: [to.x, to.y, to.z], angle: Math.atan2(b.shownR, dist) * pad, dist, solid: b.promoted && b.kind === "sphere" });
+      const angle = Math.atan2(b.shownR, dist) * pad;
+      const reach = Math.min(Math.PI, Math.max(angle * 1.85, GAZE_TOLERANCE) * STICKY * 1.05);
+      if (to.dot(worldDir) < dist * Math.cos(reach)) continue;
+      to.divideScalar(dist);
+      cands.push({ id: b.obj.id, dir: [to.x, to.y, to.z], angle, dist, solid: b.promoted && b.kind === "sphere" });
     }
-    const local = worldDir.clone().applyQuaternion(this.space.quaternion.clone().invert());
-    return { icrf: normalize(fromXr([local.x, local.y, local.z])), target: pickGaze(cands, arr(worldDir), sticky) };
+    return pickGaze(cands, arr(worldDir), sticky);
   }
 
   private onSelectStart = (e: XRInputSourceEvent) => {
     if (this.disposed) return;
     const ray = this.rayFrom(e.inputSource.targetRaySpace, e.frame);
     if (!ray) return;
-    const hudHit = !!this.hud?.hit(ray.origin, ray.dir);
     const { icrf, target } = this.aim(ray.origin, ray.dir);
-    // Look-at-HUD + pinch toggles, but a pinch on an object still flies there.
-    const onHud = hudHit || (this.hudAimed && !target);
-    const pinch: Pinch = { dir: icrf, target: onHud ? null : target, hud: onHud, origin: null, last: null, start: performance.now(), moved: 0, mode: "undecided" };
+    const pinch: Pinch = { dir: icrf, target, origin: null, last: null, start: performance.now(), moved: 0, mode: "undecided" };
     this.pinches.set(e.inputSource, pinch);
     this.lastPinch.set(e.inputSource, pinch);
     this.prevSpan = null;
@@ -1041,22 +1145,14 @@ export class XrPresentation {
     this.prevSpan = null;
   };
 
-  /** A quick pinch on the mic toggles talk; on an object it flies there. */
+  /** A quick pinch on an object flies there; on empty space it closes the details card. */
   private onSelect = (e: XRInputSourceEvent) => {
     if (this.disposed || !this.refSpace) return;
     const pinch = this.pinches.get(e.inputSource) ?? this.lastPinch.get(e.inputSource);
     this.lastPinch.delete(e.inputSource);
-    if (pinch?.hud) {
-      useVoice.getState().toggleTalk();
-      return;
-    }
     if (pinch && (pinch.moved > TAP_MOVE_M || performance.now() - pinch.start > TAP_MS)) return;
     const ray = this.rayFrom(e.inputSource.targetRaySpace, e.frame);
     if (!ray) return;
-    if (this.hud?.hit(ray.origin, ray.dir)) {
-      useVoice.getState().toggleTalk();
-      return;
-    }
     const target = pinch ? pinch.target : this.aim(ray.origin, ray.dir).target;
     if (target) {
       this.flyTo(target);
@@ -1069,7 +1165,6 @@ export class XrPresentation {
     const right = new THREE.Vector3(1, 0, 0).applyQuaternion(headQ);
     const hands: { pinch: Pinch; pos: THREE.Vector3; dir: THREE.Vector3 }[] = [];
     for (const [source, pinch] of this.pinches) {
-      if (pinch.hud) continue;
       const pose = frame.getPose(source.gripSpace ?? source.targetRaySpace, this.refSpace);
       const ray = this.rayFrom(source.targetRaySpace, frame);
       if (!pose || !ray) continue;
@@ -1124,6 +1219,9 @@ export class XrPresentation {
     const dt = this.lastTime ? Math.min(0.1, (time - this.lastTime) / 1000) : 0;
     this.lastTime = time;
 
+    // three only refreshes the combined XR camera inside render(); use this frame's pose for
+    // head-locked content (mic pill, reticle) so it does not swim a frame behind the head.
+    this.renderer.xr.updateCamera?.(this.camera);
     const xrCam = this.renderer.xr.getCamera();
     const head = new THREE.Vector3().setFromMatrixPosition(xrCam.matrixWorld);
     const headQ = new THREE.Quaternion().setFromRotationMatrix(xrCam.matrixWorld);
@@ -1140,7 +1238,7 @@ export class XrPresentation {
     } else if (Math.abs(this.zoomLeft) > 1e-3) {
       const step = Math.sign(this.zoomLeft) * Math.min(Math.abs(this.zoomLeft), dt * 1.8);
       this.zoomLeft -= step;
-      this.zoomAt(this.focusId, this.aim(head, forward).icrf, Math.exp(step));
+      this.zoomAt(this.focusId, this.icrfOf(forward), Math.exp(step));
     }
     if (frame) this.stepGestures(frame, dt, head, headQ);
     if (this.dirty) this.relayout();
@@ -1151,11 +1249,7 @@ export class XrPresentation {
     for (const m of this.pointMats) m.uniforms.uPx.value = this.px;
     for (const c of this.models.values()) if (c.node.visible && c.particles) for (const m of c.particles.mats) m.uniforms.uPx.value = this.px;
 
-    // Place the HUD first so it is hittable on the opening frame (before any pan).
-    this.hud?.follow(head, forward);
-    this.hudAimed = !!this.hud?.hit(head, forward);
-    const hudHover = this.hudAimed;
-    const target = hudHover ? null : this.aim(head, forward, this.gazeId).target;
+    const target = this.gazeAt(head, forward, this.gazeId);
     if (target !== this.gazeId) { this.gazeId = target; this.gazeSince = time; }
     if (this.gazeId !== this.gazeReported && time - this.gazeSince > 400) {
       this.gazeReported = this.gazeId;
@@ -1169,12 +1263,11 @@ export class XrPresentation {
       this.reticle.position.copy(head).addScaledVector(forward, dist);
       this.reticle.quaternion.copy(headQ);
       this.reticle.scale.setScalar(dist * 0.024);
-      this.reticle.visible = !hudHover;
       (this.reticle.material as THREE.ShaderMaterial).uniforms.uProgress.value = this.card?.id === target ? 0 : dwell.progress;
     }
-    this.placeLabels(head, headQ, forward);
+    this.placeLabels(head, headQ, forward, time);
     this.placeCard(head, headQ, forward, time);
-    this.hud?.update(head, forward, time, hudHover);
+    this.hud?.update(head, headQ, time);
     this.renderer.render(this.scene, this.camera);
   };
 
@@ -1182,49 +1275,84 @@ export class XrPresentation {
    * Names sit on the same ray as the object, a small angular lift above it, at the object's own
    * depth so both eyes and a moving head keep the name glued to the star or galaxy.
    */
-  private placeLabels(head: THREE.Vector3, headQ: THREE.Quaternion, forward: THREE.Vector3) {
-    for (const c of this.labels.values()) c.node.visible = false;
-    const headUp = new THREE.Vector3(0, 1, 0).applyQuaternion(headQ);
-    const dirOf = (b: Body) => b.world.clone().sub(head);
+  private placeLabels(head: THREE.Vector3, headQ: THREE.Quaternion, forward: THREE.Vector3, time: number) {
     const gazed = this.gazeId ? this.byId.get(this.gazeId) : undefined;
-    const near = this.bodies
-      .filter((b) => {
-        if (b === gazed || b.hidden || !(b.obj.featured || b.promoted || b.angle > 0.01)) return false;
-        const to = dirOf(b);
-        const dist = to.length();
-        return dist > 1e-4 && to.dot(forward) / dist > Math.cos(0.48);
-      })
-      .sort((a, b) => Number(b.promoted) - Number(a.promoted) || b.angle - a.angle || b.obj.display.priority - a.obj.display.priority);
-    const solids = this.bodies.filter((b) => b.promoted && b.kind === "sphere").map((b) => {
-      const to = dirOf(b);
-      const dist = to.length();
-      return { b, dir: to.multiplyScalar(1 / Math.max(dist, 1e-9)), dist };
-    });
-    const occluded = (b: Body, dir: THREE.Vector3, dist: number) =>
-      solids.some((s) => s.b !== b && s.dist < dist && s.dir.angleTo(dir) < Math.atan2(s.b.drawR, s.dist));
-    const placed: THREE.Vector3[] = [];
+    if (time - this.labelPickAt > LABEL_PICK_MS || forward.dot(this.labelPickDir) < Math.cos(0.15) || (!!gazed && this.labelPick[0] !== gazed)) {
+      this.pickLabels(head, forward, gazed);
+      this.labelPickAt = time;
+      this.labelPickDir.copy(forward);
+    }
+    for (const c of this.labels.values()) c.node.visible = false;
+    const headUp = this.tmpA.set(0, 1, 0).applyQuaternion(headQ);
+    const dir = this.tmpB, lift = new THREE.Vector3();
     const now = performance.now();
-    for (const b of gazed ? [gazed, ...near] : near) {
-      if (placed.length >= LABELS + (gazed ? 1 : 0)) break;
-      const to = dirOf(b);
-      const dist = to.length();
+    for (const b of this.labelPick) {
+      const l = this.labels.get(b.obj.id);
+      if (!l || b.hidden) continue;
+      dir.copy(b.world).sub(head);
+      const dist = dir.length();
       if (dist < 1e-4) continue;
-      const dir = to.multiplyScalar(1 / dist);
-      if (b !== gazed && (placed.some((p) => p.angleTo(dir) < 0.06) || occluded(b, dir, dist))) continue;
-      placed.push(dir.clone());
-      const liftDir = headUp.clone().addScaledVector(dir, -headUp.dot(dir));
-      if (liftDir.lengthSq() < 1e-6) liftDir.set(0, 1, 0);
-      else liftDir.normalize();
-      const lift = Math.max(b.shownR * 1.08, dist * 0.016);
-      const l = this.label(b.obj.id, b.obj.name);
-      l.node.position.copy(head).addScaledVector(dir, dist).addScaledVector(liftDir, lift);
+      dir.divideScalar(dist);
+      lift.copy(headUp).addScaledVector(dir, -headUp.dot(dir));
+      if (lift.lengthSq() < 1e-6) lift.set(0, 1, 0);
+      else lift.normalize();
+      l.node.position.copy(head).addScaledVector(dir, dist).addScaledVector(lift, Math.max(b.shownR * 1.08, dist * 0.016));
       l.node.quaternion.copy(headQ);
       l.node.scale.setScalar(dist * (b === gazed ? 0.2 : 0.155));
       l.node.renderOrder = b === gazed ? 12 : 10;
       l.node.visible = true;
       l.used = now;
     }
-    this.evict(this.labels, LABEL_CACHE);
+    if (this.labels.size > LABEL_CACHE) {
+      const keep = new Set(this.labelPick.map((b) => b.obj.id));
+      this.evict(this.labels, LABEL_CACHE, (c, id) => c.node.visible || keep.has(id));
+    }
+  }
+
+  /**
+   * Which names to show: the gazed object, then the biggest nearby ones in a cone ahead, skipping
+   * crowded or occluded ones. New label textures are rate-limited so sweeping across a dense
+   * field does not stall on canvas uploads.
+   */
+  private pickLabels(head: THREE.Vector3, forward: THREE.Vector3, gazed: Body | undefined) {
+    const cone = Math.cos(0.48), to = this.tmpA;
+    const near: { b: Body; dir: THREE.Vector3; dist: number }[] = [];
+    const solids: { b: Body; dir: THREE.Vector3; dist: number }[] = [];
+    const entry = (b: Body) => {
+      const dir = b.world.clone().sub(head);
+      const dist = dir.length();
+      return { b, dir: dir.divideScalar(Math.max(dist, 1e-9)), dist };
+    };
+    for (const b of this.bodies) {
+      if (b.hidden) continue;
+      if (b.promoted && b.kind === "sphere") solids.push(entry(b));
+      if (b === gazed || !(b.obj.featured || b.promoted || b.angle > 0.01)) continue;
+      to.copy(b.world).sub(head);
+      const dist = to.length();
+      if (dist > 1e-4 && to.dot(forward) > dist * cone) near.push(entry(b));
+    }
+    near.sort((a, b) => Number(b.b.promoted) - Number(a.b.promoted) || b.b.angle - a.b.angle || b.b.obj.display.priority - a.b.obj.display.priority);
+    const occluded = (e: { b: Body; dir: THREE.Vector3; dist: number }) =>
+      solids.some((s) => s.b !== e.b && s.dist < e.dist && s.dir.angleTo(e.dir) < Math.atan2(s.b.drawR, s.dist));
+    const placed: THREE.Vector3[] = [];
+    const picked: Body[] = [];
+    let fresh = 0;
+    const take = (b: Body) => {
+      if (!this.labels.has(b.obj.id)) {
+        if (b !== gazed && fresh >= NEW_LABELS_PER_PICK) return false;
+        fresh++;
+        this.label(b.obj.id, b.obj.name);
+      }
+      picked.push(b);
+      return true;
+    };
+    if (gazed && !gazed.hidden) { const e = entry(gazed); if (e.dist > 1e-4 && take(gazed)) placed.push(e.dir); }
+    for (const e of near) {
+      if (placed.length >= LABELS + (gazed ? 1 : 0)) break;
+      if (e.dist < 1e-4 || placed.some((p) => p.angleTo(e.dir) < 0.06) || occluded(e)) continue;
+      if (take(e.b)) placed.push(e.dir);
+    }
+    this.labelPick = picked;
   }
 
   /** The details card floats beside its object at reading distance and closes after looking away. */

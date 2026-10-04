@@ -53,7 +53,7 @@ npm run dev
 - **Dictation (speech to text).** The Mission Control microphone records one utterance and transcribes it with Grok through `POST /api/stt`, so it also works in Firefox and Chromium builds without Google speech services.
 - **Microphone.** Accessibility › Voice lists your inputs and has a **Test microphone** meter. If an input delivers no sound for a few seconds, the app says so and suggests choosing another device. The microphone needs HTTPS or localhost.
 - **Grok Imagine** (Images section of a destination card) generates an image from catalog facts only, labeled **AI reconstruction**, never presented as an observation. Static catalog summaries are never labeled as AI.
-- The server rate-limits each endpoint per client (per 10 minutes: 30 voice sessions, 240 speech clips, 120 transcriptions, 120 chat turns, 10 images).
+- The server rate-limits each endpoint per client (per 10 minutes: 30 voice sessions, 240 speech clips, 400 transcriptions (the VR wake word transcribes each utterance), 120 chat turns, 10 images).
 
 Without a key, the Guide panel provides clearly labeled **scripted explanations and map actions**. Contextual prompts use the selected object's sourced summary, calculated light delay and compatible physical neighbors. Live Grok receives the same validated context; live Voice and Imagine were not exercised without credentials.
 
@@ -151,7 +151,8 @@ Floating search at the top, a bottom sheet with collapsed, half and full states,
 - You stand in the same 3D map as the web view: nearby objects stay on a true linear scale; farther stars and galaxies keep their real directions and angular sizes, with log-compressed depth so Andromeda, Virgo and a distant quasar sit at different depths. Galaxies and nebulae are thick particle volumes (not camera-facing photos). Pinch something to fly there like a ship.
 - **Look** with your head (web pages do not get eye tracking). **Pinch** what you are looking at to fly there; pinch and drag to turn around it; spread two pinching hands or push one hand to zoom. A Quest thumbstick does the same. Names sit on the object; hitboxes are large enough for coarse head gaze.
 - **Hold your gaze** about half a second (a ring fills) to open details; a quick pinch does the same. Looking away closes the card.
-- **Grok Voice** is a look-and-pinch toggle: look at the microphone HUD (lower-center) and pinch to unmute, speak, pinch again to send and mute. Grok replies once to that utterance and does not narrate travel. The destination is rotated in front of where you were looking when you asked.
+- **Grok Voice** is hands-free: the microphone is always listening, but only an utterance that starts with "Grok" (for example "Grok, take me to Saturn") is sent; anything else is ignored. Saying just "Grok" waits a few seconds for the command. Speech is detected locally, then transcribed through `/api/stt`, so the realtime session only receives addressed commands. A small status pill sits head-locked at the bottom center of the view. Grok replies once and does not narrate travel; the destination is rotated in front of where you were looking when you asked.
+- **Performance in VR:** particle galaxies are built in a Web Worker, overlapping particle models share one fill budget and are frustum-culled, labels are re-chosen a few times per second, and the star buffer only re-centres when float precision needs it. Not yet profiled on a headset.
 - Leave VR with the system gesture. **Headset validation pending**: math and session lifecycle are tested; a physical Vision Pro / Quest pass is still needed.
 
 **Testing on a headset.** WebXR requires a secure context:

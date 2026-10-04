@@ -129,7 +129,7 @@ app.post("/api/tts", limiter(240, 10 * 60_000), async (req, res) => {
 const STT_KEYTERMS = (catalog?.objects ?? []).filter((o) => o.featured).sort((a, b) => b.display.priority - a.display.priority).map((o) => o.name.slice(0, 50)).slice(0, 100);
 
 /** Grok speech-to-text for dictation. Body: a WAV recording. */
-app.post("/api/stt", express.raw({ type: ["audio/wav", "audio/x-wav", "audio/*"], limit: "4mb" }), limiter(120, 10 * 60_000), async (req, res) => {
+app.post("/api/stt", express.raw({ type: ["audio/wav", "audio/x-wav", "audio/*"], limit: "4mb" }), limiter(400, 10 * 60_000), async (req, res) => {
   if (!Buffer.isBuffer(req.body) || req.body.length < 100) {
     res.status(400).json({ error: "Send a WAV recording." });
     return;
