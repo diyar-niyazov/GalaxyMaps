@@ -1,9 +1,10 @@
 /** Shared, non-component helpers for the UI (kept out of component modules for Fast Refresh). */
 import type { RefObject } from "react";
-import type { CatalogObject, ImageryKind, Region } from "../lib/types";
+import type { CatalogObject, ImageRecord, ImageryKind, Region } from "../lib/types";
 import type { DataBundle } from "../data/bundle";
 import { formatDistance } from "../lib/format";
 import { AU_KM, LY_KM } from "../lib/units";
+import { TYPE_LABEL } from "../lib/search";
 
 /** Shared so the "/" shortcut can focus the main search box. */
 export const searchInputRef: RefObject<HTMLInputElement | null> = { current: null };
@@ -15,6 +16,14 @@ export const IMAGERY_LABEL: Record<ImageryKind, string> = {
   "ai-reconstruction": "AI reconstruction",
 };
 
+const COMPOSITE = /\b(composite|mosaic|false[- ]colou?r|multi-?wavelength|combined)\b/i;
+
+/** Observation, composite, illustration or reconstruction; composites are observed data assembled or recoloured. */
+export function imageryLabel(image: ImageRecord): string {
+  if (image.kind === "observed" && COMPOSITE.test(`${image.title} ${image.credit}`)) return "Composite image";
+  return IMAGERY_LABEL[image.kind];
+}
+
 const REGION_LABEL: Record<Region, string> = {
   "solar-system": "Solar System",
   "stellar-neighborhood": "Stellar neighborhood",
@@ -23,6 +32,41 @@ const REGION_LABEL: Record<Region, string> = {
   "local-volume": "Nearby galaxies",
   cosmological: "Distant universe",
 };
+
+export const regionLabel = (r: Region) => REGION_LABEL[r];
+
+/** Spaceflight records share the catalog type "mission"; these are the accurate kinds people expect. */
+const SPACEFLIGHT_KIND: Record<string, string> = {
+  "falcon-9": "Launch vehicle",
+  "falcon-heavy": "Launch vehicle",
+  starship: "Launch vehicle & spacecraft",
+  dragon: "Spacecraft",
+  iss: "Space station",
+  hubble: "Space telescope",
+  chandra: "Space telescope",
+  curiosity: "Rover",
+  perseverance: "Rover",
+  "tesla-roadster": "Payload",
+};
+
+/** Type label for display: the catalog type, refined for spaceflight records. */
+export function typeLabel(o: CatalogObject): string {
+  return SPACEFLIGHT_KIND[o.id] ?? TYPE_LABEL[o.type];
+}
+
+const ENTITY: Record<string, string> = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">", nbsp: " " };
+
+/** Image credits come from Commons/NASA metadata; strip wiki markup and decode HTML entities. */
+export function cleanCredit(text: string): string {
+  return text
+    .replace(/\[\[(?:[^\]|]*\|)?([^\]]*)\]\]/g, "$1")
+    .replace(/'{2,}/g, "")
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+    .replace(/&([a-z]+);/gi, (m, n) => ENTITY[n.toLowerCase()] ?? m)
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 /** Where the object is: its parent system/galaxy, else its region. */
 export function locationOf(data: DataBundle, o: CatalogObject): string {

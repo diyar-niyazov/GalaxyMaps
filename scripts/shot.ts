@@ -2,6 +2,8 @@
  * One-off headless screenshot of the dev server, for visual review.
  *
  *   npx tsx scripts/shot.ts "/?place=saturn" out.png [width] [height] [js-to-run-before-capture]
+ *   CLIP="x,y,w,h" crops the capture to a region at native resolution.
+ *   FAKE_MIC=1 grants microphone access and feeds Chromium's synthetic test tone.
  */
 import { spawn } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -17,7 +19,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const profile = mkdtempSync(join(tmpdir(), "galaxymaps-shot-"));
 const browser = spawn(process.env.CHROMIUM ?? "chromium", [
   "--headless=new", "--no-sandbox", "--hide-scrollbars", `--window-size=${width},${height}`,
-  "--use-angle=swiftshader", "--enable-unsafe-swiftshader", `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, "about:blank",
+  "--use-angle=swiftshader", "--enable-unsafe-swiftshader", `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`,
+  ...(process.env.FAKE_MIC ? ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", "--autoplay-policy=no-user-gesture-required"] : []),
+  "about:blank",
 ], { stdio: "ignore" });
 
 let url = "";
@@ -62,7 +66,8 @@ try {
   await sleep(2500);
   if (js) console.log(JSON.stringify(await evaluate(`(async () => { ${js} })()`)));
   await sleep(2500);
-  const { data } = (await send("Page.captureScreenshot", { format: "png" })) as { data: string };
+  const clip = process.env.CLIP?.split(",").map(Number);
+  const { data } = (await send("Page.captureScreenshot", { format: "png", ...(clip ? { clip: { x: clip[0], y: clip[1], width: clip[2], height: clip[3], scale: 1 } } : {}) })) as { data: string };
   writeFileSync(out, Buffer.from(data, "base64"));
   console.log(`wrote ${out}`);
 } finally {

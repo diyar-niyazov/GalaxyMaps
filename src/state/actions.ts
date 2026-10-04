@@ -2,18 +2,33 @@ import { useStore } from "./store";
 import { getEngine } from "../map/engineRef";
 import { REGION_PRESETS } from "../map/presets";
 import { LY_KM } from "../lib/units";
+import { rememberView } from "./navigation";
+import { useLibrary } from "./library";
+import { useDiscoveryStore } from "./discovery";
 
 /** Select an object and enter its Locked object view (or the universe overview for redshift-only objects). */
-export function focusObject(id: string) {
+export function focusObject(id: string, guided = false) {
   const st = useStore.getState();
+  if (!st.data?.byId.has(id)) return;
+  if (!guided && useDiscoveryStore.getState().activeTourId && !useDiscoveryStore.getState().paused) useDiscoveryStore.getState().pauseTour();
+  if (st.selectedId !== id) rememberView();
   st.select(id);
   getEngine()?.focus(id);
+  useLibrary.getState().remember(id);
 }
 
 /** Home: a locked close-up of Earth. */
 export function goHome() {
-  useStore.getState().setInside(null);
+  if (useDiscoveryStore.getState().activeTourId) useDiscoveryStore.getState().pauseTour();
+  rememberView();
+  useStore.setState({ inside: null, selectedId: null, panel: "explore", playing: false, progress: 0 });
   getEngine()?.homeEarth();
+}
+
+export function directionsTo(destinationId?: string | null, originId?: string | null) {
+  rememberView();
+  if (useDiscoveryStore.getState().activeTourId) useDiscoveryStore.getState().pauseTour();
+  useStore.getState().openDirections(destinationId, originId);
 }
 
 /** Deliberately enter an exploration frame for a region preset. */
@@ -21,6 +36,8 @@ export function goRegion(presetId: string) {
   const st = useStore.getState();
   const p = REGION_PRESETS.find((x) => x.id === presetId);
   if (!p || !st.data) return;
+  if (useDiscoveryStore.getState().activeTourId) useDiscoveryStore.getState().pauseTour();
+  rememberView();
   st.setInside(p.insideId ?? null);
   getEngine()?.exploreTo(p.target(st.data, st.jd));
 }
@@ -34,6 +51,7 @@ export function exploreInside(id: string) {
   if (!data || !eng || !obj) return;
   const pos = eng.getObjectPosition(id);
   if (!pos) return;
+  rememberView();
   st.setInside(id);
   st.setPanel("explore");
   const children = data.catalog.objects.filter((o) => o.parentId === id);

@@ -4,7 +4,10 @@
  */
 import { runTool as runToolTyped } from "./tools";
 import { useStore } from "../state/store";
+import { lightDelay, nearbyDestinations } from "../lib/learning";
+import { formatDistance } from "../lib/format";
 import { resolveOne } from "../lib/search";
+import { useTravel } from "../state/travel";
 
 type R = Record<string, any>;
 const runTool = (name: string, args: Record<string, unknown>) => runToolTyped(name, args) as Promise<R>;
@@ -34,12 +37,118 @@ function journeyText(j: R): string {
 const MARS_EXPLAINER =
   "Real spacecraft don't fly straight at Mars. Leaving Earth, a probe already shares Earth's ~30 km/s orbit around the Sun. The cheapest path is a Hohmann transfer: a half-ellipse that touches Earth's orbit and Mars's orbit. Mars must be about 44° ahead of Earth at launch, so these windows open roughly every 26 months. Ask for directions from Earth to Mars to see the idealized transfer drawn on the map, with all assumptions listed.";
 
+const REGION_WORDS: [RegExp, string][] = [
+  [/observable universe|whole universe|the universe/, "universe"],
+  [/local group/, "local-group"],
+  [/virgo/, "virgo"],
+  [/milky way/, "milky-way"],
+  [/inner (planets|solar system)/, "inner"],
+  [/kuiper/, "kuiper"],
+  [/solar system/, "solar"],
+  [/nearby stars|stellar neighbou?rhood/, "neighborhood"],
+];
+const TOUR_WORDS: [RegExp, string][] = [
+  [/nebula/, "nebulae"], [/black hole|extreme/, "extremes"], [/andromeda/, "andromeda"], [/demo.?2|spacex/, "spacex-demo-2"], [/spaceflight|astronaut/, "human-spaceflight"],
+];
+
+/** Map actions beyond routing: journeys, tours, comparisons, regions, clock, saving, accessibility. */
+async function appCommand(q: string): Promise<string | null> {
+  const fail = (r: R) => r.error ?? r.reason ?? null;
+  const phase = useTravel.getState().phase;
+  if ((phase === "preview" && /^(start|go|engage|yes|let's go)\b|start (the )?journey/.test(q)) || /^start (the )?journey$/.test(q)) {
+    const r = await runTool("controlJourney", { action: "start" });
+    return r.ok ? "Journey started. Space pauses, Escape exits, and Skip jumps to arrival." : r.reason;
+  }
+  if (/(begin|start|launch).*(journey|trip|travel)|take off|travel there/.test(q)) {
+    const dest = q.match(/(?:journey|trip|travel)\s+to\s+(.+)$/);
+    if (dest) {
+      const o = resolve(dest[1]);
+      if (!o) return `I couldn't find “${dest[1]}” in the catalog.`;
+      const r = await runTool("startRoute", { originId: "earth", destinationId: o.id });
+      if (r.error || r.ok === false) return fail(r) ?? "That route is unavailable.";
+    }
+    const p = await runTool("controlJourney", { action: "preview" });
+    if (p.ok === false) return p.reason;
+    const j = p.journey;
+    return `Ready to travel ${j.originName} → ${j.destinationName}: ${j.vehicle}, ${j.duration}. ${j.model} Press Start journey, or say “start”.`;
+  }
+  const DONE = { pause: "paused", resume: "resumed", skip: "skipped to arrival", cancel: "cancelled" } as const;
+  for (const action of ["pause", "resume", "skip", "cancel"] as const) {
+    if (new RegExp(`\\b${action}\\b.*(journey|trip|travel)|^${action}$`).test(q) || (phase !== "idle" && new RegExp(`^${action}\\b`).test(q))) {
+      const r = await runTool("controlJourney", { action });
+      return r.ok ? `Journey ${DONE[action]}.` : r.reason;
+    }
+  }
+  const cmp = q.match(/compare (?:the size of )?(.+?) (?:and|with|to|vs\.?) (.+?)(?: sizes?)?$/);
+  if (cmp && !/mode|speed/.test(q)) {
+    const a = resolve(cmp[1]), b = resolve(cmp[2]);
+    if (!a || !b) return `I couldn't find “${!a ? cmp[1] : cmp[2]}” in the catalog.`;
+    const r = await runTool("compareSizes", { firstId: a.id, secondId: b.id });
+    return r.ok ? `Comparing ${a.name} and ${b.name} side by side.` : `${r.object ? `${r.object}: ` : ""}${fail(r)}`;
+  }
+  if (/\btour\b/.test(q)) {
+    const t = TOUR_WORDS.find(([re]) => re.test(q))?.[1];
+    if (t) {
+      const r = await runTool("startTour", { tourId: t });
+      return r.ok ? `Opening “${r.tour}”, ${r.stops} stops.` : r.reason;
+    }
+  }
+  if (/zoom|go to|take me to|show( me)?|fly to/.test(q)) {
+    const region = REGION_WORDS.find(([re]) => re.test(q))?.[1];
+    if (region) {
+      await runTool("setRegion", { region });
+      return region === "universe" ? "Showing the observable universe. Directions are true; distances are compressed logarithmically." : "Moving the map there.";
+    }
+  }
+  if (/^zoom in\b/.test(q)) { await runTool("setZoomTarget", { target: "in" }); return "Zoomed in."; }
+  if (/^zoom out\b/.test(q)) { await runTool("setZoomTarget", { target: "out" }); return "Zoomed out."; }
+  if (/\b(go )?home\b/.test(q) && q.length < 20) { await runTool("setZoomTarget", { target: "home" }); return "Back home to Earth."; }
+  if (/unlock|free (camera|explore)|stop following/.test(q)) { await runTool("unlockCamera", {}); return "Camera unlocked; the map pans freely."; }
+  if (/(play|start|run) (the )?(time|simulation|clock)/.test(q)) { await runTool("controlSimulation", { action: "play" }); return "Simulation running: planets and moons are moving."; }
+  if (/(pause|stop) (the )?(time|simulation|clock)/.test(q)) { await runTool("controlSimulation", { action: "pause" }); return "Simulation paused."; }
+  if (/surprise me/.test(q)) {
+    const r = await runTool("surpriseMe", {});
+    return r.ok ? `${r.destination.name}: ${r.reason}` : r.reason;
+  }
+  if (/\b(save|bookmark)\b/.test(q)) {
+    const m = q.match(/(?:save|bookmark)\s+(.+?)(?:\s+for later)?$/);
+    const st = useStore.getState();
+    const o = m && !/^(this|it|that)( place)?$/.test(m[1]) ? resolve(m[1]) : st.data?.byId.get(st.selectedId ?? "") ?? null;
+    if (!o) return "Select a destination first, or say “save Saturn”.";
+    await runTool("savePlace", { id: o.id });
+    return `Saved ${o.name} on this browser.`;
+  }
+  if (/describe (the |this |current )?(view|map|screen)|what am i (looking at|seeing)/.test(q)) return (await runTool("describeView", {})).description;
+  if (/accessib|high contrast|larger text|bigger text|reduce motion/.test(q)) { await runTool("openAccessibilitySettings", {}); return "Opened accessibility settings: high contrast, larger text, reduced motion and the map navigation toolbar."; }
+  return null;
+}
+
 export async function offlineReply(input: string): Promise<string> {
   const q = input.toLowerCase().trim();
   if (!q) return "Type a request, e.g. “Take me from Earth to Polaris”.";
   const st = useStore.getState();
+  const selected = st.data?.byId.get(st.selectedId ?? "");
+  if (selected && st.data) {
+    if (/what makes|unusual|interesting/.test(q)) {
+      const summary = selected.summary;
+      return summary ? `${selected.name}: ${summary.text}\nSource: ${summary.url}` : `${selected.name}: ${selected.facts.slice(0, 2).map((f) => `${f.label}: ${f.value}`).join(". ")}. More source details are in this object's card.`;
+    }
+    if (/light delay|light.travel|light reaching/.test(q)) {
+      const delay = lightDelay(selected, st.data, st.jd);
+      return delay ? `${delay.text}\n${delay.model}\nThis is a light-travel insight, separate from spacecraft duration.` : `A numerical light delay is unavailable for ${selected.name}: its record has no compatible measured Earth separation or sourced cosmological lookback time.`;
+    }
+    if (/explore next/.test(q)) {
+      const nearby = nearbyDestinations(selected, st.data, st.jd);
+      if (nearby.length) return `Physically nearby ${selected.name}, using three-dimensional positions:\n${nearby.map(({ object, km }) => `• ${object.name}: ${formatDistance(km)} from ${selected.name}`).join("\n")}\nOpen a name from the object's card to continue.`;
+      const related = st.data.catalog.objects.filter((o) => o.id !== selected.id && o.image && o.featured && (selected.parentId ? o.parentId === selected.parentId : o.category === selected.category)).slice(0, 3);
+      return related.length ? `Related destinations: ${related.map((o) => o.name).join(", ")}. These share a host or category; no physical-nearness claim is made.` : `Try Surprise me or a curated tour for a sourced next destination. Physical proximity isn't available for ${selected.name}.`;
+    }
+  }
 
   if (/why|straight|curv|hohmann|transfer/.test(q) && /mars/.test(q)) return MARS_EXPLAINER;
+
+  const action = await appCommand(q);
+  if (action) return action;
 
   const routeMatch = q.match(/(?:from\s+(.+?)\s+)?to\s+(.+?)(?:\s+(?:by|at|with|using|via)\s+(.+))?$/);
   if (/(take me|route|directions|go|travel|fly|get|journey|trip)/.test(q) && routeMatch) {
@@ -108,5 +217,5 @@ export async function offlineReply(input: string): Promise<string> {
     return `Showing ${direct.name}. Say “take me to ${direct.name}” for directions.`;
   }
 
-  return "I'm the offline scripted guide, so I understand a few patterns: “take me from Earth to Polaris”, “by Voyager”, “add Vega”, “suggest stops”, “compare light speed and Voyager”, “explain this journey”, “show me Saturn”, “which destinations have rings?”, or “why don't rockets fly straight to Mars?”";
+  return "I'm the offline scripted guide, so I understand a few patterns: “take me from Earth to Polaris”, “begin a journey to Mars”, “compare Earth and Jupiter”, “start the nebulae tour”, “zoom out to the observable universe”, “add Vega”, “explain this journey”, “show me Saturn”, “describe the view”, “play the simulation”, or “why don't rockets fly straight to Mars?”";
 }

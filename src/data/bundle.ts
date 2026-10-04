@@ -3,6 +3,7 @@ import { buildSearchIndex, type SearchIndex } from "../lib/search";
 import { positionOf } from "../lib/route";
 import { hygRouteCapability, hygLabel, describeSpectralType, CONSTELLATIONS, temperatureFromBV, blackbodyRgb, rgbToHex } from "../lib/stars";
 import { PC_KM } from "../lib/units";
+import { applyEditorialAssets } from "../lib/editorialAssets";
 
 export interface DataBundle {
   catalog: Catalog;
@@ -16,13 +17,25 @@ export interface DataBundle {
   search: SearchIndex;
 }
 
+/** Recreate a saved lightweight HYG record without inflating the curated catalog. */
+export function restoreCatalogId(data: DataBundle, id: string): boolean {
+  if (data.byId.has(id)) return true;
+  if (!/^hyg-\d+$/.test(id)) return false;
+  const index = data.hygIndex.get(Number(id.slice(4)));
+  if (index == null) return false;
+  objectForStar(data, index);
+  return data.byId.has(id);
+}
+
 export async function loadBundle(): Promise<DataBundle> {
+  const request = { signal: AbortSignal.timeout(20000) };
   const [catalog, eph, starsBuf, starNames] = await Promise.all([
-    fetch("/data/catalog.json").then((r) => { if (!r.ok) throw new Error("catalog"); return r.json() as Promise<Catalog>; }),
-    fetch("/data/ephemeris.json").then((r) => { if (!r.ok) throw new Error("ephemeris"); return r.json() as Promise<Ephemeris>; }),
-    fetch("/data/stars.bin").then((r) => { if (!r.ok) throw new Error("stars"); return r.arrayBuffer(); }),
-    fetch("/data/star-names.json").then((r) => (r.ok ? r.json() : {})),
+    fetch("/data/catalog.json", request).then((r) => { if (!r.ok) throw new Error("catalog"); return r.json() as Promise<Catalog>; }),
+    fetch("/data/ephemeris.json", request).then((r) => { if (!r.ok) throw new Error("ephemeris"); return r.json() as Promise<Ephemeris>; }),
+    fetch("/data/stars.bin", request).then((r) => { if (!r.ok) throw new Error("stars"); return r.arrayBuffer(); }),
+    fetch("/data/star-names.json", request).then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
   ]);
+  applyEditorialAssets(catalog);
   const stars = new Float32Array(starsBuf);
   const starStride = catalog.stars.columns.length;
   const byId = new Map(catalog.objects.map((o) => [o.id, o]));

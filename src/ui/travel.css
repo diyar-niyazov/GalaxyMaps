@@ -1,0 +1,58 @@
+.travel-preview, .travel-hud {
+  position: absolute; z-index: 30; left: 50%; transform: translateX(-50%);
+  width: min(440px, calc(100vw - 24px)); color: #e8eefc;
+  background: rgba(10, 16, 30, 0.94); border: 1px solid rgba(138, 180, 248, 0.28);
+  border-radius: 16px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px);
+}
+.travel-preview { top: 50%; transform: translate(-50%, -50%); padding: 18px 20px 16px; }
+.travel-hud { bottom: 92px; padding: 12px 14px 12px; }
+.travel-eyebrow { display: flex; align-items: center; gap: 6px; margin: 0; color: #8ab4f8; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.travel-preview h2 { margin: 6px 0 12px; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.travel-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 12px; }
+.travel-facts div { display: grid; gap: 3px; }
+.travel-facts dt { font-size: 11.5px; color: #a9b6cc; }
+.travel-facts dd { margin: 0; font-size: 13.5px; font-weight: 600; }
+.travel-note { margin: 0 0 14px; font-size: 12.5px; line-height: 1.55; color: #c3cde0; }
+.travel-speed { border: 0; padding: 0; margin: 0 0 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.travel-speed legend { float: left; font-size: 12px; color: #a9b6cc; margin-right: 6px; padding: 0; }
+.travel-speed [role="radiogroup"] { display: inline-flex; border: 1px solid rgba(138, 180, 248, 0.35); border-radius: 999px; overflow: hidden; }
+.travel-speed button { min-width: 44px; min-height: 32px; border: 0; background: transparent; color: #dbe5f8; font-size: 12.5px; cursor: pointer; }
+.travel-speed button.active { background: #8ab4f8; color: #0b1220; font-weight: 700; }
+.travel-speed.compact { margin: 0 0 0 auto; }
+.travel-speed.compact legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.travel-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.travel-primary, .travel-secondary {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px;
+  border-radius: 999px; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.travel-primary { background: #8ab4f8; color: #0b1220; border: 0; }
+.travel-primary:hover { background: #a8c7fa; }
+.travel-secondary { background: transparent; color: #dbe5f8; border: 1px solid rgba(219, 229, 248, 0.4); }
+.travel-secondary:hover { background: rgba(219, 229, 248, 0.08); }
+.travel-primary.small, .travel-secondary.small { min-height: 36px; padding: 0 12px; font-size: 13px; }
+.travel-hud-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.travel-hud-title { display: grid; gap: 2px; min-width: 0; }
+.travel-hud-title strong { font-size: 14.5px; }
+.travel-hud-title small { font-size: 12px; color: #a9b6cc; }
+.travel-hud .icon-btn { color: #dbe5f8; }
+.travel-progress { height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.14); margin: 10px 0; overflow: hidden; }
+.travel-progress span { display: block; height: 100%; background: #8ab4f8; }
+.travel-hud-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.travel-preview button:focus-visible, .travel-hud button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.begin-journey {
+  display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 10px; row-gap: 2px;
+  width: calc(100% - 32px); margin: 12px 16px 4px; padding: 10px 16px; border: 0; border-radius: 12px;
+  background: linear-gradient(135deg, #0b1a36, #1c3c78); color: #fff; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer;
+}
+.begin-journey svg { grid-row: span 2; }
+.begin-journey small { font-size: 12px; font-weight: 400; color: #c6d6f5; }
+.begin-journey:hover:not(:disabled) { background: linear-gradient(135deg, #10234a, #24519c); }
+.begin-journey:disabled { opacity: 0.6; cursor: default; }
+.begin-journey:focus-visible { outline: 3px solid #1a73e8; outline-offset: 2px; }
+
+@media (max-width: 640px) {
+  .travel-hud { bottom: auto; top: 72px; }
+  .travel-facts { grid-template-columns: 1fr 1fr; }
+  .travel-primary, .travel-secondary, .travel-speed button { min-height: 44px; }
+}

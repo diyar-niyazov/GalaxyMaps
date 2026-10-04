@@ -1,0 +1,51 @@
+{
+  "baseUrl": "http://localhost:8788",
+  "finished": "2026-10-03T22:53:32.523Z",
+  "results": [
+    {
+      "name": "Complete mini-tour: Beautiful nebulae",
+      "ok": true,
+      "detail": "5 sourced illustrated stops; Previous/Pause/Resume/Next/Finish and return all work"
+    },
+    {
+      "name": "Complete mini-tour: Black holes & extremes",
+      "ok": true,
+      "detail": "5 sourced illustrated stops; Previous/Pause/Resume/Next/Finish and return all work"
+    },
+    {
+      "name": "Complete mini-tour: Inside Andromeda",
+      "ok": true,
+      "detail": "5 sourced illustrated stops; Previous/Pause/Resume/Next/Finish and return all work"
+    },
+    {
+      "name": "Complete mini-tour: Human spaceflight",
+      "ok": true,
+      "detail": "4 sourced illustrated stops; Previous/Pause/Resume/Next/Finish and return all work"
+    },
+    {
+      "name": "Complete SpaceX Demo-2 mission story",
+      "ok": true,
+      "detail": "5 sourced illustrated stops; Previous/Pause/Resume/Next/Finish and return all work"
+    },
+    {
+      "name": "Desktop Quiet view keeps an obvious way to restore navigation",
+      "ok": true,
+      "detail": "Quiet view hides chrome, retains GalaxyMaps identity and the loaded Orion observation credit, and Restore controls returns navigation"
+    },
+    {
+      "name": "Phone mini-tour keeps stable controls and readable content without overflow",
+      "ok": true,
+      "detail": "390px viewport; panel 390px; no horizontal overflow; Next and explicit exit work"
+    },
+    {
+      "name": "Phone Quiet view can restore the search and bottom sheet",
+      "ok": true,
+      "detail": "Quiet view hides chrome, retains GalaxyMaps identity and the loaded Orion observation credit, and Restore controls returns navigation"
+    },
+    {
+      "name": "No application error boundary or uncaught page exception",
+      "ok": true,
+      "detail": "No crash panel or uncaught exception during public UI checks"
+    }
+  ]
+}

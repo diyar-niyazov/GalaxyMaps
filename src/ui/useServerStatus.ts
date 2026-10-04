@@ -9,8 +9,12 @@ export interface ServerStatus {
 
 let cached: Promise<ServerStatus> | null = null;
 
+export function loadServerStatus(): Promise<ServerStatus> {
+  return load();
+}
+
 function load(): Promise<ServerStatus> {
-  cached ??= fetch("/api/status")
+  cached ??= fetch("/api/status", { signal: AbortSignal.timeout(8000) })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
     .then((j) => ({ reachable: true, grokConfigured: !!j.grok?.configured, voiceModel: j.grok?.voiceModel, imageModel: j.grok?.imageModel }))
     .catch(() => ({ reachable: false, grokConfigured: false }));

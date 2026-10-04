@@ -21,6 +21,7 @@ import { robustDistance, describeMethod, UNIT_TO_PC } from "../../src/lib/distan
 import { comovingDistanceLy, lightTravelTimeYears, PLANCK18 } from "../../src/lib/cosmology";
 import { MISSIONS, NOTABLE_EXOPLANETS } from "./config-extra";
 import { CATEGORY_TREE, inCategory } from "../../src/lib/taxonomy";
+import { applyEditorialAssets } from "../../src/lib/editorialAssets";
 
 const STAR_MAX_PC = 1000;
 const REF_JD = Date.UTC(...(REFERENCE_EPOCH.split("-").map(Number).map((v, i) => (i === 1 ? v - 1 : v)) as [number, number, number])) / 86_400_000 + 2_440_587.5;
@@ -670,6 +671,7 @@ async function main() {
     speedReferences,
     stars: { file: "/data/stars.bin", count: starRows.length, columns, sourceId: "hyg-v44", maxDistancePc: STAR_MAX_PC },
   };
+  applyEditorialAssets(catalog);
 
   await mkdir(PUBLIC_DATA, { recursive: true });
   await writeJson(join(PUBLIC_DATA, "catalog.json"), catalog, false);

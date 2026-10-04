@@ -1,0 +1,14 @@
+.voice-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 16px; border-bottom: 1px solid #e8eaed; }
+.voice-controls .btn { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; }
+.voice-controls .danger-ink { color: #b3261e; margin-left: auto; }
+.voice-state { display: inline-flex; align-items: flex-end; gap: 3px; width: 22px; height: 18px; margin-right: 4px; }
+.voice-state i { flex: 1; height: 30%; border-radius: 2px; background: #9aa0a6; }
+.voice-state.listening i { background: #188038; animation: voice-bar 0.9s ease-in-out infinite; }
+.voice-state.speaking i { background: #1a73e8; animation: voice-bar 0.7s ease-in-out infinite; }
+.voice-state i:nth-child(2) { animation-delay: 0.15s; }
+.voice-state i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes voice-bar { 0%, 100% { height: 30%; } 50% { height: 100%; } }
+@media (prefers-reduced-motion: reduce) { .voice-state i { animation: none !important; height: 70% !important; } }
+.voice-caption { margin: 8px 16px 0; padding: 10px 12px; border-radius: 10px; background: #0b1220; color: #fff; font-size: 15px; line-height: 1.5; }
+.mission-note { margin: 8px 16px 0; }
+.msg-listen { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 12.5px; min-height: 28px; }

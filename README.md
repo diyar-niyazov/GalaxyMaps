@@ -4,6 +4,8 @@
 
 GalaxyMaps is a continuously zoomable 3D space atlas with a map-app interface. Search for a planet, star, nebula or galaxy, open an image-led destination card, lock the camera onto it and orbit it, then ask for directions. Planet-to-planet trips use an idealized Hohmann transfer orbit; everything else gets a straight-line cruise at light speed or at Voyager 1's measured speed. Every distance comes from a cited catalog, and every model assumption is shown in the interface.
 
+Discover a destination with **Surprise me**, compare verified planet and star diameters, follow four mini-tours or the five-chapter **SpaceX Demo-2** story, and locate eligible objects in an **Earth-centered sky chart**. Save places locally, return to previous views, share the exact object/camera/date or chart, export a credited image card, and use **Quiet view** for a clean presentation.
+
 Built for BigRed//Hacks 2026 (theme: Navigation).
 
 ![Home: locked on a textured Earth](docs/screenshots/desktop-home-earth.png)
@@ -27,10 +29,11 @@ The bundled dataset in `public/data/` is committed, so the app works offline wit
 | `npm test` | Unit tests (projection and locked camera, transfer and travel modes, clock, schematic universe, taxonomy and search, dataset integrity) |
 | `npm run typecheck` | TypeScript only |
 | `npm run smoke` | Headless Chromium end-to-end checks against a running dev server (`BASE_URL`, default `http://localhost:5173`; `API_URL`, default `http://localhost:8787`). Add `-- --screenshots` to refresh `docs/screenshots/` |
+| `npm run smoke:polish` | Public-UI Chromium checks for comparison/export, all tour/story chapters, saving/sharing, Earth sky, Quiet view and phone/failure paths. Works against the dev server or built app using `BASE_URL`. |
 | `npm run data` | Re-download all sources, then rebuild the dataset (see [docs/DATA.md](docs/DATA.md)) |
 | `npm run data:build` | Rebuild the dataset from the cached raw downloads in `data/raw/` (no network) |
 
-For a demo laptop, prefer the production build: `npm run build && npm start`, then open http://localhost:8787 (run the smoke test against it with `BASE_URL=http://localhost:8787`).
+For a demo laptop, prefer the production build: `npm run build && npm start`, then open http://localhost:8787. Run `BASE_URL=http://localhost:8787 npm run smoke:polish` against the built app. The original foundation smoke suite uses development-only instrumentation.
 
 ## Credentials (optional)
 
@@ -45,11 +48,43 @@ npm run dev
 ```
 
 - The key stays on the server. For Grok Voice, the server requests a short-lived (5-minute) client secret from `POST https://api.x.ai/v1/realtime/client_secrets`, and the browser opens the realtime WebSocket with that token only.
-- **Grok Voice** ("Talk to Grok" in the Guide panel) can only call GalaxyMaps' validated tools (search the catalog, show an object, set a route, add a stop, compare travel modes, explain the journey, suggest stops). The app computes every number; Grok explains it.
+- **Voice control (speech to speech).** Press <kbd>M</kbd> anywhere, the microphone button beside Mission Control, or "Talk to Grok" in Mission Control. The session stays live while you browse, and a small dock shows whether Grok is listening or speaking, with Mute, Interrupt and End. Grok can operate the app through validated tools only: search and select objects, routes and stops, journeys and tours (start, next, previous, pause, exit), regions, zoom, layer, 3D tilt, orbit, Quiet view, Play time, date and rate, Back, Share, the sky chart, size comparisons, accessibility settings and closing overlays. Say "goodbye" to end it. The app computes every number; Grok explains it.
+- **Read-aloud (text to speech).** Listen buttons and "Read replies aloud" use Grok text-to-speech through `POST /api/tts` (voice `XAI_VOICE_NAME`), falling back to the browser's voice if Grok is unavailable. Turn it off or change the speed under Accessibility › Voice.
+- **Dictation (speech to text).** The Mission Control microphone records one utterance and transcribes it with Grok through `POST /api/stt`, so it also works in Firefox and Chromium builds without Google speech services.
+- **Microphone.** Accessibility › Voice lists your inputs and has a **Test microphone** meter. If an input delivers no sound for a few seconds, the app says so and suggests choosing another device. The microphone needs HTTPS or localhost.
 - **Grok Imagine** (Images section of a destination card) generates an image from catalog facts only, labeled **AI reconstruction**, never presented as an observation. Static catalog summaries are never labeled as AI.
-- The server rate-limits both endpoints (30 voice sessions and 10 images per 10 minutes).
+- The server rate-limits each endpoint per client (per 10 minutes: 30 voice sessions, 240 speech clips, 120 transcriptions, 120 chat turns, 10 images).
 
-Without a key, the Guide panel says so and falls back to an **offline scripted guide** that calls the same validated tools, labeled "Offline guide (scripted)".
+Without a key, the Guide panel provides clearly labeled **scripted explanations and map actions**. Contextual prompts use the selected object's sourced summary, calculated light delay and compatible physical neighbors. Live Grok receives the same validated context; live Voice and Imagine were not exercised without credentials.
+
+## Deploying to Heroku
+
+The repo is a single Node web dyno: `Procfile` runs `npm start`, Heroku's Node buildpack runs `npm run build` automatically, and `.slugignore` keeps raw data, docs and scripts out of the slug. In production the server trusts Heroku's router for client IPs and redirects HTTP to HTTPS (WebXR and the share sheet need a secure context).
+
+```bash
+heroku create galaxymaps
+heroku config:set XAI_API_KEY=...          # optional; never commit .env
+git push heroku main
+heroku domains:add galaxies.wiki
+heroku domains:add www.galaxies.wiki
+heroku certs:auto:enable                   # automated certificates need a Basic or higher dyno
+```
+
+`heroku domains` prints a DNS target for each hostname. At the DNS provider, point `www` at its target with a CNAME and the apex at its target with an ALIAS record.
+
+## Deploying to Vercel
+
+The site is not static: `/api/*` (Grok chat, ephemeral voice tokens, text-to-speech, speech-to-text, image generation, status) runs as a Node serverless function. Vercel does not run Docker containers, so `npm run build:vercel` produces [Build Output API](https://vercel.com/docs/build-output-api/v3) output instead: the Vite build as static files, and the same Express app from `server/index.ts` bundled into one function at `/api`. `vercel.json` already points Vercel at that command.
+
+```bash
+npm i -g vercel
+vercel link
+vercel env add XAI_API_KEY production     # optional; paste the key when prompted, never commit it
+vercel deploy --prod
+vercel domains add galaxies.wiki
+```
+
+Optional variables (`XAI_CHAT_MODEL`, `XAI_IMAGE_MODEL`, etc. from `.env.example`) are set the same way. Voice works on serverless because the browser connects to xAI directly with a short-lived token from `/api/voice/session`; the key never leaves the function. The request rate limiter is in memory, so on Vercel it applies per function instance rather than globally. To check the output locally, run `npm run build:vercel` and inspect `.vercel/output/`.
 
 ## What you can do
 
@@ -75,7 +110,7 @@ Without a key, the Guide panel says so and falls back to an **offline scripted g
 
 - Hero image with an imagery label (Observed image, Scientific illustration, AI reconstruction) and credit/license, plus a gallery and lightbox.
 - Name, alternate name, type, parent and category; one sourced summary sentence; 3–6 fact tiles, with a correctly referenced distance first ("Distance from Earth: 0 km · you are here" on Earth; "From Earth on {date}" in the Solar System).
-- Actions: **Focus**, **Directions**, **Explore inside** (galaxies, planets with moons, groups) and **View images**.
+- Actions: **Focus**, **Directions**, **Explore inside** (galaxies, planets with moons, groups), **Compare sizes** where measurements support it, and **View from Earth** where a direction is available. Select the hero to open its gallery.
 - Three "Why it's interesting" highlights, related destinations and missions, and expandable **Details**, **Images** and **Sources** sections.
 - **Explore inside Andromeda** lists 21 features (companion galaxies, the M31* nucleus, globular clusters, novae, a supernova) with breadcrumbs Universe › Local Group › Andromeda Galaxy.
 - **SpaceX and human spaceflight**: 10 cards (Falcon 9, Falcon Heavy, Dragon, Starship, Crew Dragon Demo-2, Inspiration4, Polaris Dawn, the Tesla Roadster, the ISS and Apollo 11), with status and operator. A disclaimer on each says inclusion does not imply endorsement.
@@ -98,13 +133,26 @@ Without a key, the Guide panel says so and falls back to an **offline scripted g
 
 Floating search at the top, a bottom sheet with collapsed, half and full states, safe-area insets, and pinch-to-zoom and two-finger rotate. The locked object stays centred above the sheet.
 
+### Discovery, comparisons and sharing
+
+- **Compare sizes:** audited mean/equivalent planet and moon diameters, the IAU nominal Sun, and primary-paper Sirius A. True scale preserves the physical ratio; tiny objects have a labeled magnification inset. Fit both explicitly uses independent display scales. Presets include Earth/Jupiter, Earth/Sun, Sun/Sirius A and Earth/Moon.
+- **Mini-tours:** Beautiful nebulae, Black holes & extremes, Inside Andromeda and Human spaceflight. Each has Start, Previous/Next, jump, Pause/Resume and return to the previous scene. Their ordering is editorial, not a physical route.
+- **Mission story:** five sourced chapters of the completed 2020 SpaceX/NASA Demo-2 mission, with authentic local NASA photographs. The map supplies destination context; no invented flight trajectory is shown.
+- **Earth sky:** an interactive stereographic window onto an Earth-centered sky sphere. Solar System directions use the selected epoch; catalog objects disclose J2000/geometric approximations. Angular neighbors are labeled separately from physical proximity. This chart does not predict a local horizon or tonight's visibility.
+- **Light delay:** compatible full 3D separation divided by c, or sourced cosmological lookback time. Unknown host depth and unsupported distances withhold a number.
+- **Saved & recent:** versioned lightweight browser storage, bounded lists and Undo for unsaving; storage failure keeps a usable session. No account is needed.
+- **Exact links:** versioned and validated object/route/layer/epoch/camera state, comparison pair or tour stop, and chart orientation/zoom. Locked cameras use a stable object anchor. Native sharing or clipboard copying has honest feedback and a manual-copy fallback. Localhost links are labeled local; no public deployment exists in this workspace.
+- **Quiet view:** the full-screen icon above Home hides panels and map chrome, retains identity/credits and a visible Restore controls button. Escape restores controls before leaving a hidden tour.
+- **Map controls (right edge, top to bottom):** About, Share this view, Slowly orbit (while locked) or 3D tilt (while exploring), Quiet view, Home, zoom, Enter VR. Back sits at the left of the time bar once you have history; the Realistic/Atlas layer toggle is in the top-right corner.
+
 ### WebXR (immersive VR)
 
-- **Enter VR** appears only when `navigator.xr.isSessionSupported("immersive-vr")` resolves true, and the session starts from a user gesture.
-- The scene places the focused object 1.6 m ahead, with related destinations on a ring, a spatial card built from the same record as the page card, and a control bar (Focus, Next, Smaller, Larger, Recenter, Exit VR).
-- Selection uses `select` events from any input source, including visionOS transient pointers. The app never writes the viewer pose; Recenter moves the content, not the user.
-- Phone and XR load the 2k sky texture and low-resolution Earth materials.
-- **Headset validation pending**: the code paths are typechecked and the 2D app is tested, but no physical headset was available.
+- **Enter VR** appears only when `navigator.xr.isSessionSupported("immersive-vr")` resolves true, and the session starts from a user gesture. There are no other buttons in VR.
+- You stand near the object you were looking at. Every catalog object is drawn in its true direction with its true angular size (small ones get a minimum dot size); distances are compressed logarithmically so that far objects remain visible.
+- **Look around** with your head. **Pinch to zoom** where you are looking: spread two pinching hands apart to fly toward it, or pinch with one hand and push forward (pull back to retreat). A Quest controller's thumbstick does the same.
+- **Stare** at an object for about a second (a ring fills around the reticle) to show its details card beside it; a quick pinch on it does the same. Looking away closes the card.
+- Pages get head direction, not eye tracking, so "where you look" means the centre of your view. Leave VR with the system gesture or button.
+- **Headset validation pending**: the code paths are typechecked, the gaze/zoom math is unit tested, and the scene was rendered in a flat browser, but no physical headset was available.
 
 **Testing on a headset.** WebXR requires a secure context:
 
@@ -122,9 +170,10 @@ Floating search at the top, a bottom sheet with collapsed, half and full states,
 | `R` | Reset view |
 | `F` | Fit the current route |
 | `L` | Toggle Realistic / Atlas layer |
+| `M` | Start or end voice control with Grok |
 | `D` | Directions (to the selected place) |
 | `Space` | Play / pause time |
-| `Esc` | Close menus first, then leave the lock or route framing, then close panels |
+| `Esc` | Close the active dialog/chart/comparison or restore Quiet view, then menus, camera and panels |
 
 ## Scientific model and assumptions
 
@@ -147,14 +196,15 @@ From `npm run data:build`:
 - 919 catalog objects, of which 374 are featured destinations, plus 109,389 HYG stars within 1,000 pc.
 - 126 highlights: Solar System 24, stars 16, compact objects 12, clusters 10, nebulae 18, galaxies 26, structures 6, missions 14.
 - 68 galaxies, 21 Andromeda features, 10 SpaceX and human-spaceflight cards.
+- 274 hero images, 479 additional gallery references and 65 source records, including the newly audited local NASA/EHT assets. Provenance: [content manifest](docs/polish/content-manifest.md).
 
 ## Limitations
 
-- **Headset validation pending.** WebXR has not been run on a physical headset.
+- **Headset validation pending.** WebXR has not been run on a physical headset or visionOS Simulator. Session ownership, exact return, gesture handling and renderer teardown are tested separately. Current upstream documentation and the remaining device checklist: [XR status](docs/polish/xr-status.md).
 - **Live Grok untested here.** The Grok Voice and Imagine integrations follow the xAI documentation, but no key was configured during development.
 - **Ephemeris window.** Precise positions cover 2026-09-01 to 2027-03-01; outside it, two-body orbits are approximate.
 - **Images.** Gallery images come from each object's Wikipedia page. Images that don't mention the object are filtered out at build time, which removes images from navigation templates.
-- **Bundle size.** The JS bundle is about 970 kB (about 270 kB gzipped).
+- **Bundle size.** Three.js and the catalog UI exceed Vite's 500 kB advisory. Actual final build sizes and software-rendered browser evidence are recorded in [the completion report](docs/COMPLETION-REPORT.md); no GPU performance result is claimed.
 
 ## Project layout
 
@@ -164,8 +214,8 @@ src/map/        Three.js map engine (projection, locked camera, labels, flights,
 src/state/      Zustand store, actions, clock, menus, URL sync
 src/ui/         React sidebar, cards, directions, map chrome
 src/xr/         WebXR immersive-vr presentation
-src/ai/         Validated tool layer, Grok Voice client, offline scripted guide
-server/         Express: /api/status, /api/voice/session, /api/imagine; serves dist/ in production
+src/ai/         Validated tool layer, Grok Voice client, shared audio/microphone capture, offline scripted guide
+server/         Express: /api/status, /api/voice/session, /api/tts, /api/stt, /api/chat, /api/imagine; serves dist/ in production
 scripts/data/   Reproducible data pipeline (fetch → data/raw, build → public/data)
 scripts/        smoke.ts (end-to-end checks), shot.ts (one-off screenshots)
 docs/           Architecture, data, demo script, completion report

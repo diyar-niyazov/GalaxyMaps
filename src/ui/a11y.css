@@ -1,0 +1,66 @@
+/* Skip links: hidden until focused */
+.skip-links a {
+  position: fixed; z-index: 1000; left: 12px; top: -60px; padding: 10px 16px;
+  background: #0b57d0; color: #fff; font-weight: 600; border-radius: 8px; text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.skip-links a:focus { top: 12px; outline: 3px solid #fff; outline-offset: 2px; }
+
+.map:focus-visible { outline: 3px solid #8ab4f8; outline-offset: -3px; }
+.sidebar-body:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+
+/* Map navigation toolbar */
+.audio-nav {
+  position: absolute; z-index: 25; top: 64px; left: 50%; transform: translateX(-50%);
+  width: min(620px, calc(100% - 24px)); padding: 8px; border-radius: 14px;
+  background: rgba(255, 255, 255, 0.97); box-shadow: var(--shadow-2); color: var(--text);
+}
+.audio-nav-buttons { display: flex; gap: 6px; align-items: center; }
+.audio-nav-buttons button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex: 1;
+  min-height: 40px; padding: 0 10px; border: 1px solid var(--border); border-radius: 999px;
+  background: #fff; color: var(--text); font-size: 13.5px; font-weight: 500; cursor: pointer;
+}
+.audio-nav-buttons button:hover { background: var(--hover); }
+.audio-nav-buttons .audio-nav-close { flex: none; width: 40px; padding: 0; }
+.audio-nav-caption { margin: 8px 6px 2px; font-size: 13.5px; line-height: 1.5; color: var(--text); }
+
+.sidebar-footer { gap: 8px; align-items: center; }
+.sidebar-footer .a11y-btn { width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%; }
+
+/* Settings dialog */
+.a11y-toggles { display: grid; gap: 8px; }
+.a11y-toggle { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+.a11y-toggle input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--blue); flex: none; }
+.a11y-toggle span { display: grid; gap: 2px; }
+.a11y-toggle strong { font-weight: 600; }
+.a11y-toggle small { color: var(--text-2); font-size: 13px; line-height: 1.45; }
+.a11y-dialog .muted.small { display: flex; gap: 6px; align-items: center; }
+
+/* High contrast */
+html.a11y-contrast {
+  --text: #000; --text-2: #1f1f1f; --text-3: #333; --border: #5f6368; --blue: #0b57d0; --blue-ink: #0842a0; --hover: #e3e3e3;
+}
+html.a11y-contrast .sidebar, html.a11y-contrast .sidebar * { text-shadow: none; }
+html.a11y-contrast .muted, html.a11y-contrast small { color: var(--text-2) !important; opacity: 1 !important; }
+html.a11y-contrast button, html.a11y-contrast .photo-card, html.a11y-contrast .journey-card { border-color: var(--border); }
+html.a11y-contrast :focus-visible { outline: 3px solid #000 !important; outline-offset: 2px !important; box-shadow: 0 0 0 5px #fff !important; }
+html.a11y-contrast .photo-label { background: rgba(0, 0, 0, 0.88); }
+html.a11y-contrast .ctrl, html.a11y-contrast .camera-btn, html.a11y-contrast .status-bar, html.a11y-contrast .layer-toggle { border: 1px solid #000; }
+html.a11y-contrast .travel-preview, html.a11y-contrast .travel-hud { background: #000; border-color: #fff; }
+html.a11y-contrast .travel-note, html.a11y-contrast .travel-facts dt, html.a11y-contrast .travel-hud-title small { color: #fff; }
+
+/* Larger text: panels and map controls scale together so layouts keep their proportions */
+html.a11y-large-text .sidebar-body, html.a11y-large-text .sidebar-search, html.a11y-large-text .sidebar-footer,
+html.a11y-large-text .map-controls, html.a11y-large-text .map-bottom, html.a11y-large-text .layer-toggle, html.a11y-large-text .travel-preview,
+html.a11y-large-text .travel-hud, html.a11y-large-text .audio-nav, html.a11y-large-text dialog { zoom: 1.2; }
+
+/* Reduced motion (in-app setting; the system preference is honoured by existing media queries) */
+html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-motion="reduce"] *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+}
+
+@media (max-width: 640px) {
+  .audio-nav { top: auto; bottom: calc(var(--sheet-h, 40vh) + 8px); }
+  .audio-nav-buttons button { min-height: 44px; font-size: 13px; padding: 0 8px; }
+}

@@ -65,7 +65,8 @@ export interface EarthMaterials {
 }
 
 export function createEarthMaterials(quality: "high" | "low", onLoad: () => void): EarthMaterials {
-  const blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1);
+  // A useful blue surface remains visible if a texture cannot be loaded.
+  const blank = new THREE.DataTexture(new Uint8Array([36, 83, 128, 255]), 1, 1);
   blank.needsUpdate = true;
   const surface = new THREE.ShaderMaterial({
     vertexShader: VERT,
@@ -85,9 +86,18 @@ export function createEarthMaterials(quality: "high" | "low", onLoad: () => void
     side: THREE.BackSide,
   });
   const loader = new THREE.TextureLoader();
+  let disposed = false;
+  const textures = new Set<THREE.Texture>([blank]);
+  surface.addEventListener("dispose", () => {
+    disposed = true;
+    textures.forEach((t) => t.dispose());
+    textures.clear();
+  });
   const res = quality === "high" ? "4k" : "2k";
   const load = (file: string, uniform: string, flag?: string) =>
     loader.load(`/textures/${file}`, (t) => {
+      if (disposed) { t.dispose(); return; }
+      textures.add(t);
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = 8;
       surface.uniforms[uniform].value = t;

@@ -72,6 +72,12 @@ export function ObjectSearch({ value, onSelect, placeholder, label, leading, tra
   }, [data, view, q, category, browsing, counts, suggestions, limit]);
 
   const totalInCategory = category ? counts.get(category) ?? 0 : 0;
+  /** Matches the category filter hides, so the user can widen the search without retyping. */
+  const outsideFilter = useMemo(() => {
+    if (!data || view !== "results" || !category) return 0;
+    const shown = new Set(rows.map((r) => (r.kind === "obj" ? r.obj.id : "")));
+    return search(data.search, q, 12).filter((r) => !shown.has(r.obj.id)).length;
+  }, [data, view, category, q, rows]);
 
   const choose = (obj: CatalogObject) => {
     menu.setOpen(false);
@@ -128,7 +134,7 @@ export function ObjectSearch({ value, onSelect, placeholder, label, leading, tra
   const emptyText =
     view === "results" ? `No destination matching “${q}”${category ? ` in ${findNode(category)?.label}` : ""} in the GalaxyMaps catalog.` :
     view === "category" ? `No ${findNode(category!)?.label.toLowerCase()} in the GalaxyMaps catalog yet.` : null;
-  const showPanel = open && (rows.length > 0 || emptyText != null || view === "tree");
+  const showPanel = open && (rows.length > 0 || emptyText != null || view === "tree" || outsideFilter > 0);
 
   return (
     <div className={`osearch ${className ?? ""} ${showPanel ? "is-open" : ""}`} ref={menu.ref}>
@@ -222,6 +228,11 @@ export function ObjectSearch({ value, onSelect, placeholder, label, leading, tra
           ) : emptyText ? (
             <div className="osearch-empty" role="status">{emptyText}</div>
           ) : null}
+          {outsideFilter > 0 && (
+            <button type="button" className="text-btn osearch-more" onMouseDown={(e) => e.preventDefault()} onClick={() => { setCategory(null); ref.current?.focus(); }}>
+              Search all categories ({outsideFilter} more {outsideFilter === 1 ? "match" : "matches"} outside {findNode(category!)?.label})
+            </button>
+          )}
           {view === "category" && totalInCategory > limit && (
             <button type="button" className="text-btn osearch-more" onMouseDown={(e) => e.preventDefault()} onClick={() => setLimit((l) => l + PAGE)}>
               Show more ({totalInCategory - limit} more)

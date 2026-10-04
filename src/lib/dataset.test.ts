@@ -171,6 +171,17 @@ describe("routes on real data", () => {
     const alnilam = computeRoute([get("earth"), get("alnilam")], LIGHT_MODE, ctx());
     expect(alnilam.ok).toBe(false);
   });
+  it("never implies an internal travel distance for features placed at their host's distance", () => {
+    const sibling = computeRoute([get("ngc-206"), get("mayall-ii")], LIGHT_MODE, ctx());
+    expect(sibling.ok).toBe(false);
+    for (const pair of [["andromeda", "mayall-ii"], ["mayall-ii", "andromeda"]]) {
+      const r = computeRoute(pair.map(get), LIGHT_MODE, ctx());
+      expect(r.ok).toBe(false);
+      if (!r.ok) expect(r.error).toMatch(/depth inside Andromeda/);
+    }
+    expect(computeRoute([get("earth"), get("mayall-ii")], LIGHT_MODE, ctx()).ok).toBe(true);
+    expect(computeRoute([get("andromeda"), get("m32")], LIGHT_MODE, ctx()).ok).toBe(true);
+  });
   it("Andromeda is a Local Group distance (~2.5 million ly)", () => {
     const m31 = get("andromeda");
     expect(m31.distance!.valueKm / PC_KM).toBeCloseTo(761_000, -3);

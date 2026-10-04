@@ -1,0 +1,65 @@
+.earthsky-overlay { position: absolute; z-index: 44; inset: 0; padding: 20px; display: flex; align-items: center; justify-content: center; pointer-events: auto; background: #02081375; }
+.earthsky-panel { width: 100%; max-width: 740px; max-height: 100%; overflow: auto; border: 1px solid #8ea7cb40; border-radius: 18px; background: #091320ed; box-shadow: 0 18px 70px #0008; color: #dce7f7; pointer-events: auto; scrollbar-color: #34506e #101d2b; }
+.earthsky-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 19px 23px 0; }
+.earthsky-header > div > span { font-size: 10px; font-weight: 650; color: #92b5db; letter-spacing: .06em; text-transform: uppercase; }
+.earthsky-header h1 { margin: 6px 0 0; font-size: 22px; line-height: 1.25; letter-spacing: -.03em; font-weight: 600; }
+.earthsky-icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 8px; min-width: 34px; min-height: 34px; font-size: 18px; border: 1px solid #5c789748; background: #16263a; color: #b9d3ee; border-radius: 8px; cursor: pointer; }
+.earthsky-description { margin: 9px 23px 0; color: #8b9db5; font-size: 11px; line-height: 1.5; }
+.earthsky-surface { position: relative; height: clamp(300px, 44vh, 480px); width: 100%; touch-action: none; cursor: grab; overflow: hidden; }
+.earthsky-surface:active { cursor: grabbing; }
+.earthsky-surface canvas { width: 100%; height: 100%; display: block; }
+.earthsky-surface canvas:focus-visible { outline: 1px solid #7eb7eb; outline-offset: -4px; border-radius: 8px; }
+.earthsky-chart-label, .earthsky-field-label { position: absolute; top: 14px; color: #6987a8; font-size: 9px; pointer-events: none; }
+.earthsky-chart-label { left: 23px; }.earthsky-field-label { right: 23px; }
+.earthsky-canvas-fallback { position: absolute; inset: 40%; text-align: center; font-size: 13px; color: #aac1dc; line-height: 1.6; }
+.earthsky-controls { display: flex; align-items: center; gap: 7px; padding: 0 22px 16px; border-bottom: 1px solid #34527245; }
+.earthsky-controls > button:first-child { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; background: #183d64; border: 1px solid #4d86bb5e; color: #c0dfff; border-radius: 7px; padding: 8px 10px; font-size: 10px; cursor: pointer; }
+.earthsky-controls > span { flex: 1; color: #6f88a4; font-size: 9px; text-align: center; }
+.earthsky-reading { padding: 17px 23px 18px; }
+.earthsky-coordinates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; }
+.earthsky-coordinates dt { color: #829ab6; font-size: 9px; margin-bottom: 6px; }
+.earthsky-coordinates dd { margin: 0; color: #d9e9fb; font-size: 15px; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.earthsky-epoch { color: #88a1bf; font-size: 10px; margin: 12px 0 17px; }
+.earthsky-neighbors { margin-bottom: 15px; }
+.earthsky-neighbors > strong { display: block; font-size: 10px; color: #abc4df; font-weight: 600; }
+.earthsky-neighbors > strong > span { padding-left: 6px; font-size: 9px; font-weight: 400; color: #718caa; }
+.earthsky-neighbors > div { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.earthsky-neighbors button { border: 1px solid #56739548; background: #112236; color: #a8c2df; border-radius: 6px; font-size: 10px; padding: 7px 9px; cursor: pointer; }
+.earthsky-neighbors small { color: #688caf; margin-left: 8px; font-size: 9px; }
+.earthsky-sources { border-top: 1px solid #34527245; padding-top: 12px; color: #839fbe; font-size: 10px; line-height: 1.7; }
+.earthsky-sources summary { cursor: pointer; color: #a2bbd5; font-weight: 550; }
+.earthsky-sources p { margin: 10px 0; }
+.earthsky-sources ul { margin: 9px 0; padding-left: 16px; }
+.earthsky-sources a { color: #9ac9f6; }
+.earthsky-footer { display: flex; gap: 16px; align-items: center; margin-top: 15px; flex-wrap: wrap; }
+.earthsky-footer > button { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; padding: 5px 0; color: #a2cdf6; border: 0; background: transparent; cursor: pointer; }
+.earthsky-footer > span { color: #88a2bd; font-size: 8px; margin-left: auto; }
+.earthsky-footer > span a { color: #789abc; }
+.earthsky-panel button:focus-visible, .earthsky-panel a:focus-visible, .earthsky-panel summary:focus-visible, .earthsky-panel input:focus-visible { outline: 2px solid #9accff; outline-offset: 3px; }
+.earthsky-share-feedback { margin: 12px 0 0; color: #b5d5f6; font-size: 11px; line-height: 1.5; }
+.earthsky-manual-share { display: grid; gap: 7px; margin-top: 12px; color: #a8c5e3; font-size: 10px; }
+.earthsky-manual-share input { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid #4c769a; border-radius: 7px; color: #c8e0f7; background: #112236; font-size: 11px; }
+@media (max-width: 1100px) and (min-width: 721px) {
+  .earthsky-overlay { padding: 14px; }
+  .earthsky-header { padding: 17px 18px 0; }.earthsky-header h1 { font-size: 19px; }
+  .earthsky-description { margin-left: 18px; margin-right: 18px; }
+  .earthsky-controls { padding-left: 17px; padding-right: 17px; }.earthsky-controls > span { display: none; }
+  .earthsky-controls > button:first-child { margin-right: auto; }
+  .earthsky-coordinates { gap: 7px; }.earthsky-coordinates dd { font-size: 12px; }
+  .earthsky-reading { padding-left: 18px; padding-right: 18px; }
+  .earthsky-footer > span { max-width: 100px; text-align: right; }
+}
+@media (max-width: 720px) {
+  .earthsky-overlay { position: fixed; inset: 64px 0 0; padding: 10px 9px 18px; z-index: 56; }
+  .earthsky-panel { border-radius: 15px; }
+  .earthsky-header { padding: 15px 16px 0; }.earthsky-header h1 { font-size: 20px; }
+  .earthsky-description { margin-left: 16px; margin-right: 16px; font-size: 10px; }
+  .earthsky-surface { height: min(46vh, 360px); min-height: 280px; }
+  .earthsky-controls { padding: 0 14px 13px; }.earthsky-controls > span { display: none; }
+  .earthsky-controls > button:first-child { margin-right: auto; min-height: 44px; }
+  .earthsky-controls .earthsky-icon, .earthsky-header .earthsky-icon { min-width: 44px; min-height: 44px; }
+  .earthsky-reading { padding: 15px 16px 17px; }.earthsky-coordinates { gap: 8px; }.earthsky-coordinates dd { font-size: 13px; }
+  .earthsky-footer > span { font-size: 8px; max-width: 130px; text-align: right; }
+  .earthsky-neighbors button, .earthsky-footer > button, .earthsky-sources summary { min-height: 44px; }
+  .earthsky-sources summary { display: flex; align-items: center; }
+}

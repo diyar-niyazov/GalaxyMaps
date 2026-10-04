@@ -1,137 +1,73 @@
-# GalaxyMaps upgrade: completion report
+# GalaxyMaps final polish: implementation and verification
 
-Scope: every feature in `GalaxyMaps-Cursor-Upgrade-Prompt.md`, implemented in the existing React 19 + TypeScript + Vite + Three.js app (no replacement scaffold). All numbers below were produced on 2026-10-03 by the commands named next to them. Nothing here was deployed, and no public URL exists.
+Implemented the selected scope in `GalaxyMaps-Final-Polish-Cursor-Prompt.md` in the existing React/TypeScript/Three.js app. Work proceeded through three phases with delegated file ownership and independent review. The original branding, light navigation panel, astronomical calculations and continuous map remain in use.
 
-## Verification results
+No public deployment or HTTPS headset URL exists in this workspace. Verification uses the built app at **http://localhost:8788** and development app at **http://localhost:5174** (5173 was occupied). Normal production startup defaults to 8787.
 
-| Check | Command | Result |
-| --- | --- | --- |
-| Unit tests | `npm test` | 71/71 passed (6 files) |
-| Typecheck | `npm run typecheck` | Clean |
-| Production build | `npm run build` | OK. JS 965.8 kB (271.2 kB gzip), CSS 44.9 kB, lazy XR chunk 8.8 kB |
-| End-to-end browser checks | `npm run smoke -- --screenshots` (dev server) | 17/17 passed |
-| Dataset build | `npm run data:build` | Counts below |
+## Checks on 2026-10-03
 
-The unit tests cover projection and the locked-camera pivot, label collision, the observable-universe radius and logarithmic mapping, the Hohmann transfer (Earth → Mars 250–265 days, outward, departs on or after the map date, benchmark = distance / c), the two travel modes, the Play time clock (starts paused, interaction hold and 1.2 s idle resume, hidden page, clamping), taxonomy and search (type words, catalog IDs, typos, category filter, honest empty results), and catalog integrity and content targets.
+| Check | Result |
+| --- | --- |
+| Unit tests | **165/165 passed** in 20 files, including rejected spatial Exit, renderer restoration and galaxy viewing geometry |
+| Typecheck and production build | Passed; main JS 1,071.13 kB / 304.82 kB gzip, CSS 72.91 kB / 15.38 kB gzip, lazy XR 11.20 kB / 4.55 kB gzip |
+| Foundation development browser suite | **17/17 passed** |
+| Phase B public-UI browser gate | **16/16 passed**; `docs/screenshots/polish-results-phase-b.json` |
+| Final built-app public-UI browser gate | **25/25 checks resolved** across the full run and clean focused rerun; original reports and run provenance are retained in `docs/screenshots/polish-results.json` |
+| Dataset build from cached raw data | Passed, without new network downloads |
+| Whitespace check | Clean |
 
-The smoke test (headless Chromium, desktop 1440×900 and phone 390×844) checks:
+Browser evidence uses Chromium with SwiftShader software rendering at 1440×900 and 390×844 phone emulation. Actual screenshots, real input, focus and paint hit-testing are inspected. Emulation is not a physical phone test. Independent review checked exact sky Back/focus, phone overlay controls, Quiet-tour Escape recovery, contextual guide answers, resource ownership and browser history after reload. Physical headset/simulator acceptance and live Grok remain pending.
 
-- Home opens locked on a textured Earth exactly at the pivot.
-- Drag, wheel and arrow keys keep the object within 2 px of the pivot; there is no pan.
-- Esc leaves the lock.
-- Search for "black hole" returns 9 results.
-- The Browse tree shows real counts.
-- The Mars card has 6 fact tiles and the actions Focus, Directions, Explore inside and View images.
-- Andromeda Explore inside lists 21 features with breadcrumbs.
-- The observable-universe labels are present.
-- Earth → Mars shows "8.5 months" with exactly the travel modes Light speed and Voyager 1, in Route framing.
-- Play time advances about 17 days in 2.5 s at 1 week/s with Earth held centred.
-- The region Galaxies menu works.
-- On phone: floating search, collapsed sheet with Earth centred above it, the Saturn card in the half sheet, and "nebula" search.
-- No error panels appear.
+The first production run passed 23/25 checks. Two sky-chart pixel-identity checks differed through canvas rasterization while numerical view state matched. A clean 9/9 focused run verified exact public target/center/field/date, perceptual chart agreement and actual controls; the original 23/25 and focused reports remain available. Final visual review also caught an unsuitable spherical nebula proxy; matching projected observations and explicit illustration labels now distinguish extended objects from spherical bodies.
 
-### Performance (smoke test, headless Chromium with SwiftShader software rendering)
+Affected imagery checks then passed 9/9 and final scene/label checks passed 3/3, with both reports retained. A final production Chromium check on `index-Vu8OcNyo.js` verified wrapped Time controls have a 12 px gap from Back/Share/Quiet (`finishBottom=760`, `timeTop=772`) and the source popover's final Plane text is painted above other controls. Evidence: `docs/screenshots/polish-wrapped-map-controls.png`. The final source/layout change does not alter astronomy, sharing or tour state.
 
-- 30.0 fps in the nearby-stars view at 1440×900 (30.9 fps on the previous run). This is software rendering; no GPU figure was measured.
-- 38 MB JS heap; 451 live DOM elements. Fresh pages measure 323–360 elements; the CDP "Nodes" metric also counts earlier navigations not yet garbage-collected.
-- The engine renders on demand, so an idle view stops drawing. Labels and symbols come from pooled DOM/SVG nodes updated by the engine, not React, so no React state updates per object per frame. XR scenes release a focus's geometries, materials and textures when the focus changes, and everything on session end.
-- Phones (and screens under 700 px or with a coarse pointer) load the 2k sky and low-resolution Earth materials. XR uses the 2k sky.
-- Large PNG hero images are converted to JPEG, which shrank `public/media` from 89 MB to 51 MB. List thumbnails are 160 px (1.6 MB total).
+Galaxy finishing preserves morphology: only spiral/barred/lenticular reconstructions use inclined discs; elliptical/irregular sprites remain camera-facing. Initial galaxy inspection uses the Sun-facing direction so catalog axis ratios are legible. An independent review and the geometry regression test verify the camera rotation; explicit shared-view orientation remains authoritative.
 
-### Screenshots (`docs/screenshots/`)
+The final built-app Andromeda rerun passed 2/2 on `index-CBIiEIQe.js`, with all five stops intact and corrected first/last screenshots. Independent Phase C review approved the source and actual desktop/phone evidence; no blocking defect remains in the tested ordinary-page flows.
 
-- Desktop: `desktop-home-earth`, `desktop-search-black-hole`, `desktop-browse`, `desktop-card-mars`, `desktop-andromeda-inside`, `desktop-universe`, `desktop-earth-mars-transfer`, `desktop-play-time`, `desktop-regions`.
-- Phone: `phone-home-earth`, `phone-card-saturn`, `phone-search`.
+The final browser suite covers truthful comparisons, extreme ratios/insets, Fit both, swapping and actual PNG download; fresh comparison/sky links and clipboard denial; all 24 stops across four tours and the story; Previous/Next/Pause/Resume/jump/return; nonrepeating Surprise picks; saved-place persistence; exact route pose/model/endpoints and Reset/Fit; reload/Back history; sky drag/keyboard/zoom/recenter/Back; Quiet view; physical nearby versus related learning; phone comparison/tours/directions/sky; and blocked-image recovery.
 
-## Catalog counts vs targets (`npm run data:build`)
+## Implemented experience
 
-| Target | Required | Built |
-| --- | --- | --- |
-| Destinations (featured) | 250–500 | 374 |
-| Highlights | 75–150 | 126 |
-| Galaxies | 40–80 | 68 |
-| Andromeda features | ≥ 10 | 21 |
-| SpaceX / human spaceflight cards | 6–10 | 10 |
+**Foundation:** Earth deliberately fills the usable map; Saturn's pose reveals its rings. The panorama is quieter, labels retain selection/endpoints and physical positions stay separate from display sizing. Galaxies use explicitly schematic catalog-morphology reconstructions; eligible nebulae, remnants, clusters and EHT black holes use matching projected observations with visible-image provenance. Spherical body fallbacks are labeled illustrations. Search/categories, galaxy interiors and the schematic observable universe remain available. Native gallery dialogs isolate keyboard focus. Preview, simulation and camera orbit have separate clocks with bounded elapsed time and visibility handling.
 
-- Highlights by category: Solar System 24, stars 16, compact objects 12, clusters 10, nebulae 18, galaxies 26, structures 6, missions 14.
-- Browse category totals (including tags): Solar System 67, stars 648, compact objects 32, clusters 41, nebulae 28, galaxies 70, structures 8, missions 30.
-- 919 catalog objects in total, 271 with a hero image, and 109,389 HYG stars within 1,000 pc.
-- Gallery images: 475 kept and 218 dropped because they did not mention the object. Wikipedia's page image list includes navigation-template images, such as a Crab Nebula photo on Alnilam's page; the build now filters these out.
+**Discovery loop:** audited planet/moon/star comparisons use one truthful scale, a labeled magnification inset, explicit independent Fit both scales, presets, provenance, swap, sharing and export. Surprise me has Beautiful, Strange and supported physical Nearby pools with sourced reasons and recent-repeat avoidance. Four image-led tours and five authentic Demo-2 chapters have complete navigation. These editorial sequences are distinct from physical routes; mission scenes show destination context without an invented trajectory.
 
-## Requirement coverage
+**Save/share/return:** favorites and bounded recent visits persist in versioned lightweight local storage; unsave has Undo. Back restores selection, camera, panel, layer, route and epoch, including reload and jumps beyond the snapshot cache. Validated version-2 links retain legacy support and use stable object anchors for locked views. Local links are labeled local; denied clipboard access produces a selectable manual URL. Designed exports include identity, a sourced fact and image credits.
 
-- **Rename**: GalaxyMaps in the UI, title, metadata, package name, server user agent, README and docs. The app uses no localStorage or sessionStorage, so no storage keys needed migrating. Object IDs and external URLs are unchanged.
-- **Regions**: grouped pills with dropdowns (Solar System, Stars, Milky Way, Galaxies, Observable universe) and an overflow menu. On phone only the overflow menu shows.
-- **Search and browse**:
-  - An ARIA combobox with a tree of categories, real counts and thumbnails.
-  - A filter chip that emphasizes matching markers.
-  - "None yet" for empty categories instead of padding.
-  - Fuzzy matching over names, aliases, catalog IDs and type words.
-  - Search is fully local; there is no online provider, so the prompt's online-search debounce does not apply.
-- **Observable universe**: a transparent bubble with a ~46 Gly comoving radius, labelled "Schematic overview — logarithmic distance" with a selected-catalog caption. It has distance bands and no linear scale bar. Picking works through the boundary, and selecting an object returns to its local frame.
-- **Screenshot-audit fixes**:
-  - Home is a textured Earth close-up.
-  - Star field and label hierarchy are calmer.
-  - The Milky Way is labelled "Milky Way (reconstruction)".
-  - Sidebar: shorter intro, image-led journey cards and highlights, and a compact status bar with expandable "Sources and model details".
-  - The vehicle strip became a two-option Travel mode dropdown.
-  - Distance labels: "You are here", "1 AU from the Sun", and Earth to Earth = 0.
-- **Desktop layout**:
-  - Sidebar of 380–420 px with a collapse button.
-  - Framing uses the unobscured map area.
-  - 8 px spacing rhythm and one blue accent.
-- **Map rendering**:
-  - Textured planets and the Moon with IAU spin.
-  - Saturn's rings, fixed this round: their opacity was being applied twice.
-  - Label collision avoidance, including for forced labels.
-  - Distinct glyphs for compact objects, quasars and groups.
-  - Galaxy discs at catalogued position angle and inclination; the spiral texture was fixed to draw two symmetric arms.
-  - Realistic and Atlas layers stay coherent.
-- **Locked object view**:
-  - Explore, Locked and Route framings, entered as the prompt requires.
-  - Pivot centred in the usable area; orbit with inertia and pitch limits; all panning disabled; zoom toward the pivot within limits.
-  - "Locked on X" indicator, Reset view, and Back to explore (restores the saved view).
-  - Esc closes menus, then the lock.
-  - Route framing with a way back to the destination's lock.
-  - Moving bodies stay centred during Play time; the locked view re-centres on the same frame the date changes.
-  - Seamless panorama sky; labels and orbits fade while locked; optional Orbit camera.
-- **Destination cards**:
-  - Hero and gallery with lightbox; name, alternate name, type, parent and category.
-  - One sourced sentence; 3–6 fact tiles, distance first, with no duplicate Sun/Earth distance tile outside the Solar System.
-  - The four actions; three highlights; related destinations and missions.
-  - Details, Images and Sources expanders.
-  - Grok Imagine output is labelled "AI reconstruction"; static summaries are never labelled AI.
-- **Directions**:
-  - Travel mode dropdown with exactly Light speed and Voyager 1.
-  - Hohmann transfer first for planet pairs (Earth → Mars about 259 days, shown as 8.5 months), with a separate direct-distance benchmark.
-  - Straight-line cruise otherwise, with the model outputs listed.
-  - The route preview uses its own clock and pauses Play time.
-- **Play time**:
-  - Play/Pause, Reset and five rate presets; starts paused.
-  - Pauses during map interaction and search and resumes after 1.2 s idle if still armed; pauses on a hidden page.
-  - Respects reduced motion; outside the Horizons window it shows an "Approximate orbits" flag; bodies spin.
-- **Phone**: floating search, a collapsed/half/full bottom sheet, safe-area insets, pinch-to-zoom and two-finger rotate, and the locked object centred above the sheet.
-- **WebXR**:
-  - immersive-vr capability detection, with Enter VR started from a user gesture.
-  - `select` from any input source, including transient pointers.
-  - Spatial card and control bar built from the same catalog record.
-  - The viewer pose is never written; Recenter moves the content.
-  - The README documents headset testing over USB with `adb reverse`, or through your own trusted HTTPS endpoint.
-- **Security and honesty**:
-  - The xAI key stays server-side.
-  - There is no image proxy: images are local files or direct Wikimedia URLs.
-  - No Google assets are used, and no data was fabricated.
-  - Grok usage is unchanged and rate-limited.
-  - No external service is queried per frame.
+**Finishing:** eligible cards open an Earth-centered stereographic sky chart with actual HYG stars, selected-date planetary directions, source/epoch disclosure and angular neighbors. It makes no local-horizon prediction. Light delay uses compatible full 3D separation/c or sourced cosmological lookback time; unknown depth and unsupported data withhold numbers. Physical nearby and thematic related recommendations are distinguished. Live guide requests receive validated object context; offline explanations are clearly scripted. Quiet view retains identity, credits and an obvious exit. Hints dismiss on use; desktop hover waits for deliberate dwell.
 
-## Known gaps and limitations
+**Responsive and resilient:** phone sky controls paint above the sheet; comparison/tours/directions fit without page overflow. Sky focus is confined and restored to its opener. Escape restores Quiet controls before exiting a hidden tour. Failed images retain a labeled fallback and Retry. Provider/essential-data requests have deadlines; optional star-name failure does not block core exploration. Input listeners, timers, superseded focus resources and late textures are cleaned up.
 
-- **Headset validation pending.** The WebXR code is typechecked and wired, but it has not been run on a physical headset.
-- **Live Grok untested.** No xAI key was configured, so Voice and Imagine ran only through their no-key paths, and the offline guide was the one exercised.
-- **GPU performance not measured.** The only frame rate figures come from software rendering in headless Chromium.
-- **Not every phone gesture is automated.** The full sheet state and two-finger rotate are implemented, but the smoke test checks only the collapsed and half states.
-- **No bloom pass.** There is no post-processing bloom; the Sun uses a glow sprite. This keeps phone and XR frame time low.
-- **Untextured moons.** Moons other than the Moon have no bundled texture and render as shaded spheres in their catalog colour.
-- **Unmeasured depth.** Galaxy features (for example inside Andromeda) have measured sky positions but unmeasured depth, and the UI says so.
-- **Large bundle.** The main JS bundle exceeds Vite's 500 kB advisory size; only the XR module is code-split.
-- **Approximate image filter.** The gallery filter matches on names and aliases, so it can drop a relevant image whose title doesn't mention the object (for example one artist's impression of Gaia BH1).
+**WebXR:** capability-driven entry stays in a user gesture. Session-level transient-pointer selection avoids controller-index assumptions. Spatial inspection, sourced facts, related/tour Previous/Next, focus/recenter/scale and exit reuse catalog data. Head pose remains runtime-owned; flat camera orbit and clocks pause. Acquired sessions are released across import/startup failures, renderer teardown follows Three.js end handling, and unchanged exit restores the exact ordinary-page view. Spatial and ordinary Exit share the session owner. Mocked lifecycle tests establish ownership/state behavior, not headset comfort. See [XR status and actual-device checklist](polish/xr-status.md).
+
+## Delivered content
+
+| Content | Count |
+| --- | ---: |
+| Distinct catalog objects | 919 |
+| Featured destinations | 374 |
+| Hero images | 274 |
+| Additional gallery references | 479 |
+| Source records | 65 |
+| Galaxies | 68 |
+| Andromeda children | 21 |
+| SpaceX / human-spaceflight cards | 10 |
+| Separate HYG stars | 109,389 |
+
+Counts exclude aliases/decorative particles. Six local story assets comprise four NASA photographs and two EHT observations. Matching real cards receive the same audited assets through the reproducible builder. Primary URLs, dates, credits and comparison provenance: [content manifest](polish/content-manifest.md), [discovery source audit](polish/discovery-sources.md).
+
+## Evidence and repeatable run
+
+Foundation screenshots are under `docs/screenshots/desktop-*` and `phone-*`. Production screenshots use `polish-*`: comparisons/export, every tour and story, Saved, sky, Quiet and phone interactions. JSON reports identify the actual base URL and assertions.
+
+Run `npm run build` then `npm start`; verify with `BASE_URL=http://localhost:8787 npm run smoke:polish`. The original foundation suite needs a development server: `BASE_URL=http://localhost:5173 API_URL=http://localhost:8787 npm run smoke`. Chromium is required (`CHROMIUM` can supply its path). Follow [DEMO.md](DEMO.md) and the [phase checklist](polish/IMPLEMENTATION.md).
+
+## Exact remaining limits
+
+- No physical phone, Vision Pro, visionOS Simulator or other headset was available. Secure-origin deployment and XR input/stereo/performance need the documented device run.
+- No xAI credentials were configured. Voice/Imagine were preserved but not exercised; core exploration and scripted explanations work without a key.
+- No public hosting destination was configured. Links generated here are local and the app says so.
+- The main bundle exceeds Vite's 500 kB advisory. Rendering runs on demand and phone/XR texture profiles are smaller. No GPU frame-rate claim is made; concurrent software-rendered timing is not a device benchmark.
+- Transfers are circular, coplanar educational models. Precise ephemerides cover 2026-09-01 through 2027-03-01; outside that range positions are approximate and labeled. Galaxy internal depth is often unknown; most moons use shaded illustrative spheres rather than new surface textures.

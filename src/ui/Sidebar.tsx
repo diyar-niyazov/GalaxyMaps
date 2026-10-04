@@ -1,13 +1,22 @@
 import { useMemo, useRef } from "react";
+import { VoiceButton } from "./VoiceControls";
 import { useStore, type SheetState } from "../state/store";
 import { ObjectSearch } from "./ObjectSearch";
-import { SearchIcon, DirectionsIcon, ChatIcon, ChevronLeftIcon, ChevronRightIcon } from "./icons";
+import { SearchIcon, DirectionsIcon, ChatIcon, ChevronLeftIcon, ChevronRightIcon, AccessibilityIcon } from "./icons";
+import { openAccessibilitySettings } from "./A11yChrome";
 import { ExplorePanel } from "./ExplorePanel";
 import { PlaceCard } from "./PlaceCard";
 import { DirectionsPanel } from "./DirectionsPanel";
 import { GuidePanel } from "./GuidePanel";
-import { focusObject } from "../state/actions";
+import { focusObject, directionsTo, goHome } from "../state/actions";
 import { searchInputRef } from "./describe";
+import { useComparison } from "../state/comparison";
+import { ComparisonPanel } from "./ComparisonPanel";
+import { useDiscoveryStore } from "../state/discovery";
+import { TourPanel, PausedTourBanner } from "./DiscoveryPanel";
+import { shareCurrentView } from "../lib/share";
+import { useNavigation } from "../state/navigation";
+import brandLogo from "../../icon.png";
 
 
 const SHEET_ORDER: SheetState[] = ["collapsed", "half", "full"];
@@ -57,29 +66,50 @@ export function Sidebar() {
   const selectedId = useStore((s) => s.selectedId);
   const select = useStore((s) => s.select);
   const setPanel = useStore((s) => s.setPanel);
-  const openDirections = useStore((s) => s.openDirections);
+  const openDirections = directionsTo;
   const collapsed = useStore((s) => s.sidebarCollapsed);
   const setCollapsed = useStore((s) => s.setSidebarCollapsed);
   const setSheet = useStore((s) => s.setSheet);
   const selected = selectedId && data ? data.byId.get(selectedId) ?? null : null;
+  const comparing = useComparison((s) => s.open);
+  const activeTour = useDiscoveryStore((s) => s.activeTourId);
+  const tourPaused = useDiscoveryStore((s) => s.paused);
+  const backCount = useNavigation((s) => s.history.length);
 
   const suggestions = useMemo(
     () => (data ? data.catalog.objects.filter((o) => o.highlight && o.image).sort((a, b) => b.display.priority - a.display.priority).slice(0, 8) : []),
     [data],
   );
 
-  const showSearch = panel === "explore" || panel === "place";
+  const touring = !!activeTour && !tourPaused;
+  const showSearch = !comparing && (panel === "explore" || panel === "place");
+  const returnHome = () => {
+    if (useComparison.getState().open) useComparison.getState().close();
+    useDiscoveryStore.setState({
+      activeTourId: null,
+      stopIndex: 0,
+      started: false,
+      paused: false,
+      previousView: null,
+      surprise: null,
+      error: null,
+    });
+    goHome();
+  };
 
   return (
     <>
-      <aside className="sidebar" aria-label="GalaxyMaps panel" data-map-inset="bottom" aria-hidden={collapsed || undefined}>
+      <aside className="sidebar" aria-label="GalaxyMaps panel" data-map-inset="bottom">
         <SheetHandle />
         <header className="sidebar-brand">
-          <span className="brand-logo" aria-hidden="true" />
-          <span className="brand-text">
-            <strong>GalaxyMaps</strong>
-            <small>Directions across the universe</small>
-          </span>
+          {backCount > 0 && !comparing && !touring && <button type="button" className="icon-btn small" aria-label="Back to previous view" onClick={() => useNavigation.getState().back()}><ChevronLeftIcon /></button>}
+          <button type="button" className="brand-home" aria-label="GalaxyMaps home" title="Return to the Earth home view" onClick={returnHome}>
+            <img className="brand-logo" src={brandLogo} alt="" aria-hidden="true" />
+            <span className="brand-text">
+              <strong>GalaxyMaps</strong>
+              <small>Directions across the universe</small>
+            </span>
+          </button>
           <button type="button" className="icon-btn collapse-btn" aria-label="Collapse side panel" title="Collapse side panel" onClick={() => setCollapsed(true)}>
             <ChevronLeftIcon />
           </button>
@@ -114,17 +144,24 @@ export function Sidebar() {
             />
           </div>
         )}
-        <div className="sidebar-body">
-          {panel === "explore" && <ExplorePanel />}
-          {panel === "place" && selected && <PlaceCard obj={selected} />}
-          {panel === "place" && !selected && <ExplorePanel />}
-          {panel === "directions" && <DirectionsPanel />}
-          {panel === "guide" && <GuidePanel />}
+        <div className="sidebar-body" id="sidebar-body" tabIndex={-1}>
+          {comparing ? <ComparisonPanel onShare={shareCurrentView} /> : touring ? <TourPanel /> : <>
+            <PausedTourBanner />
+            {panel === "explore" && <ExplorePanel />}
+            {panel === "place" && selected && <PlaceCard key={selected.id} obj={selected} />}
+            {panel === "place" && !selected && <ExplorePanel />}
+            {panel === "directions" && <DirectionsPanel />}
+            {panel === "guide" && <GuidePanel />}
+          </>}
         </div>
-        {panel !== "guide" && (
+        {panel !== "guide" && !comparing && !touring && (
           <div className="sidebar-footer">
-            <button type="button" className="guide-fab" onClick={() => setPanel("guide")}>
-              <ChatIcon size={18} /> Ask the guide
+            <button type="button" className="guide-fab" onClick={() => { if (activeTour && !tourPaused) useDiscoveryStore.getState().pauseTour(); setPanel("guide"); }}>
+              <ChatIcon size={18} /> Mission Control
+            </button>
+            <VoiceButton className="icon-btn a11y-btn" />
+            <button type="button" className="icon-btn a11y-btn" aria-label="Accessibility settings" title="Accessibility settings" onClick={openAccessibilitySettings}>
+              <AccessibilityIcon size={20} />
             </button>
           </div>
         )}

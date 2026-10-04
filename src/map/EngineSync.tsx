@@ -7,8 +7,7 @@ import { advancePlayJd, PLAY_MAX_JD, PLAY_MIN_JD } from "../lib/ephemeris";
 import { ICRF_TO_ECLIPTIC } from "../lib/coords";
 import { mulMatVec, transpose } from "../lib/vec";
 import type { Vec3 } from "../lib/types";
-
-const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+import { reducedMotion } from "../lib/motion";
 
 /** Pushes store state into the imperative map engine and runs the clocks. Renders nothing. */
 export function EngineSync() {
@@ -78,7 +77,7 @@ export function EngineSync() {
     let last = performance.now();
     const tick = (now: number) => {
       const st = useStore.getState();
-      const p = Math.min(1, st.progress + (now - last) / 1000 / st.playbackSeconds);
+      const p = Math.min(1, st.progress + (document.hidden ? 0 : Math.max(0, Math.min(250, now - last))) / 1000 / st.playbackSeconds);
       last = now;
       st.setProgress(p);
       if (p >= 1) {
@@ -104,7 +103,7 @@ export function EngineSync() {
     const tick = (now: number) => {
       const st = useStore.getState();
       const rate = TIME_RATES.find((r) => r.id === st.time.rate)!.daysPerSecond;
-      const dt = Math.min(250, now - last);
+      const dt = Math.max(0, Math.min(250, now - last));
       last = now;
       acc += dt;
       if (acc >= stepMs) {

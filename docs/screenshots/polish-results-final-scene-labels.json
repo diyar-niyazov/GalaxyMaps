@@ -1,0 +1,21 @@
+{
+  "baseUrl": "http://localhost:8788",
+  "finished": "2026-10-03T22:55:34.553Z",
+  "results": [
+    {
+      "name": "Complete mini-tour: Black holes & extremes",
+      "ok": true,
+      "detail": "5 sourced illustrated stops; Previous/Pause/Resume/Next/Finish and return all work"
+    },
+    {
+      "name": "Complete mini-tour: Inside Andromeda",
+      "ok": true,
+      "detail": "5 sourced illustrated stops; Previous/Pause/Resume/Next/Finish and return all work"
+    },
+    {
+      "name": "No application error boundary or uncaught page exception",
+      "ok": true,
+      "detail": "No crash panel or uncaught exception during public UI checks"
+    }
+  ]
+}

@@ -1,14 +1,15 @@
 import * as THREE from "three";
-import type { CatalogObject, Vec3 } from "../lib/types";
+import type { CatalogObject, ImageRecord, Vec3 } from "../lib/types";
 import type { DataBundle } from "../data/bundle";
 import { positionAt } from "../data/bundle";
-import { makeProjector, zoomAround, fitView, planeName, unproject, centerOf, type View, type Viewport, type Projector } from "./projection";
+import { makeProjector, zoomAround, fitView, planeMatrix, planeName, unproject, centerOf, sunFacingPose, type View, type Viewport, type Projector } from "./projection";
 import { flightPath, flightDuration, easeInOut } from "./flight";
 import { declutter, type LabelCandidate } from "./labels";
 import { renderMilkyWay, HALF_SIZE_KPC, R0_KPC, armLabelAnchors, galactocentricToIcrf } from "./milkyWay";
 import { SkySphere } from "./sky";
 import { createEarthMaterials, type EarthMaterials } from "./earthMaterial";
-import { spriteTexture, MAP_GLYPH } from "./glyphs";
+import { spriteTexture, galaxyKind, MAP_GLYPH } from "./glyphs";
+import { buildGalaxyParticles, galaxyParams, particleBlend, particleBudget, type GalaxyParams } from "./galaxyModel";
 import { OBSERVABLE_RADIUS_LY, logRadius, DISTANCE_BANDS_LY, bandLabel, universeBlend } from "./universe";
 import { orbitPolyline } from "../lib/kepler";
 import { GALACTIC_TO_ICRF, ICRF_TO_ECLIPTIC, unitFromRaDec } from "../lib/coords";
@@ -17,6 +18,8 @@ import { AU_KM, LY_KM, PC_KM } from "../lib/units";
 import { primeMeridian } from "../lib/rotation";
 import { hohmannState, transferRadius } from "../lib/transfer";
 import type { TransferPlan } from "../lib/route";
+import { canvasFont, loadCanvasFonts } from "../lib/fonts";
+import { reducedMotion } from "../lib/motion";
 
 export type Layer = "realistic" | "atlas";
 export type PickTarget = { kind: "object"; id: string } | { kind: "star"; index: number };
@@ -41,6 +44,12 @@ export interface ViewInfo {
   universe: number;
   /** Which background is visible, for provenance. */
   background: "sky-panorama" | "catalog-stars" | "milky-way" | "universe" | "none";
+  /** An observation actually loaded and visible in the locked inspection view. */
+  projectedImage?: ImageRecord | null;
+  illustrativeBody?: boolean;
+  schematicObject?: boolean;
+  /** Generic 3D particle model shown for the locked galaxy, e.g. "barred spiral · SB(rs)bc". */
+  galaxyModel?: string | null;
 }
 
 export interface EngineCallbacks {
@@ -49,6 +58,7 @@ export interface EngineCallbacks {
   onCameraChange?(mode: CameraMode, lockedId: string | null): void;
   /** True while the user is dragging, pinching or scrolling the map. */
   onInteraction?(active: boolean): void;
+  onHover?(id: string | null): void;
 }
 
 export interface RouteDisplay {
@@ -64,8 +74,59 @@ const ROUTE_BLUE = "#2f6fed";
 const LOCK_TILT_MIN = 0.02;
 const LOCK_TILT_MAX = Math.PI - 0.25;
 const EXPLORE_TILT_MAX = 1.35;
+const SPHERICAL_TYPES = new Set(["star", "planet", "dwarf-planet", "moon", "exoplanet", "white-dwarf", "neutron-star"]);
+const EXTENDED_TYPES = new Set(["galaxy", "nebula", "supernova-remnant", "star-cluster", "quasar", "black-hole"]);
 
-const reducedMotion = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+/** Particles per galaxy at full detail; small or low-density screens get half. */
+const GALAXY_PARTICLES = typeof window !== "undefined" && Math.max(window.screen?.width ?? 0, window.screen?.height ?? 0) * (window.devicePixelRatio || 1) >= 1600 ? 90_000 : 45_000;
+/** Galaxy particle buffers kept on the GPU; older invisible ones are released. */
+const GALAXY_CACHE = 6;
+const GALAXY_KIND_LABEL = { spiral: "spiral", barred: "barred spiral", elliptical: "elliptical", lenticular: "lenticular", irregular: "irregular" } as const;
+
+interface GalaxyLod {
+  group: THREE.Group;
+  light: THREE.Points;
+  dust: THREE.Points | null;
+  params: GalaxyParams;
+  max: number;
+}
+
+const GALAXY_VERTEX = /* glsl */ `
+  attribute float aSize;
+  attribute vec3 color;
+  uniform float uScale;
+  uniform float uStarScale;
+  varying vec3 vColor;
+  varying float vEnergy;
+  void main() {
+    vColor = color;
+    // Stars and knots (small sizes) stay point-like at any zoom; haze grows with the galaxy.
+    float px = aSize * (aSize < 12.0 ? uStarScale : uScale);
+    // Points below one pixel keep their total light instead of brightening when clamped.
+    vEnergy = min(1.0, px * px);
+    gl_PointSize = clamp(px, 1.0, 160.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }`;
+const GALAXY_LIGHT_FRAGMENT = /* glsl */ `
+  uniform float uOpacity;
+  varying vec3 vColor;
+  varying float vEnergy;
+  void main() {
+    vec2 d = gl_PointCoord - 0.5;
+    float r2 = dot(d, d) * 4.0;
+    if (r2 > 1.0) discard;
+    gl_FragColor = vec4(vColor * exp(-r2 * 4.0) * vEnergy * uOpacity, 1.0);
+  }`;
+const GALAXY_DUST_FRAGMENT = /* glsl */ `
+  uniform float uOpacity;
+  varying float vEnergy;
+  void main() {
+    vec2 d = gl_PointCoord - 0.5;
+    float r2 = dot(d, d) * 4.0;
+    if (r2 > 1.0) discard;
+    gl_FragColor = vec4(0.05, 0.03, 0.02, exp(-r2 * 3.0) * 0.32 * vEnergy * uOpacity);
+  }`;
+
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const wrapAngle = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
@@ -112,9 +173,9 @@ const STAR_VERT = /* glsl */ `
     vec3 p = uM * rel * uPxPerPc;
     gl_Position = projectionMatrix * vec4(p.xy + uOffset, 0.0, 1.0);
     float m = uLimit - absmag;
-    float a = pow(clamp(m / 4.0, 0.0, 1.0), 1.35);
-    gl_PointSize = clamp(0.9 + m * 0.26, 0.9, 4.2) * uDpr;
-    vAlpha = a * uFade * 0.9;
+    float a = pow(clamp(m / 4.5, 0.0, 1.0), 1.5);
+    gl_PointSize = clamp(0.8 + m * 0.24, 0.8, 3.8) * uDpr;
+    vAlpha = a * uFade * 0.85;
     vColor = uAtlas > 0.5 ? vec3(0.22, 0.27, 0.36) : mix(bv2rgb(ci), vec3(1.0), 0.08);
   }
 `;
@@ -142,6 +203,8 @@ interface Renderable {
   glow?: THREE.Sprite;
   /** Schematic galaxy/nebula/cluster sprite, oriented on the sky plane. */
   sprite?: THREE.Mesh | null;
+  /** Near-field 2.5D particle model that replaces the flat sprite as a galaxy grows on screen. */
+  galaxy?: GalaxyLod;
   orbit?: { pts: Vec3[]; aKm: number; parent: string | null; line: THREE.Line };
 }
 
@@ -189,6 +252,7 @@ export class MapEngine {
   private ambient = new THREE.AmbientLight(0xffffff, 0.07);
   private discTex = softDiscTexture();
   private plane = new THREE.PlaneGeometry(1, 1);
+  private inspectionSphere: THREE.Mesh;
   private texLoader = new THREE.TextureLoader();
   private raf = 0;
   private flight: Flight | null = null;
@@ -197,7 +261,9 @@ export class MapEngine {
   private pointers = new Map<number, { x: number; y: number; type: string }>();
   private pinch: { d0: number; a0: number; mid0: [number, number]; view: View } | null = null;
   private inertia: { vh: number; vt: number; t: number } | null = null;
+  private travel: { w0: number; w1: number; wMid: number; c0: Vec3; wStart: number } | null = null;
   private wheelIdle = 0;
+  private inputAbort = new AbortController();
   private mode: CameraMode = "explore";
   private lockedId: string | null = null;
   private exploreSaved: View | null = null;
@@ -239,7 +305,13 @@ export class MapEngine {
     this.labelLayer = document.createElement("div");
     this.labelLayer.className = "map-labels";
     container.appendChild(this.labelLayer);
-    this.measureCtx.font = "500 12px Inter, system-ui, sans-serif";
+    this.measureCtx.font = canvasFont("500 12px");
+    void loadCanvasFonts().then(() => {
+      if (this.disposed) return;
+      this.measureCtx.font = canvasFont("500 12px");
+      this.textWidthCache.clear();
+      this.needsRender = true;
+    });
 
     const rect = container.getBoundingClientRect();
     const small = Math.min(rect.width || 1024, rect.height || 768) < 700 || window.matchMedia?.("(pointer: coarse)").matches;
@@ -249,6 +321,15 @@ export class MapEngine {
     this.view = { center: positionAt(data, earth, jd)!, widthKm: 2.2e6, heading: 0, tilt: 0 };
 
     this.scene.add(this.ambient, this.sunLight);
+    this.inspectionSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 96, 64),
+      new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.14 }),
+    );
+    this.inspectionSphere.matrixAutoUpdate = false;
+    this.inspectionSphere.frustumCulled = false;
+    this.inspectionSphere.renderOrder = 3;
+    this.inspectionSphere.visible = false;
+    this.scene.add(this.inspectionSphere);
     this.buildStars();
     this.buildMilkyWay();
     this.buildRenderables(small ? "low" : "high");
@@ -334,6 +415,7 @@ export class MapEngine {
           }
           if (obj.display.texture) {
             this.texLoader.load(`/textures/${obj.display.texture}`, (t) => {
+              if (this.disposed) { t.dispose(); return; }
               t.colorSpace = THREE.SRGBColorSpace;
               t.anisotropy = 8;
               (mat as THREE.MeshLambertMaterial).map = t;
@@ -358,6 +440,7 @@ export class MapEngine {
           const ringMat = new THREE.MeshLambertMaterial({ color: 0xd9c7a0, emissive: 0x6b6250, transparent: true, side: THREE.DoubleSide, depthWrite: false, opacity: 0.9 });
           if (obj.display.rings.texture) {
             this.texLoader.load(`/textures/${obj.display.rings.texture}`, (t) => {
+              if (this.disposed) { t.dispose(); return; }
               t.colorSpace = THREE.SRGBColorSpace;
               ringMat.map = t;
               ringMat.emissiveMap = t;
@@ -402,7 +485,9 @@ export class MapEngine {
 
   private spriteFor(r: Renderable): THREE.Mesh | null {
     if (r.sprite !== undefined) return r.sprite;
-    const tex = spriteTexture(r.obj);
+    const modelled = r.obj.type === "galaxy" || r.obj.type === "quasar";
+    const observed = !modelled && EXTENDED_TYPES.has(r.obj.type) && r.obj.image?.kind === "observed" ? r.obj.image : null;
+    const tex = spriteTexture(r.obj) ?? (observed ? this.discTex : null);
     if (!tex) return (r.sprite = null);
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(this.plane, mat);
@@ -410,7 +495,80 @@ export class MapEngine {
     mesh.frustumCulled = false;
     mesh.renderOrder = 2;
     this.scene.add(mesh);
+    if (observed) {
+      const applyPhoto = (photo: THREE.Texture) => {
+        if (this.disposed) { photo.dispose(); return; }
+        photo.colorSpace = THREE.SRGBColorSpace;
+        photo.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
+        if (mat.map && mat.map !== tex) mat.map.dispose();
+        mat.map = photo;
+        mat.blending = THREE.NormalBlending;
+        mat.needsUpdate = true;
+        mesh.userData.observedAspect = observed.width && observed.height ? observed.width / observed.height : 1;
+        mesh.userData.projectedImage = observed;
+        this.needsRender = true;
+      };
+      this.texLoader.load(observed.src, applyPhoto);
+    }
     return (r.sprite = mesh);
+  }
+
+  private galaxyLods: Renderable[] = [];
+
+  private galaxyFor(r: Renderable): GalaxyLod {
+    if (r.galaxy) {
+      this.galaxyLods.splice(this.galaxyLods.indexOf(r), 1);
+      this.galaxyLods.push(r);
+      return r.galaxy;
+    }
+    const params = galaxyParams(r.obj);
+    const { light, dust } = buildGalaxyParticles(params, GALAXY_PARTICLES);
+    const group = new THREE.Group();
+    group.matrixAutoUpdate = false;
+    group.renderOrder = 2;
+    const points = (positions: Float32Array, sizes: Float32Array, colors: Float32Array | null, fragmentShader: string, blending: THREE.Blending) => {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
+      if (colors) geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+      const mat = new THREE.ShaderMaterial({
+        uniforms: { uScale: { value: 1 }, uStarScale: { value: 1 }, uOpacity: { value: 0 } },
+        vertexShader: GALAXY_VERTEX, fragmentShader, transparent: true, depthTest: false, depthWrite: false, blending,
+      });
+      const p = new THREE.Points(geo, mat);
+      p.frustumCulled = false;
+      group.add(p);
+      return p;
+    };
+    const lightPts = points(light.positions, light.sizes, light.colors, GALAXY_LIGHT_FRAGMENT, THREE.AdditiveBlending);
+    lightPts.renderOrder = 2;
+    let dustPts: THREE.Points | null = null;
+    if (dust.count) {
+      dustPts = points(dust.positions, dust.sizes, null, GALAXY_DUST_FRAGMENT, THREE.NormalBlending);
+      dustPts.renderOrder = 3;
+    }
+    this.scene.add(group);
+    r.galaxy = { group, light: lightPts, dust: dustPts, params, max: light.count };
+    this.galaxyLods.push(r);
+    while (this.galaxyLods.length > GALAXY_CACHE) {
+      const old = this.galaxyLods.find((g) => !g.galaxy!.group.visible);
+      if (!old) break;
+      this.releaseGalaxy(old);
+    }
+    return r.galaxy;
+  }
+
+  private releaseGalaxy(r: Renderable) {
+    const g = r.galaxy;
+    if (!g) return;
+    for (const p of [g.light, g.dust]) {
+      if (!p) continue;
+      p.geometry.dispose();
+      (p.material as THREE.Material).dispose();
+    }
+    this.scene.remove(g.group);
+    this.galaxyLods.splice(this.galaxyLods.indexOf(r), 1);
+    r.galaxy = undefined;
   }
 
   private updatePositions() {
@@ -447,7 +605,9 @@ export class MapEngine {
   }
 
   setHover(id: string | null) {
+    if (this.hoverId === id) return;
     this.hoverId = id;
+    this.cb.onHover?.(id);
     this.needsRender = true;
   }
 
@@ -459,12 +619,65 @@ export class MapEngine {
 
   setRoute(route: RouteDisplay | null) {
     this.route = route;
+    // Refresh reset targets without disturbing a deliberately restored camera pose.
+    if (this.mode === "route") this.routeFit = route ? this.routeFramePoints(route) : null;
     this.needsRender = true;
+  }
+
+  private routeFramePoints(route: RouteDisplay): Vec3[] {
+    if (!route.transfer) return route.positions;
+    const radius = Math.max(route.transfer.h.r1Km, route.transfer.h.r2Km) * 1.08;
+    const ecl2icrf = transpose(ICRF_TO_ECLIPTIC);
+    return [0, 1, 2, 3].map((i) => mulMatVec(ecl2icrf, [radius * Math.cos(i * Math.PI / 2), radius * Math.sin(i * Math.PI / 2), 0]));
   }
 
   setPlayback(progress: number | null) {
     this.playback = progress;
     this.needsRender = true;
+  }
+
+  /**
+   * Cinematic travel: while route playback runs, the camera follows the craft along the drawn
+   * route (transfer ellipse or straight segments), widening mid-journey to keep context.
+   */
+  setTravel(on: boolean): boolean {
+    if (!on || !this.route || this.route.ids.length < 2) {
+      this.travel = null;
+      this.needsRender = true;
+      return false;
+    }
+    const origin = this.data.byId.get(this.route.ids[0]), dest = this.data.byId.get(this.route.ids[this.route.ids.length - 1]);
+    if (!origin || !dest) return false;
+    const pts = this.route.positions;
+    let extent = 0;
+    for (const a of pts) for (const b of pts) extent = Math.max(extent, length(sub(a, b)));
+    if (this.route.transfer) extent = Math.max(extent, 2 * this.route.transfer.h.r2Km);
+    const w0 = this.focusWidth(origin), w1 = this.focusWidth(dest);
+    this.flight = null;
+    this.zoomAnim = null;
+    this.inertia = null;
+    this.travel = { w0, w1, wMid: Math.max(w0, w1, extent * 0.9), c0: this.view.center, wStart: this.view.widthKm };
+    this.needsRender = true;
+    return true;
+  }
+
+  /** World position of the travelling craft at the current playback progress. */
+  private playbackPosition(): Vec3 | null {
+    if (!this.route || this.playback == null || this.route.positions.length < 2) return null;
+    const plan = this.route.transfer;
+    if (plan) {
+      const st = hohmannState(plan.h, this.playback * plan.h.transferSeconds);
+      const sun = this.byId.get("sun")?.pos;
+      if (!sun) return null;
+      const a = st.craft.angle + plan.lon0;
+      return add(sun, mulMatVec(transpose(ICRF_TO_ECLIPTIC), [st.craft.r * Math.cos(a), st.craft.r * Math.sin(a), 0]));
+    }
+    const P = this.route.positions;
+    const lens = P.slice(1).map((p, i) => length(sub(p, P[i])));
+    const total = lens.reduce((x, y) => x + y, 0);
+    let target = this.playback * total, i = 0;
+    while (i < lens.length - 1 && target > lens[i]) { target -= lens[i]; i++; }
+    return lerp(P[i], P[i + 1], lens[i] > 0 ? Math.min(1, target / lens[i]) : 0);
   }
 
   setAutoOrbit(on: boolean) {
@@ -494,8 +707,19 @@ export class MapEngine {
     return this.mode;
   }
 
+  /** The rendered epoch can be ahead of the throttled React clock by one store interval. */
+  getJd(): number { return this.jd; }
+
   getLockedId() {
     return this.lockedId;
+  }
+
+  /** Restore a meaningful saved view without replaying a framing animation. */
+  restoreView(view: View, mode: CameraMode, lockedId: string | null) {
+    if (mode === "locked" && lockedId && this.lockOn(lockedId, { widthKm: view.widthKm, heading: view.heading, tilt: view.tilt, instant: true })) return;
+    this.routeFit = mode === "route" && this.route ? this.routeFramePoints(this.route) : null;
+    this.setMode(mode === "route" ? "route" : "explore", null);
+    this.flyTo(view, true);
   }
 
   getObjectPosition(id: string): Vec3 | null {
@@ -550,11 +774,11 @@ export class MapEngine {
     const R = this.frameRadiusKm(obj);
     const focus = this.focusWidth(obj);
     if (R && obj.region === "solar-system") {
-      const initial = toWidth(2 * R, obj.display.rings ? 0.62 : 0.46);
-      return { initial, min: toWidth(2 * (obj.radiusKm ?? R), 0.92), max: Math.max(initial * 6, focus * 3) };
+      const initial = toWidth(2 * R, obj.display.rings ? 0.82 : this.vp.width < 700 ? 0.8 : 0.86);
+      return { initial, min: toWidth(2 * (obj.radiusKm ?? R), 0.96), max: Math.max(initial * 6, focus * 3) };
     }
     if (R) {
-      const initial = toWidth(2 * R, 0.78);
+      const initial = toWidth(2 * R, 0.9);
       return { initial, min: initial * 0.03, max: initial * 40 };
     }
     return { initial: focus, min: focus * 2e-4, max: focus * 40 };
@@ -572,6 +796,7 @@ export class MapEngine {
     const tilt1 = target.tilt ?? this.view.tilt, heading1 = target.heading ?? this.view.heading;
     this.zoomAnim = null;
     this.inertia = null;
+    this.travel = null;
     if (o.instant || reducedMotion()) {
       this.view = { center: target.center, widthKm: w1, tilt: tilt1, heading: heading1 };
       this.flight = null;
@@ -614,8 +839,11 @@ export class MapEngine {
     if (!obj || !pos) return false;
     if (this.mode === "explore") this.exploreSaved = { ...this.view };
     const framing = this.lockFraming(obj);
-    const heading = opts.heading ?? this.view.heading;
-    const tilt = clamp(opts.tilt ?? Math.max(this.view.tilt, obj.region === "solar-system" && this.frameRadiusKm(obj) ? 0.9 : this.view.tilt), LOCK_TILT_MIN, LOCK_TILT_MAX);
+    const pole = obj.display.rings && obj.display.pole ? mulMatVec(planeMatrix(framing.initial), unitFromRaDec(obj.display.pole.ra, obj.display.pole.dec)) : null;
+    // Start galaxy inspection from the Sun-facing direction so the catalog axis ratio is legible.
+    const galaxyView = obj.type === "galaxy" ? sunFacingPose(pos, framing.initial) : null;
+    const heading = opts.heading ?? (galaxyView?.heading ?? (pole ? Math.atan2(-pole[1], pole[0]) : this.view.heading));
+    const tilt = clamp(opts.tilt ?? (galaxyView?.tilt ?? (pole ? 1.1 : Math.max(this.view.tilt, obj.region === "solar-system" && this.frameRadiusKm(obj) ? 0.9 : this.view.tilt))), LOCK_TILT_MIN, LOCK_TILT_MAX);
     const widthKm = clamp(opts.widthKm ?? framing.initial, framing.min, framing.max);
     this.lockHome = { widthKm, heading, tilt };
     this.setMode("locked", id);
@@ -739,6 +967,8 @@ export class MapEngine {
 
   dispose() {
     this.disposed = true;
+    clearTimeout(this.wheelIdle);
+    this.inputAbort.abort();
     cancelAnimationFrame(this.raf);
     this.resizeObs.disconnect();
     this.scene.traverse((o) => {
@@ -764,6 +994,8 @@ export class MapEngine {
 
   private attachInput() {
     const el = this.container;
+    const signal = this.inputAbort.signal;
+    el.addEventListener("pointerleave", () => { this.setHover(null); el.style.cursor = ""; }, { signal });
     el.addEventListener("wheel", (e) => {
       e.preventDefault();
       this.flight = null;
@@ -784,11 +1016,12 @@ export class MapEngine {
       this.interaction(true);
       clearTimeout(this.wheelIdle);
       this.wheelIdle = window.setTimeout(() => this.interaction(false), 450);
-    }, { passive: false });
+    }, { passive: false, signal });
 
     el.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "mouse" && e.button !== 0 && e.button !== 1 && e.button !== 2) return;
-      el.setPointerCapture(e.pointerId);
+      // Synthetic or already-released pointers cannot be captured; the drag still works without capture.
+      try { el.setPointerCapture(e.pointerId); } catch { /* not capturable */ }
       this.flight = null;
       this.inertia = null;
       this.zoomAnim = null;
@@ -803,7 +1036,7 @@ export class MapEngine {
       }
       el.classList.add("dragging");
       this.interaction(true);
-    });
+    }, { signal });
 
     el.addEventListener("pointermove", (e) => {
       const rect = el.getBoundingClientRect();
@@ -859,7 +1092,7 @@ export class MapEngine {
       }
       dr.lastX = e.clientX; dr.lastY = e.clientY; dr.lastT = now;
       this.needsRender = true;
-    });
+    }, { signal });
 
     const end = (e: PointerEvent, cancelled: boolean) => {
       const rect = el.getBoundingClientRect();
@@ -888,9 +1121,9 @@ export class MapEngine {
         this.interaction(false);
       }
     };
-    el.addEventListener("pointerup", (e) => end(e, false));
-    el.addEventListener("pointercancel", (e) => end(e, true));
-    el.addEventListener("contextmenu", (e) => e.preventDefault());
+    el.addEventListener("pointerup", (e) => end(e, false), { signal });
+    el.addEventListener("pointercancel", (e) => end(e, true), { signal });
+    el.addEventListener("contextmenu", (e) => e.preventDefault(), { signal });
     el.addEventListener("dblclick", (e) => {
       const rect = el.getBoundingClientRect();
       const [lo, hi] = this.widthLimits();
@@ -898,7 +1131,12 @@ export class MapEngine {
       const cur = this.zoomAnim?.target ?? Math.log(this.view.widthKm);
       const locked = this.mode === "locked";
       this.zoomAnim = { target: clamp(cur + Math.log(e.shiftKey ? 2.5 : 0.4), Math.log(lo), Math.log(hi)), x: locked ? cx : e.clientX - rect.left, y: locked ? cy : e.clientY - rect.top };
-    });
+      if (reducedMotion()) {
+        this.view = zoomAround(this.view, this.vp, Math.exp(this.zoomAnim.target - Math.log(this.view.widthKm)), this.zoomAnim.x, this.zoomAnim.y);
+        this.zoomAnim = null;
+        this.needsRender = true;
+      }
+    }, { signal });
   }
 
   private startDrag(x: number, y: number, rotate: boolean) {
@@ -1012,8 +1250,18 @@ export class MapEngine {
       }
       if (lockedPos) this.view = { ...this.view, center: lockedPos };
     }
+    const craft = this.travel ? this.playbackPosition() : null;
+    if (this.travel && craft) {
+      const p = this.playback ?? 0, t = this.travel;
+      const smooth = (x: number) => x * x * (3 - 2 * x);
+      const lw = Math.log(t.w0) + (Math.log(t.w1) - Math.log(t.w0)) * smooth(p) + (Math.log(t.wMid) - Math.max(Math.log(t.w0), Math.log(t.w1))) * Math.sin(Math.PI * p);
+      const b = smooth(clamp(p / 0.12, 0, 1));
+      this.view = { ...this.view, center: lerp(t.c0, craft, b), widthKm: Math.exp(Math.log(t.wStart) + (lw - Math.log(t.wStart)) * b) };
+      animating = true;
+    }
     const [lo, hi] = this.widthLimits();
-    if (!this.flight) this.view.widthKm = clamp(this.view.widthKm, lo, hi);
+    if (this.travel) this.view.widthKm = clamp(this.view.widthKm, MIN_WIDTH_KM * 0.05, MAX_WIDTH_KM);
+    else if (!this.flight) this.view.widthKm = clamp(this.view.widthKm, lo, hi);
     else this.view.widthKm = clamp(this.view.widthKm, MIN_WIDTH_KM * 0.05, MAX_WIDTH_KM);
     if (!animating && !this.needsRender && !this.drag && !this.pinch) return;
     this.frame();
@@ -1026,9 +1274,17 @@ export class MapEngine {
   private background: ViewInfo["background"] = "none";
 
   info(): ViewInfo {
+    const lockedR = this.mode === "locked" && this.lockedId ? this.byId.get(this.lockedId) : undefined;
+    const sprite = lockedR?.sprite;
+    const g = lockedR?.galaxy?.group.visible ? lockedR.galaxy : null;
+    const morphology = lockedR?.obj.display.morphology;
     return {
+      galaxyModel: g ? `${GALAXY_KIND_LABEL[g.params.kind]}${morphology ? ` · ${morphology}` : " · morphology not catalogued"}` : null,
       view: this.view, kmPerPx: this.view.widthKm / this.vp.width, plane: planeName(this.view.widthKm), vp: this.vp,
       mode: this.mode, lockedId: this.lockedId, universe: this.universe, background: this.background,
+      projectedImage: sprite?.visible ? sprite.userData.projectedImage ?? null : null,
+      illustrativeBody: this.mode === "locked" && this.inspectionSphere.visible,
+      schematicObject: !!sprite?.visible && !sprite.userData.projectedImage,
     };
   }
 
@@ -1051,7 +1307,9 @@ export class MapEngine {
     (this.starMat.uniforms.uCenter.value as THREE.Vector3).set(c[0] / PC_KM, c[1] / PC_KM, c[2] / PC_KM);
     (this.starMat.uniforms.uOffset.value as THREE.Vector2).set(cx - this.vp.width / 2, this.vp.height / 2 - cy);
     this.starMat.uniforms.uPxPerPc.value = proj.k * PC_KM;
-    this.starMat.uniforms.uLimit.value = Math.max(-3, Math.min(15.5, 13.6 - 4.6 * Math.log10(Math.max(widthPc, 1e-6) / 4)));
+    // Keep the number of stars per screen area roughly constant: small screens get a brighter limit.
+    const areaTerm = clamp(1.1 * Math.log10((this.vp.width * this.vp.height) / (1440 * 900)), -1, 0.5);
+    this.starMat.uniforms.uLimit.value = Math.max(-3, Math.min(15.5, 13.6 - 4.6 * Math.log10(Math.max(widthPc, 1e-6) / 4) + areaTerm));
     const starFade = clamp(Math.log10(widthPc / 0.3) / 1.2, 0, 1);
     const farFade = 1 - clamp(Math.log10(widthPc / 30_000) / 0.8, 0, 1);
     const starAlpha = starFade * farFade * (atlas ? 0.9 : 1) * (locked ? 0.55 : 1);
@@ -1069,10 +1327,14 @@ export class MapEngine {
 
     // Milky Way illustration
     const mwFade = clamp(Math.log10(widthPc / 600) / 0.9, 0, 1) * linear;
-    this.milkyWay.visible = mwFade > 0.01;
+    const gc = galactocentricToIcrf(0, 0);
+    const s = proj.project(gc);
+    // The orthographic map has no camera position. While inspecting another galaxy the viewer is
+    // nominally a few view-widths in front of it, so our own galaxy, which lies on the Sun-facing
+    // line of sight, is behind the viewer and must not be drawn over the target.
+    const mwBehindViewer = locked && s[2] > this.vp.width * 2;
+    this.milkyWay.visible = mwFade > 0.01 && !mwBehindViewer;
     if (this.milkyWay.visible) {
-      const gc = galactocentricToIcrf(0, 0);
-      const s = proj.project(gc);
       const ex = mulMatVec(m, mulMatVec(GALACTIC_TO_ICRF, [1, 0, 0]));
       const ey = mulMatVec(m, mulMatVec(GALACTIC_TO_ICRF, [0, 1, 0]));
       const ez = mulMatVec(m, mulMatVec(GALACTIC_TO_ICRF, [0, 0, 1]));
@@ -1099,6 +1361,7 @@ export class MapEngine {
     const transfer = this.route?.transfer;
     const routeIds = new Set(this.route?.ids ?? []);
     const labelCands: LabelCandidate[] = [];
+    this.inspectionSphere.visible = false;
     const lockedChildren = new Set<string>();
     if (locked) for (const o of this.data.catalog.objects) if (o.parentId === this.lockedId) lockedChildren.add(o.id);
 
@@ -1107,6 +1370,7 @@ export class MapEngine {
       if (r.mesh) r.mesh.visible = false;
       if (r.glow) r.glow.visible = false;
       if (r.sprite) r.sprite.visible = false;
+      if (r.galaxy) r.galaxy.group.visible = false;
       if (r.orbit) r.orbit.line.visible = false;
       if (!r.pos || u > 0.98) continue;
       const o = r.obj;
@@ -1180,6 +1444,10 @@ export class MapEngine {
         }
         rPx = o.display.extentKm ? Math.max(o.display.extentKm * proj.k * 0.5, 6) : 3;
       }
+      const syntheticScale = (this.lockHome?.widthKm ?? W) / W;
+      if (isLocked && !r.mesh && SPHERICAL_TYPES.has(o.type)) {
+        rPx = Math.max(rPx, clamp(this.usable().min * 0.43 * syntheticScale, 4, this.usable().min * 4));
+      }
       r.visible = visible;
       r.rPx = rPx;
       if (!visible) continue;
@@ -1187,6 +1455,7 @@ export class MapEngine {
 
       // Meshes
       if (r.mesh && !atlas && !(o.id === "sun" && widthPc > 5000)) this.placeSphere(r, proj, rPx);
+      else if (isLocked && SPHERICAL_TYPES.has(o.type) && !atlas) this.placeInspectionSphere(r, rPx);
       if (r.glow && o.id === "sun" && !atlas && widthPc < 5000) {
         const gs = Math.max(rPx * 5, 34);
         r.glow.scale.set(gs, gs, 1);
@@ -1195,15 +1464,22 @@ export class MapEngine {
       }
 
       // Extended objects: schematic sprite on the sky plane once large enough, else a symbol.
-      const extPx = (o.display.extentKm ?? 0) * proj.k;
+      let extPx = (o.display.extentKm ?? 0) * proj.k;
+      if (isLocked && EXTENDED_TYPES.has(o.type) && extPx <= 0) {
+        extPx = clamp(this.usable().min * 0.86 * syntheticScale, 8, this.usable().min * 8);
+        r.rPx = extPx / 2;
+      }
       let drewSprite = false;
       if (!solar && extPx > 7 && !atlas) {
         const sp = this.spriteFor(r);
         if (sp) {
+          const fade = dim * (locked && !isLocked ? 0.5 : 1);
+          const blend = o.type === "galaxy" || o.type === "quasar" ? particleBlend(extPx) : 0;
           this.placeSkySprite(sp, r, proj, extPx);
-          (sp.material as THREE.MeshBasicMaterial).opacity = clamp((extPx - 7) / 18, 0, 1) * (o.type === "galaxy" ? 0.95 : 0.8) * dim * (locked && !isLocked ? 0.5 : 1);
+          (sp.material as THREE.MeshBasicMaterial).opacity = clamp((extPx - 7) / 18, 0, 1) * (o.type === "galaxy" ? 0.95 : 0.8) * fade * (1 - blend);
           sp.visible = true;
           drewSprite = extPx > 16;
+          if (blend > 0) this.placeGalaxy(this.galaxyFor(r), r, proj, extPx, blend * fade);
         }
       }
 
@@ -1239,6 +1515,8 @@ export class MapEngine {
       // Labels: locked inspection keeps the locked object, its moons, route stops and hover.
       if (u > 0.35) continue;
       if (locked && !isLocked && !lockedChildren.has(o.id) && !inRoute && o.id !== this.hoverId) continue;
+      // A shown route keeps its endpoints and major neighbours readable; minor bodies keep markers only.
+      if (this.route && !inRoute && !isSel && o.id !== this.hoverId && (o.type === "asteroid" || o.type === "comet" || o.type === "spacecraft" || o.type === "mission")) continue;
       let pri = o.display.priority;
       if (solar && W < 200 * AU_KM) pri += 25;
       if (!solar && W > 50_000 * PC_KM && o.region !== "local-group" && o.region !== "local-volume") pri -= 40;
@@ -1248,12 +1526,20 @@ export class MapEngine {
       if (o.id === "sagittarius-a-star" && widthPc > 30_000) continue;
       if (solar && widthPc > 2 && !isSel && !inRoute) continue;
       if (o.hygId && !o.featured && !isSel && !emph && pri < 8 && widthPc > 20) continue;
-      labelCands.push({ id: o.id, x: s[0], y: s[1], width: this.textWidth(o.name), height: 16, priority: pri, offset: Math.min(rPx, 400) + 6, force: isSel || inRoute || isLocked || o.id === this.hoverId || (o.id === "earth" && solar && W < 60 * AU_KM) });
+      let labelName = o.name;
+      if (o.id === "milky-way") {
+        labelName = this.milkyWay.visible ? `${o.name} (reconstruction)` : o.name;
+        this.setLabelText(o.id, labelName);
+      } else {
+        if (isLocked && drewSprite && !r.sprite?.userData.projectedImage) labelName += " (schematic)";
+        this.setLabelText(o.id, labelName);
+      }
+      labelCands.push({ id: o.id, x: s[0], y: s[1], width: this.textWidth(labelName), height: 16, priority: pri, offset: Math.min(rPx, 400) + 6, force: isSel || inRoute || isLocked || o.id === this.hoverId || (o.id === "earth" && solar && W < 60 * AU_KM) });
     }
 
     // Milky Way and spiral-arm labels
     if (this.milkyWay.visible && u < 0.35 && !locked) {
-      if (widthPc > 30_000) {
+      if (widthPc > 30_000 && !this.byId.get("milky-way")?.visible) {
         const s = proj.project(galactocentricToIcrf(0, 0));
         labelCands.push({ id: "__mw", x: s[0], y: s[1], width: this.textWidth("Milky Way (reconstruction)"), height: 16, priority: 99, offset: 8 });
       }
@@ -1288,11 +1574,12 @@ export class MapEngine {
 
     for (const [id, el] of this.svgPool) if (!this.svgUsed.has(id)) el.setAttribute("display", "none");
 
-    this.placeLabels(declutter(labelCands, this.vp.width, this.vp.height, locked ? 24 : 55, blocked));
+    const ins = this.insets;
+    this.placeLabels(declutter(labelCands, this.vp.width, this.vp.height, locked ? 24 : 55, blocked, [ins.left, ins.top, this.vp.width - ins.right, this.vp.height - ins.bottom]));
 
     this.renderer.clear();
     if (skyOpacity > 0.01 && this.sky.loaded) {
-      this.sky.update(m, this.vp.width / this.vp.height, skyOpacity * 0.9);
+      this.sky.update(m, this.vp.width / this.vp.height, skyOpacity * 0.22);
       this.renderer.render(this.sky.scene, this.sky.camera);
     }
     this.renderer.render(this.scene, this.camera);
@@ -1334,29 +1621,46 @@ export class MapEngine {
     }
   }
 
+  /** Shaded illustration for spherical bodies without a dedicated textured body mesh. */
+  private placeInspectionSphere(r: Renderable, rPx: number) {
+    const color = new THREE.Color(r.obj.display.color);
+    const material = this.inspectionSphere.material as THREE.MeshLambertMaterial;
+    material.color.copy(color);
+    material.emissive.copy(color);
+    const matrix = new THREE.Matrix4().makeScale(rPx, rPx, rPx);
+    matrix.setPosition(r.sx - this.vp.width / 2, this.vp.height / 2 - r.sy, clamp(r.depth, -5e6, 5e6));
+    this.inspectionSphere.matrix.copy(matrix);
+    this.inspectionSphere.matrixWorldNeedsUpdate = true;
+    this.inspectionSphere.visible = true;
+  }
+
   /**
-   * Orient a schematic sprite. Galaxies are drawn as thin discs: major axis along the observed
+   * Orient a schematic sprite. Disc galaxies use a major axis along the observed
    * position angle, inclined so that seen from the Sun the disc has the catalogued axis ratio
-   * (cos i = b/a; which side is nearer is unknown). Nebulae and clusters face the camera.
+   * (cos i = b/a; which side is nearer is unknown). Other extended objects face the camera;
+   * an elliptical galaxy's axis ratio does not establish a disc inclination.
    */
   private placeSkySprite(sp: THREE.Mesh, r: Renderable, proj: Projector, extPx: number) {
     const o = r.obj;
+    const observedAspect = Number(sp.userData.observedAspect);
+    if (Number.isFinite(observedAspect) && observedAspect > 0) {
+      const mat4 = new THREE.Matrix4().makeScale(extPx, extPx / observedAspect, 1);
+      mat4.setPosition(r.sx - this.vp.width / 2, this.vp.height / 2 - r.sy, 0);
+      sp.matrix.copy(mat4);
+      sp.matrixWorldNeedsUpdate = true;
+      return;
+    }
     const q = o.display.axisRatio ?? 1;
-    let X: Vec3 = [1, 0, 0], Y: Vec3 = [0, Math.max(q, 0.7), 0], Z: Vec3 = [0, 0, 1];
-    if (o.type === "galaxy") {
-      const los = normalize(r.pos!);
-      let east = cross([0, 0, 1], los);
-      if (length(east) < 1e-9) east = [1, 0, 0];
-      east = normalize(east);
-      const north = cross(los, east);
-      const pa = ((o.display.positionAngle ?? 0) * Math.PI) / 180;
-      const major = add(scale(north, Math.cos(pa)), scale(east, Math.sin(pa)));
-      const minor = cross(los, major);
-      const cosI = clamp(q, 0.12, 1);
-      const inPlane = add(scale(minor, cosI), scale(los, Math.sqrt(1 - cosI * cosI)));
-      X = mulMatVec(proj.m, major);
-      Y = mulMatVec(proj.m, inPlane);
-      Z = mulMatVec(proj.m, normalize(cross(major, inPlane)));
+    let X: Vec3 = [1, 0, 0], Y: Vec3 = [0, clamp(q, 0.12, 1), 0], Z: Vec3 = [0, 0, 1];
+    if (o.type === "galaxy" || o.type === "quasar") {
+      const frame = this.galaxyFrame(o, r.pos!, proj);
+      if (frame.disc) [X, Y, Z] = frame.axes;
+      else {
+        // Ellipsoids and irregulars face the camera, with the major axis along the position angle.
+        const s = Math.hypot(frame.axes[0][0], frame.axes[0][1]) || 1;
+        const mx = frame.axes[0][0] / s, my = frame.axes[0][1] / s, b = clamp(q, 0.12, 1);
+        X = [mx, my, 0]; Y = [-my * b, mx * b, 0];
+      }
     }
     const mat4 = new THREE.Matrix4().makeBasis(
       new THREE.Vector3(X[0] * extPx, X[1] * extPx, X[2] * extPx),
@@ -1366,6 +1670,52 @@ export class MapEngine {
     mat4.setPosition(r.sx - this.vp.width / 2, this.vp.height / 2 - r.sy, 0);
     sp.matrix.copy(mat4);
     sp.matrixWorldNeedsUpdate = true;
+  }
+
+  /**
+   * World-fixed galaxy axes in view space. Disc galaxies: major axis along the observed position
+   * angle, inclined so that from the Sun the disc shows the catalogued axis ratio (cos i = b/a;
+   * which side is nearer is unknown). Other galaxies: major, minor and line-of-sight axes.
+   */
+  private galaxyFrame(o: CatalogObject, pos: Vec3, proj: Projector): { disc: boolean; axes: [Vec3, Vec3, Vec3] } {
+    const los = normalize(pos);
+    let east = cross([0, 0, 1], los);
+    if (length(east) < 1e-9) east = [1, 0, 0];
+    east = normalize(east);
+    const north = cross(los, east);
+    const pa = ((o.display.positionAngle ?? 0) * Math.PI) / 180;
+    const major = add(scale(north, Math.cos(pa)), scale(east, Math.sin(pa)));
+    const minor = cross(los, major);
+    const kind = galaxyKind(o);
+    if (o.type === "galaxy" && (kind === "spiral" || kind === "barred" || kind === "lenticular")) {
+      const cosI = clamp(o.display.axisRatio ?? 1, 0.12, 1);
+      const inPlane = add(scale(minor, cosI), scale(los, Math.sqrt(1 - cosI * cosI)));
+      return { disc: true, axes: [mulMatVec(proj.m, major), mulMatVec(proj.m, inPlane), mulMatVec(proj.m, normalize(cross(major, inPlane)))] };
+    }
+    return { disc: false, axes: [mulMatVec(proj.m, major), mulMatVec(proj.m, minor), mulMatVec(proj.m, los)] };
+  }
+
+  /** Particle galaxy in the same world-fixed frame as its sprite, with thickness along the normal. */
+  private placeGalaxy(g: GalaxyLod, r: Renderable, proj: Projector, extPx: number, opacity: number) {
+    const { axes } = this.galaxyFrame(r.obj, r.pos!, proj);
+    const [X, Y, Z] = axes.map((a) => new THREE.Vector3(a[0] * extPx, a[1] * extPx, a[2] * extPx));
+    g.group.matrix.makeBasis(X, Y, Z).setPosition(r.sx - this.vp.width / 2, this.vp.height / 2 - r.sy, 0);
+    g.group.matrixWorldNeedsUpdate = true;
+    const n = particleBudget(extPx, g.max);
+    // Fewer particles at distance: each carries proportionally more light.
+    const gain = Math.sqrt(g.max / n) * 0.7;
+    const uScale = (extPx / 1000) * this.dpr;
+    g.light.geometry.setDrawRange(0, n);
+    const lm = g.light.material as THREE.ShaderMaterial;
+    lm.uniforms.uScale.value = uScale;
+    lm.uniforms.uStarScale.value = Math.min(uScale, 1.1 * this.dpr);
+    lm.uniforms.uOpacity.value = opacity * gain;
+    if (g.dust) {
+      const dm = g.dust.material as THREE.ShaderMaterial;
+      dm.uniforms.uScale.value = dm.uniforms.uStarScale.value = uScale;
+      dm.uniforms.uOpacity.value = opacity;
+    }
+    g.group.visible = true;
   }
 
   // ---------------------------------------------------------------- SVG helpers
@@ -1553,6 +1903,7 @@ export class MapEngine {
     this.svgText("uni-sub", cx, cy - R - 10, `≈ ${gly} billion light-years to the edge (comoving radius, Planck 2018)`, "uni-sub", a, "middle");
     this.svgText("uni-scale", cx, cy + R + 22, "Schematic overview — logarithmic distance", "uni-sub", a, "middle");
     this.svgText("uni-catalog", cx, cy + R + 38, "Dots: selected GalaxyMaps catalog objects, not every galaxy", "uni-sub dim", a, "middle");
+    this.svgText("uni-edge", cx, cy + R + 54, "The edge is an observational horizon, not a physical wall or a destination", "uni-sub dim", a, "middle");
     this.svgCircle("uni-here", cx, cy, 3.5, "#ffffff", ROUTE_BLUE, 2, a, 4);
     const hereText = "Milky Way (you are here)";
     this.svgText("uni-here-l", cx + 8, cy + 4, hereText, "uni-label", a);

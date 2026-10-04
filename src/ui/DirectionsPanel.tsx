@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { useStore, MAX_STOPS } from "../state/store";
+import { useNavigation } from "../state/navigation";
+import { escapeCamera } from "../state/actions";
 import { useMode, useModes, useRoute, useStopObjects } from "../state/selectors";
 import { ObjectSearch } from "./ObjectSearch";
 import { BackIcon, SwapIcon, AddIcon, CloseIcon, ArrowUpIcon, ArrowDownIcon, PlayIcon, PauseIcon, ReplayIcon, FitIcon, WarningIcon, LightIcon, RocketIcon, ChevronDownIcon, OrbitIcon } from "./icons";
@@ -10,6 +12,7 @@ import type { CatalogObject } from "../lib/types";
 import type { TransportMode } from "../lib/transport";
 import { distance } from "../lib/vec";
 import { useMenu } from "./menus";
+import { beginTravel, useTravel } from "../state/travel";
 
 const STOP_LETTERS = "ABCDE";
 
@@ -73,7 +76,7 @@ export function DirectionsPanel() {
   return (
     <div className="panel directions">
       <div className="dir-head">
-        <button type="button" className="icon-btn" aria-label="Close directions" onClick={() => setPanel(selectedId ? "place" : "explore")}>
+        <button type="button" className="icon-btn" aria-label="Close directions" onClick={() => { if (!useNavigation.getState().back()) { escapeCamera(); setPanel(selectedId ? "place" : "explore"); } }}>
           <BackIcon />
         </button>
         <h1 className="dir-title">Directions</h1>
@@ -164,6 +167,7 @@ function RouteDetails({ route }: { route: OkRoute }) {
   const playbackSeconds = useStore((s) => s.playbackSeconds);
   const setPlaybackSeconds = useStore((s) => s.setPlaybackSeconds);
   const requestFit = useStore((s) => s.requestFit);
+  const travelPhase = useTravel((s) => s.phase);
   const t = route.transfer;
   const ctx = durationContext(route.modeledSeconds);
   const unc = route.totalSigmaKm != null && route.totalSigmaKm > 0 ? formatUncertainty(route.totalSigmaKm, route.totalSigmaKm) : null;
@@ -193,6 +197,11 @@ function RouteDetails({ route }: { route: OkRoute }) {
         {ctx && <p className="route-context">{ctx}</p>}
         {unc && <p className="muted small">Distance uncertainty {unc}</p>}
       </div>
+
+      <button type="button" className="begin-journey" onClick={() => beginTravel()} disabled={travelPhase !== "idle"}>
+        <RocketIcon size={18} /> Begin journey
+        <small>Camera travels the route · compressed visualization</small>
+      </button>
 
       <div className="playback" aria-label="Journey preview">
         <button type="button" className="icon-btn filled" aria-label={playing ? "Pause preview" : progress >= 1 ? "Replay preview" : "Play preview"} onClick={() => setPlaying(!playing)}>
@@ -267,7 +276,7 @@ function DetourSuggestions({ stops }: { stops: CatalogObject[] }) {
   const jd = useStore((s) => s.jd);
   const addStop = useStore((s) => s.addStop);
   const n = stops.length;
-  const day = Math.round(jd);
+  const day = jd;
   const suggestions = useMemo(() => {
     const ctx = { eph: data.eph, jdTdb: day };
     const positions = stops.map((s) => positionOf(s, ctx)!);
@@ -285,7 +294,7 @@ function DetourSuggestions({ stops }: { stops: CatalogObject[] }) {
   if (n >= MAX_STOPS || !suggestions.length) return null;
   return (
     <section className="detours" aria-labelledby="detour-h">
-      <h2 id="detour-h" className="section-title">Add a stop along the way?</h2>
+      <h2 id="detour-h" className="section-title">Suggested stops · added distance</h2>
       <ul>
         {suggestions.map(({ o, det }) => (
           <li key={o.id}>

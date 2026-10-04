@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { logRadius, universeBlend, OBSERVABLE_RADIUS_LY, UNIVERSE_FADE_START_KM, UNIVERSE_FADE_END_KM, DISTANCE_BANDS_LY } from "./universe";
 import { declutter, type LabelCandidate } from "./labels";
-import { makeProjector, unproject, fitView, centerOf, type View, type Viewport } from "./projection";
+import { makeProjector, unproject, fitView, centerOf, sunFacingPose, type View, type Viewport } from "./projection";
+import { mulMatVec, normalize, scale } from "../lib/vec";
 import { LY_KM } from "../lib/units";
 import type { Vec3 } from "../lib/types";
 
@@ -55,9 +56,28 @@ describe("label decluttering", () => {
     const placed = declutter([c("x", 100, 100, 5, { fixed: true })], 800, 600, 60, [[90, 80, 200, 120]]);
     expect(placed).toHaveLength(0);
   });
+  it("keeps optional labels fully inside the uncovered map area, but never drops forced ones", () => {
+    const bounds: [number, number, number, number] = [0, 50, 740, 600];
+    const edge = declutter([c("edge", 735, 300, 5, { fixed: true })], 800, 600, 60, [], bounds);
+    expect(edge).toHaveLength(0);
+    const flipped = declutter([c("flip", 735, 300, 5)], 800, 600, 60, [], bounds);
+    expect(flipped).toHaveLength(1);
+    expect(flipped[0].left + flipped[0].width).toBeLessThanOrEqual(740);
+    const forced = declutter([c("sel", 795, 20, 0, { force: true })], 800, 600, 60, [], bounds);
+    expect(forced.map((p) => p.id)).toEqual(["sel"]);
+  });
 });
 
 describe("projection with an off-centre usable area", () => {
+  it("frames galaxies from the Sun-facing side across display planes and sky directions", () => {
+    for (const widthKm of [1e6, 1e16, 1e19]) for (const center of [[8e18, 3e18, -4e18], [-2e18, 5e18, 9e18], [1e18, -6e18, -3e18]] as Vec3[]) {
+      const view: View = { center, widthKm, ...sunFacingPose(center, widthKm) };
+      const towardSun = mulMatVec(makeProjector(view, { width: 800, height: 600 }).m, scale(normalize(center), -1));
+      expect(towardSun[0]).toBeCloseTo(0, 12);
+      expect(towardSun[1]).toBeCloseTo(0, 12);
+      expect(towardSun[2]).toBeCloseTo(1, 12);
+    }
+  });
   const vp: Viewport = { width: 1000, height: 800, cx: 620, cy: 380 };
   const view: View = { center: [1e6, -2e6, 3e5], widthKm: 5e5, heading: 0.7, tilt: 0.9 };
   it("projects the view centre onto the pivot", () => {

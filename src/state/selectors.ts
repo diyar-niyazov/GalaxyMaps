@@ -4,6 +4,23 @@ import { travelModes, LIGHT_MODE, type TransportMode } from "../lib/transport";
 import { computeRoute, type RouteModelPreference, type RouteResult } from "../lib/route";
 import type { CatalogObject } from "../lib/types";
 import type { DataBundle } from "../data/bundle";
+import type { CameraMode } from "../map/MapEngine";
+import { useComparison } from "./comparison";
+import { useEarthSky } from "./earthSky";
+
+/**
+ * The one focused experience the user is in. Comparison overlays the map without moving it, so it
+ * takes precedence over the camera mode underneath; Back/Esc leave it first.
+ */
+export type Experience = "explore" | "locked" | "route" | "comparison" | "sky";
+export const experienceOf = (camera: CameraMode, comparing: boolean, sky = false): Experience => sky ? "sky" : comparing ? "comparison" : camera;
+export const currentExperience = (): Experience => experienceOf(useStore.getState().camera.mode, useComparison.getState().open, useEarthSky.getState().open);
+export function useExperience(): Experience {
+  const camera = useStore((s) => s.camera.mode);
+  const comparing = useComparison((s) => s.open);
+  const sky = useEarthSky((s) => s.open);
+  return experienceOf(camera, comparing, sky);
+}
 
 export function modesFor(data: DataBundle | null): TransportMode[] {
   return travelModes(data?.catalog.speedReferences ?? []);
@@ -32,11 +49,11 @@ export function routeFor(data: DataBundle, stopIds: (string | null)[], mode: Tra
   return computeRoute(objs as CatalogObject[], mode, { eph: data.eph, jdTdb: jd }, model);
 }
 
-/** Route recomputation is throttled to whole days so the Play-time clock does not rerun it every tick. */
+/** Use the same epoch as cards and the renderer; store clock updates are already bounded. */
 export function useRoute(): RouteResult | null {
   const data = useStore((s) => s.data);
   const stops = useStore((s) => s.stops);
-  const day = useStore((s) => Math.round(s.jd * 4) / 4);
+  const day = useStore((s) => s.jd);
   const model = useStore((s) => s.routeModel);
   const mode = useMode();
   return useMemo(() => (data ? routeFor(data, stops, mode, day, model) : null), [data, stops, mode, day, model]);

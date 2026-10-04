@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "../state/store";
 import type { CatalogObject, Fact, ImageRecord } from "../lib/types";
 import { positionOf } from "../lib/route";
@@ -6,12 +6,21 @@ import { distance } from "../lib/vec";
 import { formatDistance, formatDistanceSecondary, formatUncertainty, jdToIsoDate } from "../lib/format";
 import { TYPE_LABEL } from "../lib/search";
 import { leafLabel } from "../lib/taxonomy";
-import { DirectionsIcon, CloseIcon, SparkleIcon, ExternalIcon, WarningIcon, FocusIcon, EnterIcon, ImageIcon } from "./icons";
+import { DirectionsIcon, CloseIcon, SparkleIcon, ExternalIcon, WarningIcon, FocusIcon, EnterIcon, ImageIcon, CompareIcon, SpeakerIcon, StopIcon } from "./icons";
 import { ObjectIcon } from "./ObjectIcon";
 import { useServerStatus } from "./useServerStatus";
 import { Img, Lightbox, Credit } from "./Gallery";
-import { focusObject, exploreInside } from "../state/actions";
-import { locationOf, distanceLabel, IMAGERY_LABEL } from "./describe";
+import { focusObject, exploreInside, directionsTo } from "../state/actions";
+import { useNavigation } from "../state/navigation";
+import { locationOf, distanceLabel, imageryLabel, typeLabel } from "./describe";
+import { canSpeak, speak, stopSpeaking } from "../lib/speech";
+import { DestinationTools } from "./DestinationTools";
+import { Breadcrumbs } from "./Breadcrumbs";
+import { comparisonSize } from "../lib/comparison";
+import { openComparison } from "../state/comparison";
+import { LearningInsights } from "./LearningInsights";
+import { placedAtHostDistance } from "../lib/hierarchy";
+import { SurpriseHighlight } from "./DiscoveryPanel";
 
 interface AiImage {
   image: string;
@@ -25,20 +34,23 @@ export function PlaceCard({ obj }: { obj: CatalogObject }) {
   const data = useStore((s) => s.data)!;
   const jd = useStore((s) => s.jd);
   const select = useStore((s) => s.select);
-  const openDirections = useStore((s) => s.openDirections);
+  const openDirections = directionsTo;
   const status = useServerStatus();
   const [ai, setAi] = useState<AiImage | null>(null);
   const [aiState, setAiState] = useState<"idle" | "loading" | "error">("idle");
   const [aiError, setAiError] = useState("");
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [listening, setListening] = useState(false);
+  const aiAbort = useRef<AbortController | null>(null);
 
   useEffect(() => {
     setAi(null);
     setAiState("idle");
     setLightbox(null);
+    return () => { aiAbort.current?.abort(); stopSpeaking(); setListening(false); };
   }, [obj.id]);
 
-  const day = Math.round(jd * 4) / 4;
+  const day = jd;
   const ctx = { eph: data.eph, jdTdb: day };
   const p = positionOf(obj, ctx);
   const pe = positionOf(data.byId.get("earth")!, ctx);
@@ -64,21 +76,33 @@ export function PlaceCard({ obj }: { obj: CatalogObject }) {
   const moreFacts = own.slice(shown.length);
 
   const generate = async () => {
+    aiAbort.current?.abort();
+    const ctrl = new AbortController();
+    aiAbort.current = ctrl;
     setAiState("loading");
     try {
-      const r = await fetch("/api/imagine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ objectId: obj.id }) });
+      const r = await fetch("/api/imagine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ objectId: obj.id }), signal: ctrl.signal });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error ?? `HTTP ${r.status}`);
       setAi(j);
       setAiState("idle");
     } catch (e) {
+      if (ctrl.signal.aborted) return;
       setAiError((e as Error).message);
       setAiState("error");
     }
   };
-  const aiDisabledReason = !status ? "Checking server…" : !status.reachable ? "The GalaxyMaps API server isn't running." : !status.grokConfigured ? "Grok Imagine isn't configured (no XAI_API_KEY on the server)." : null;
+  const aiDisabledReason = !status ? "Checking availability…" : !status.reachable ? "Artistic views are temporarily unavailable." : !status.grokConfigured ? "Grok artistic views aren't connected for this installation." : null;
   const hero = images[0];
+  const comparable = !!comparisonSize(obj);
   const altName = obj.aliases.find((a) => a !== obj.name && !/^(HD|HIP|HR|Gaia|2MASS|TYC|GJ|NGC|IC|M ?\d|\[|NAME|SBDB|PSR|SN |Cl )/.test(a) && a.length < 32);
+  const toggleListen = () => {
+    if (listening) { stopSpeaking(); setListening(false); return; }
+    const where = parent ? `in ${parent.name}` : locationOf(data, obj);
+    const dist = distanceLabel(obj);
+    const text = [`${obj.name}. ${typeLabel(obj)}, ${where}.`, dist && `${dist}.`, obj.summary?.text, ...tiles.slice(0, 4).map((f) => `${f.label}: ${f.value}.`)].filter(Boolean).join(" ");
+    if (speak(text, () => setListening(false))) setListening(true);
+  };
 
   return (
     <article className="panel place" aria-labelledby="place-title">
@@ -93,23 +117,25 @@ export function PlaceCard({ obj }: { obj: CatalogObject }) {
             <span>No freely licensed image in our dataset yet</span>
           </div>
         )}
-        {hero && <span className={`imagery-badge kind-${hero.kind}`}>{IMAGERY_LABEL[hero.kind]}</span>}
+        {hero && <span className={`imagery-badge kind-${hero.kind}`}>{imageryLabel(hero)}</span>}
         {images.length > 1 && <span className="gallery-count"><ImageIcon size={14} /> {images.length}</span>}
-        <button type="button" className="icon-btn hero-close" aria-label="Close place card" onClick={() => select(null)}>
+        <button type="button" className="icon-btn hero-close" aria-label="Close place card" onClick={() => { if (!useNavigation.getState().back()) select(null); }}>
           <CloseIcon size={20} />
         </button>
       </div>
       {hero && <p className="image-credit"><Credit image={hero} /></p>}
 
+      {(obj.parentId || obj.region !== "cosmological") && <Breadcrumbs obj={obj} />}
       <header className="place-head">
         <h1 id="place-title">{obj.name}</h1>
         {altName && <p className="place-alt">{altName}</p>}
         <p className="place-sub">
-          {TYPE_LABEL[obj.type]}
+          {typeLabel(obj)}
           {parent ? <> · <button type="button" className="link-btn" onClick={() => focusObject(parent.id)}>{parent.name}</button></> : <> · {locationOf(data, obj)}</>}
           {obj.category && <> · <span className="muted">{leafLabel(obj.category)}</span></>}
         </p>
       </header>
+      <SurpriseHighlight objectId={obj.id} />
 
       {obj.summary && (
         <p className="place-lede">
@@ -133,13 +159,28 @@ export function PlaceCard({ obj }: { obj: CatalogObject }) {
             Explore inside
           </button>
         )}
-        {images.length > 0 && (
+        {comparable && (
+          <button type="button" className="action" onClick={() => openComparison(obj.id)} title="Compare physical diameters">
+            <span className="action-icon"><CompareIcon /></span>
+            Compare sizes
+          </button>
+        )}
+        {canSpeak() && (
+          <button type="button" className="action" aria-pressed={listening} onClick={toggleListen} title="Read this card aloud (browser voice)">
+            <span className="action-icon">{listening ? <StopIcon /> : <SpeakerIcon />}</span>
+            {listening ? "Stop" : "Listen"}
+          </button>
+        )}
+        {images.length > 0 && 2 + Number(children.length > 0) + Number(comparable) + Number(canSpeak()) < 4 && (
           <button type="button" className="action" onClick={() => setLightbox(0)}>
             <span className="action-icon"><ImageIcon /></span>
             View images
           </button>
         )}
       </div>
+
+      <DestinationTools obj={obj} />
+      <LearningInsights obj={obj} />
 
       {obj.mission && (
         <div className="mission-box">
@@ -162,6 +203,12 @@ export function PlaceCard({ obj }: { obj: CatalogObject }) {
         <div className="callout subtle" role="note">
           <WarningIcon size={16} />
           <span>{obj.route.reason}</span>
+        </div>
+      )}
+      {placedAtHostDistance(obj) && parent && (
+        <div className="callout subtle" role="note">
+          <WarningIcon size={16} />
+          <span>Approximate placement: measured sky position at {parent.name}'s distance. Its depth inside {parent.name} is unknown, so no internal travel distance is offered.</span>
         </div>
       )}
 
@@ -249,7 +296,7 @@ export function PlaceCard({ obj }: { obj: CatalogObject }) {
             {images.map((im, i) => (
               <li key={im.src}>
                 <button type="button" onClick={() => setLightbox(i)} aria-label={`Open image: ${im.title}`}>
-                  <img src={im.thumb ?? im.src} alt={im.alt ?? im.title} loading="lazy" />
+                  <Img image={{ ...im, src: im.thumb ?? im.src }} />
                 </button>
               </li>
             ))}

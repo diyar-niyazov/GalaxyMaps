@@ -38,6 +38,7 @@ export class SkySphere {
   private mesh: THREE.Mesh;
   private mat: THREE.ShaderMaterial;
   loaded = false;
+  private disposed = false;
 
   constructor(url: string, onLoad: () => void) {
     this.mat = new THREE.ShaderMaterial({
@@ -53,6 +54,7 @@ export class SkySphere {
     this.mesh.frustumCulled = false;
     this.scene.add(this.mesh);
     new THREE.TextureLoader().load(url, (t) => {
+      if (this.disposed) { t.dispose(); return; }
       t.colorSpace = THREE.SRGBColorSpace;
       // No mipmaps: the RA wrap is a texture-coordinate discontinuity, and mip selection there would draw a seam.
       t.generateMipmaps = false;
@@ -78,6 +80,7 @@ export class SkySphere {
   }
 
   dispose() {
+    this.disposed = true;
     (this.mat.uniforms.uMap.value as THREE.Texture | null)?.dispose();
     this.mat.dispose();
     this.mesh.geometry.dispose();

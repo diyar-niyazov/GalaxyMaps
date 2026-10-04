@@ -21,6 +21,17 @@ describe("Play time clock", () => {
     expect(t.running).toBe(false);
   });
 
+  it("route preview and exploration time cannot run together", () => {
+    useStore.getState().playTime();
+    useStore.getState().setPlaying(true);
+    expect(useStore.getState().time).toMatchObject({ armed: false, running: false });
+    useStore.getState().setProgress(0.5);
+    useStore.getState().playTime();
+    expect(useStore.getState()).toMatchObject({ playing: false, progress: 0 });
+    expect(useStore.getState().time.running).toBe(true);
+    useStore.getState().pauseTime();
+  });
+
   it("play arms and runs; pause disarms; reset returns to the start date", () => {
     const s = useStore.getState();
     s.playTime();

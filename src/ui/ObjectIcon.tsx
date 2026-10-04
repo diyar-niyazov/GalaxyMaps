@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CatalogObject, ObjectType } from "../lib/types";
 
 /** Distinct, small schematic symbols per object class (24×24 viewBox, drawn in currentColor). */
@@ -43,6 +43,7 @@ export function TypeGlyph({ type, size = 16 }: { type: ObjectType; size?: number
 export function ObjectIcon({ obj, size = 32, preferImage = true }: { obj: CatalogObject; size?: number; preferImage?: boolean }) {
   const [failed, setFailed] = useState(false);
   const src = obj.image?.thumb ?? obj.image?.src;
+  useEffect(() => setFailed(false), [src]);
   if (preferImage && src && !failed) {
     return (
       <span className="obj-icon obj-icon-img" style={{ width: size, height: size }} aria-hidden="true">

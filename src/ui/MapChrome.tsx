@@ -2,14 +2,17 @@ import { useMemo } from "react";
 import { useStore, TIME_RATES, type TimeRateId } from "../state/store";
 import { getEngine } from "../map/engineRef";
 import { REGION_PRESETS, REGION_GROUPS, type RegionPreset } from "../map/presets";
-import { AddIcon, RemoveIcon, HomeIcon, FitIcon, ThreeDIcon, LayersIcon, InfoIcon, ChevronDownIcon, MoreIcon, LockIcon, PlayIcon, PauseIcon, ReplayIcon, OrbitIcon, BackIcon, FocusIcon } from "./icons";
+import { AddIcon, RemoveIcon, HomeIcon, ThreeDIcon, LayersIcon, InfoIcon, ChevronDownIcon, MoreIcon, LockIcon, PlayIcon, PauseIcon, ReplayIcon, RotateAroundIcon, ShareIcon, QuietViewIcon, BackIcon, FocusIcon } from "./icons";
+import { useFinishing } from "../state/finishing";
+import { useNavigation } from "../state/navigation";
 import { dateFromJdTdb, jdTdb } from "../lib/units";
 import { niceScale } from "./describe";
 import { PLAY_MIN_JD, PLAY_MAX_JD, ephemerisAccuracy, clampPlayJd } from "../lib/ephemeris";
-import { useRoute } from "../state/selectors";
+import { useExperience } from "../state/selectors";
 import { goHome, goRegion, focusObject } from "../state/actions";
 import { useMenu } from "./menus";
 import { XrButton } from "../xr/XrButton";
+import { TravelOverlay } from "./TravelOverlay";
 import { DISTANCE_BANDS_LY, bandLabel } from "../map/universe";
 
 function useActivePreset(): string | null {
@@ -95,7 +98,8 @@ function CameraBar() {
   const data = useStore((s) => s.data);
   const camera = useStore((s) => s.camera);
   const stops = useStore((s) => s.stops);
-  if (!data || camera.mode === "explore") return null;
+  const experience = useExperience();
+  if (!data || experience === "explore" || experience === "comparison") return null;
   const eng = getEngine();
   if (camera.mode === "locked" && camera.lockedId) {
     const obj = data.byId.get(camera.lockedId);
@@ -105,7 +109,7 @@ function CameraBar() {
         <button type="button" className="camera-btn" onClick={() => eng?.resetView()} title="Restore this object's initial framing (R)" aria-label="Reset view">
           <ReplayIcon size={16} /> <span className="btn-label">Reset view</span>
         </button>
-        <button type="button" className="camera-btn primary" onClick={() => eng?.unlock()} title="Back to free exploration (Esc)">Back to explore</button>
+        <button type="button" className="camera-btn primary" onClick={() => eng?.unlock()} title="Unlock and return to the view you had before locking (Esc)">Back to explore</button>
       </div>
     );
   }
@@ -131,6 +135,7 @@ function TimeBar() {
   const pauseTime = useStore((s) => s.pauseTime);
   const resetTime = useStore((s) => s.resetTime);
   const setTimeRate = useStore((s) => s.setTimeRate);
+  const backCount = useNavigation((s) => s.history.length);
   const iso = dateFromJdTdb(jd).toISOString().slice(0, 10);
   const min = dateFromJdTdb(PLAY_MIN_JD).toISOString().slice(0, 10);
   const max = dateFromJdTdb(PLAY_MAX_JD).toISOString().slice(0, 10);
@@ -144,6 +149,12 @@ function TimeBar() {
   };
   return (
     <div className="time-bar" role="group" aria-label="Simulated time" data-map-inset="bottom">
+      {backCount > 0 && (
+        <button type="button" className="time-back" aria-label="Back to previous view" title="Back to previous view" onClick={() => useNavigation.getState().back()}>
+          <BackIcon size={18} />
+          <span>Back</span>
+        </button>
+      )}
       <button type="button" className={`time-play ${time.armed ? "on" : ""}`} onClick={() => (time.armed ? pauseTime() : playTime())} aria-pressed={time.armed} title="Play time (Space)">
         {time.armed ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
         <span>{time.armed ? "Pause" : "Play time"}</span>
@@ -203,10 +214,13 @@ function StatusBar() {
         <div className="status-pop" role="dialog" aria-label="Sources and model details">
           <dl>
             <div><dt>Layer</dt><dd>{layer === "realistic" ? "Realistic: textured bodies; markers are enlarged so small bodies stay visible. Distances never use marker sizes." : "Atlas: simplified symbols, not to scale."}</dd></div>
+            {viewInfo?.projectedImage && <div><dt>Object image</dt><dd>Observed image projected onto a flat plane; its depth is not resolved. {viewInfo.projectedImage.credit} · <a href={viewInfo.projectedImage.sourceUrl} target="_blank" rel="noreferrer">Image source</a></dd></div>}
+            {viewInfo?.illustrativeBody && <div><dt>Object model</dt><dd>Illustrative shaded sphere; no observed surface map is available. Its display size is enlarged for inspection.</dd></div>}
+            {viewInfo?.galaxyModel ? <div><dt>Galaxy model</dt><dd>Generic 3D particle model for a {viewInfo.galaxyModel} galaxy. Size, orientation and axis ratio follow the catalog; arms, bar, clumps and individual particles are illustrative, not a reconstruction of this galaxy, and the particles are not real stars.</dd></div> : viewInfo?.schematicObject && <div><dt>Object model</dt><dd>Schematic reconstruction from catalog type and morphology; this is not a photograph or a measured three-dimensional surface.</dd></div>}
             {bg === "sky-panorama" && svs && <div><dt>Background</dt><dd>The sky as seen from Earth: <a href={svs.url} target="_blank" rel="noreferrer">{svs.title}</a>. Decorative only; not clickable and not used for distances.</dd></div>}
             {bg === "catalog-stars" && <div><dt>Stars</dt><dd>Real stars from the <a href={src("hyg-v44")?.url} target="_blank" rel="noreferrer">HYG catalog</a> at their measured 3D positions; dim stars are drawn small.</dd></div>}
             {bg === "milky-way" && <div><dt>Milky Way</dt><dd>A labeled reconstruction (bar, four arms, dust lanes) placed 8.18 kpc from the Sun; nobody has photographed our galaxy from outside.</dd></div>}
-            {bg === "universe" && <div><dt>Overview</dt><dd>Schematic: directions are true, distances are compressed logarithmically. Radius ≈ 46 billion light-years is the comoving distance to the particle horizon in the Planck 2018 flat ΛCDM model. Bands: {DISTANCE_BANDS_LY.map(bandLabel).join(", ")}.</dd></div>}
+            {bg === "universe" && <div><dt>Overview</dt><dd>Schematic: directions are true, distances are compressed logarithmically; display positions are derived from, and never replace, the physical coordinates. Radius ≈ 46 billion light-years is the comoving distance to the particle horizon in the Planck 2018 flat ΛCDM model (<a href="https://arxiv.org/abs/1807.06209" target="_blank" rel="noreferrer">Planck Collaboration 2020</a>). Bands: {DISTANCE_BANDS_LY.map(bandLabel).join(", ")}. The dots are a selected catalog, not a census of galaxies. The boundary marks how far light could have travelled to us; it is not a physical wall and not a routable destination.</dd></div>}
             <div><dt>Positions</dt><dd>Solar System bodies from <a href={src("jpl-horizons")?.url} target="_blank" rel="noreferrer">JPL Horizons</a> for 2026-09-01 to 2027-03-01, two-body orbits outside that range. Stars, nebulae and galaxies: SIMBAD coordinates with vetted distances.</dd></div>
             <div><dt>Plane</dt><dd>The map rotates from the ecliptic (Solar System) to the Galactic plane as you zoom out. This only changes the view.</dd></div>
           </dl>
@@ -223,12 +237,10 @@ export function MapChrome() {
   const tilt = useStore((s) => s.tilt);
   const setTilt = useStore((s) => s.setTilt);
   const setAboutOpen = useStore((s) => s.setAboutOpen);
-  const requestFit = useStore((s) => s.requestFit);
   const camera = useStore((s) => s.camera);
   const orbitCamera = useStore((s) => s.orbitCamera);
   const setOrbitCamera = useStore((s) => s.setOrbitCamera);
   const panel = useStore((s) => s.panel);
-  const route = useRoute();
   if (!data) return null;
   const locked = camera.mode === "locked";
 
@@ -241,17 +253,20 @@ export function MapChrome() {
         <button type="button" className="ctrl" aria-label="About GalaxyMaps and data sources" title="About & data sources" onClick={() => setAboutOpen(true)}>
           <InfoIcon size={20} />
         </button>
+        <button type="button" className="ctrl" aria-label="Share this view" title="Share this view" onClick={() => void useFinishing.getState().shareView()}>
+          <ShareIcon size={20} />
+        </button>
         {locked ? (
-          <button type="button" className={`ctrl ${orbitCamera ? "active" : ""}`} aria-pressed={orbitCamera} aria-label="Orbit camera" title="Slowly orbit the locked object while idle" onClick={() => setOrbitCamera(!orbitCamera)}>
-            <OrbitIcon size={20} />
+          <button type="button" className={`ctrl ${orbitCamera ? "active" : ""}`} aria-pressed={orbitCamera} aria-label="Slowly orbit" title="Slowly orbit the locked object while idle" onClick={() => setOrbitCamera(!orbitCamera)}>
+            <RotateAroundIcon size={22} />
           </button>
         ) : (
           <button type="button" className={`ctrl ${tilt ? "active" : ""}`} aria-pressed={tilt} aria-label="Toggle 3D tilt" title="3D tilt (or right-drag)" onClick={() => setTilt(!tilt)}>
             <ThreeDIcon size={20} />
           </button>
         )}
-        <button type="button" className="ctrl" aria-label="Fit route" title="Fit route (F)" disabled={!route?.ok || panel !== "directions"} onClick={requestFit}>
-          <FitIcon size={20} />
+        <button type="button" className="ctrl" aria-label="Quiet view" title="Quiet view: hide controls (Esc restores)" onClick={() => useFinishing.getState().setPresentation(true)}>
+          <QuietViewIcon size={20} />
         </button>
         <button type="button" className="ctrl" aria-label="Home: Earth close-up" title="Home: Earth close-up (H)" onClick={goHome}>
           <HomeIcon size={20} />
@@ -267,16 +282,18 @@ export function MapChrome() {
         <XrButton />
       </div>
 
+      <button type="button" className={`layer-toggle preview-${layer === "realistic" ? "atlas" : "realistic"}`} onClick={() => setLayer(layer === "realistic" ? "atlas" : "realistic")} aria-label={`Switch to ${layer === "realistic" ? "Atlas" : "Realistic"} layer`}>
+        <span className="layer-thumb" aria-hidden="true" />
+        <span className="layer-name">
+          <LayersIcon size={14} /> {layer === "realistic" ? "Atlas" : "Realistic"}
+        </span>
+      </button>
+
       <div className="map-bottom">
-        <button type="button" className={`layer-toggle preview-${layer === "realistic" ? "atlas" : "realistic"}`} onClick={() => setLayer(layer === "realistic" ? "atlas" : "realistic")} aria-label={`Switch to ${layer === "realistic" ? "Atlas" : "Realistic"} layer`}>
-          <span className="layer-thumb" aria-hidden="true" />
-          <span className="layer-name">
-            <LayersIcon size={14} /> {layer === "realistic" ? "Atlas" : "Realistic"}
-          </span>
-        </button>
         <StatusBar />
         <TimeBar />
       </div>
+      <TravelOverlay />
       {camera.mode === "route" && panel !== "directions" && (
         <button type="button" className="camera-btn floating-back" onClick={() => getEngine()?.unlock()}>
           <BackIcon size={16} /> Back to explore

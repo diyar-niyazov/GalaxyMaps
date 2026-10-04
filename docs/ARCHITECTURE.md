@@ -16,6 +16,8 @@ public/data/*  ──loadBundle()──▶  DataBundle ──▶ zustand store (
 
 `npm run data:build` writes four files to `public/data/`; the app loads them with `loadBundle()` in `src/data/bundle.ts`.
 
+The builder and loader both apply the idempotent `applyEditorialAssets` overlay for audited local NASA/EHT photographs; metadata and credits stay with their actual catalog records. Essential data requests have bounded timeouts; optional star names may fail without blocking core exploration.
+
 | File | Contents |
 | --- | --- |
 | `catalog.json` | `Catalog`: `objects: CatalogObject[]`, `sources: Record<id, SourceInfo>`, `speedReferences`, `stars` metadata |
@@ -44,12 +46,15 @@ All of these are pure TypeScript with no DOM access, covered by `src/lib/science
 | `physics.ts` | `cruise(distanceKm, speedKmS)`, `separationKm(a, b)`, `properTime(t, v)` (returns `{ok: false}` unless 0 < v < c) |
 | `itinerary.ts` | `computeItinerary(positions, speed)`, `evaluateDetour(positions, candidate)` (cheapest insertion), `isOnTheWay(detour, 0.05)` |
 | `route.ts` | `positionOf(obj, ctx)`, `computeRoute(stops, mode, ctx): RouteResult` |
-| `transport.ts` | `TransportMode`, `allModes(speedRefs, customKmS, fictional)`, `customSpeedKmS(value, unit)` (null if ≤ 0 or > c) |
+| `transport.ts` | `TransportMode`, `travelModes(speedRefs)` (exactly Light speed and Voyager 1) |
 | `transfer.ts` | `hohmann(r1, r2)`, `hohmannState(h, t)` |
 | `search.ts` | `buildSearchIndex(objects)`, `search(index, q, limit)`, `resolveOne(index, q)` |
 | `format.ts` | `formatDistance`, `formatDuration`, `formatSpeed`, `formatUncertainty`, `durationContext` |
+| `comparison.ts` | audited diameter conversion, uncertainty, eligibility, ratio and verified presets |
+| `earthSky.ts` | Earth-relative direction, stereographic projection, HYG brightness/sky neighbors and coordinate formatting |
+| `learning.ts` | compatible physical proximity, geometric/cosmological light delay and sourced selected-object context |
 
-`RouteResult` is either `{ok: true, stops, positions, legs, totalKm, totalSeconds, totalSigmaKm, mode, proper, quality, notes}` or `{ok: false, error, objectId?}`.
+`RouteResult` is a discriminated success/error union. Success identifies `kind` (orbital transfer or straight-line cruise), `modeledSeconds`, compatible positions/legs and a separately labeled direct-distance `comparison`. Transfer results contain the defined Hohmann scenario; unsupported pairs carry a reason.
 
 ## 3. App state (UI area owns)
 
@@ -57,17 +62,20 @@ All of these are pure TypeScript with no DOM access, covered by `src/lib/science
 
 - **State:**
   - `data`, `jd` (TDB Julian date), `layer` (`"realistic" | "atlas"`)
-  - `panel` (`"explore" | "place" | "directions" | "guide" | "transfer"`), `selectedId`
-  - `stops: (string | null)[]` (2–5 entries, `MAX_STOPS = 5`), `modeId`, `custom`, `fictional`
-  - `playing`, `progress` (0–1), `playbackSeconds`, `tilt`, `viewInfo`, `guide` messages, `transfer`, `fitRequest`
+  - `panel` (`"explore" | "place" | "directions" | "guide"`), `selectedId`
+  - `stops: (string | null)[]` (2–5 entries, `MAX_STOPS = 5`), `modeId` (`light` / `voyager-1`), `routeModel`
+  - `playing`, `progress` (0–1), `playbackSeconds`, `time`, `orbitCamera`, `camera`, `tilt`, `viewInfo`, `guide` messages, `fitRequest`
 - **Actions:**
   - Panels and selection: `select(id)`, `openDirections(dest?, origin?)`, `setPanel`, `setLayer`
   - Stops: `setStop(i, id)`, `swapStops()`, `addStop(id, at?)`, `removeStop(i)`, `moveStop(i, ±1)`
-  - Modes: `setMode(id)`, `setCustom`, `setFictional`
+  - Modes: `setMode(id)`, `setRouteModel`, with separate preview, simulation and camera-orbit controls
   - Playback and view: `setPlaying`, `setProgress`, `requestFit()`
   - Guide: `pushGuide`
 - **Derived selectors** (`src/state/selectors.ts`): `useModes()` (Light speed and Voyager 1), `useMode()`, `useStopObjects()`, `useRoute()`, and the non-hook `routeFor(data, stops, mode, jd)`.
-- **URL sync** (`src/state/urlState.ts`): `route`, `mode`, `place`, `panel` (`transfer`/`guide`), `layer`, and `view` (scale preset id) are read once on load and written with `history.replaceState`.
+- **Focused experience:** selectors give sky/comparison precedence over the underlying Explore/Locked/Route camera. Tour/story state uses these same scenes. Entering comparison/sky pauses both clocks and camera orbit; Back restores a snapshot.
+- **URL sync** (`src/state/urlState.ts`): version2 validates finite bounded camera/date/route state plus comparison, tour stop or sky direction. Locked camera centers are relative to a stable `anchorId`; the loader resolves the physical pivot at the shared epoch. Legacy place/route/region links still load. Browser Back/Forward and in-app Back use the destination URL when a snapshot is unavailable, including after reload or a jump past the bounded cache.
+- **Navigation:** `captureView` uses the engine's actual rendered date, then records selection, panel, layer, route, camera and sheet. History is bounded to24 snapshots. Restoring a route updates reset targets without changing its saved pose.
+- **Small stores:** `comparison`, `discovery`, `earthSky`, `library` and `finishing` own their focused UI. Library storage holds stable IDs and preferences (100 favorites,20 recent) under `galaxymaps.library.v1`; malformed data or denied storage leaves the session usable.
 
 ## 4. Map engine (map area owns)
 
@@ -76,9 +84,10 @@ All of these are pure TypeScript with no DOM access, covered by `src/lib/science
 ```ts
 new MapEngine(container, data, jd, { onViewChange(info: ViewInfo), onPick(target: PickTarget | null), onHover? })
 setLayer(layer) · setJd(jd) · setSelection(id) · setRoute({ids, positions} | null) · setPlayback(progress | null)
-setScenario(hohmannScenario | null) · setTilt(rad)
-flyTo({center, widthKm, tilt?}, instant?) · flyToObject(id, widthKm?) · fitPoints(points, pad?)
-zoomBy(factor) · panBy(dx, dy) · getObjectPosition(id) · getViewport() · dispose()
+setTilt(rad) · setAutoOrbit(on) · setInsets(insets) · setPaused(paused)
+focus(id) · lockOn(id, pose?) · unlock() · homeEarth(instant?) · frameRoute(points)
+flyTo({center, widthKm, tilt?}, instant?) · restoreView(view, mode, lockedId) · fitPoints(points, pad?)
+zoomBy(factor) · panBy(dx, dy) · orbitBy(heading, tilt) · getJd() · getObjectPosition(id) · getViewport() · dispose()
 ```
 
 - **Rendering model:**
@@ -86,8 +95,11 @@ zoomBy(factor) · panBy(dx, dy) · getObjectPosition(id) · getViewport() · dis
   - The camera is orthographic over a pixel-space scene. An SVG layer draws orbits and routes, and DOM labels are decluttered by priority.
 - **Plane:** the map plane blends from the ecliptic to the galactic plane between 150 and 3000 pc (`plane` in `ViewInfo`).
 - **Camera flights:** van Wijk–Nuij smooth zoom/pan (`src/map/flight.ts`), 0.7–4.2 s, instant under `prefers-reduced-motion`.
-- **Presets:** scale presets are in `src/map/presets.ts` (`SCALE_PRESETS`, `HOME_PRESET`).
+- **Presets:** grouped region targets are in `src/map/presets.ts` (`REGION_PRESETS`, `REGION_GROUPS`); Home frames Earth separately.
 - **Milky Way:** the disk is a procedural model in `src/map/milkyWay.ts` (bar, bulge, four major arms and the Local Arm). It is labeled as an illustration and never used for coordinates.
+- **Lifetime:** map input listeners belong to an AbortController, layout/hover/zoom timers are canceled on teardown, and late texture callbacks dispose rather than update a dead scene. Earth shader textures have explicit material ownership. Galleries and source dialogs isolate keyboard focus from map shortcuts.
+- **Earth sky:** a modal2D canvas inside the shared app, with an inert underlying sidebar and isolated controls. Angular sky neighbors are distinct from physical nearby destinations; no local horizon is inferred.
+- **WebXR:** a lazily loaded spatial presentation reuses the renderer and catalog. `ImmersiveEntry` owns acquired sessions across lazy-import/startup failures; teardown restores renderer state after runtime/Three end handlers. The runtime owns head pose. Spatial browse/tour selection commits on ordinary-page return. Device acceptance and supported controls are documented in [XR status](polish/xr-status.md).
 
 ## 5. AI tools (voice/content area owns)
 
@@ -125,5 +137,5 @@ In production (`npm start`) it also serves `dist/` with an SPA fallback.
 ## Conventions
 
 - New destinations go in `scripts/data/config.ts` with a cited distance source. Then run `npm run data:build` and `npm test`.
-- New transport modes go in `src/lib/transport.ts`. Give each one a `kind` (`measured`, `assumption`, `fictional`, …) so the UI can label it.
+- Travel choices stay exactly Light speed and Voyager 1; editorial spacecraft content does not introduce a universal rocket speed.
 - Do not put numbers into UI copy or AI prompts by hand; derive them from the catalog or the science modules.

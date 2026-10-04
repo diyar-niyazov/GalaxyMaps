@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useStore } from "./state/store";
-import { loadBundle } from "./data/bundle";
+import { loadBundle, restoreCatalogId } from "./data/bundle";
 import { MapView } from "./map/MapView";
 import { EngineSync } from "./map/EngineSync";
 import { getEngine } from "./map/engineRef";
@@ -10,8 +10,21 @@ import { MapChrome } from "./ui/MapChrome";
 import { AboutDialog } from "./ui/AboutDialog";
 import { applyUrlState, startUrlSync } from "./state/urlState";
 import { ErrorBoundary } from "./ui/ErrorBoundary";
-import { goHome, escapeCamera } from "./state/actions";
+import { goHome, escapeCamera, directionsTo } from "./state/actions";
 import { closeTopMenu } from "./ui/menus";
+import { captureView, restoreView } from "./state/navigation";
+import { configureComparisonNavigation, useComparison } from "./state/comparison";
+import { initializeLibrary, useLibrary } from "./state/library";
+import { currentExperience } from "./state/selectors";
+import { EarthSkyView } from "./ui/EarthSkyView";
+import { FinishingChrome } from "./ui/FinishingChrome";
+import { VoiceDock } from "./ui/VoiceControls";
+import { useVoice } from "./state/voice";
+import { useFinishing } from "./state/finishing";
+import { useEarthSky } from "./state/earthSky";
+import { useTravel, pauseTravel, resumeTravel } from "./state/travel";
+import { describeCurrentView, stepNearby } from "./state/audioNav";
+import { SkipLinks, LiveRegions, MapSummary, CameraAnnouncements, AudioNavBar, AccessibilityDialog } from "./ui/A11yChrome";
 
 function isTyping(e: KeyboardEvent) {
   const t = e.target as HTMLElement | null;
@@ -24,6 +37,13 @@ export function App() {
   const aboutOpen = useStore((s) => s.aboutOpen);
   const collapsed = useStore((s) => s.sidebarCollapsed);
   const sheet = useStore((s) => s.sheet);
+  const presentation = useFinishing((s) => s.presentation);
+  const skyOpen = useEarthSky((s) => s.open), comparing = useComparison((s) => s.open);
+
+  useEffect(() => {
+    configureComparisonNavigation(captureView, restoreView);
+    return initializeLibrary();
+  }, []);
 
   useEffect(() => {
     let unsub: (() => void) | undefined;
@@ -31,6 +51,7 @@ export function App() {
     loadBundle()
       .then((d) => {
         if (cancelled) return;
+        [...useLibrary.getState().favorites, ...useLibrary.getState().recent].forEach((id) => restoreCatalogId(d, id));
         useStore.getState().setData(d);
         // Defer so the map engine exists before applying camera moves.
         setTimeout(() => {
@@ -39,7 +60,7 @@ export function App() {
           unsub = startUrlSync();
         }, 0);
       })
-      .catch((e) => useStore.getState().setLoadError(`Could not load the GalaxyMaps dataset (${(e as Error).message}). Run "npm run data:build" and reload.`));
+      .catch(() => { if (!cancelled) useStore.getState().setLoadError("GalaxyMaps couldn't load its catalog. Check your connection and try again."); });
     return () => {
       cancelled = true;
       unsub?.();
@@ -48,9 +69,15 @@ export function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (document.querySelector("dialog[open]")) return;
       if (e.key === "Escape") {
-        // Menus first, then the locked/route camera, then panels.
+        // One layer per press: menus, then comparison, then the locked/route camera, then panels.
+        // A nested handler (comparison panel, selector popovers) that already consumed Esc wins.
+        if (e.defaultPrevented) return;
+        if (useFinishing.getState().presentation) { e.preventDefault(); useFinishing.getState().setPresentation(false); return; }
         if (closeTopMenu()) return e.preventDefault();
+        if (useEarthSky.getState().open) { e.preventDefault(); useEarthSky.getState().close(); return; }
+        if (currentExperience() === "comparison") { e.preventDefault(); useComparison.getState().close(); return; }
         if (isTyping(e)) return;
         if (escapeCamera()) return;
         const st = useStore.getState();
@@ -60,10 +87,13 @@ export function App() {
         else if (st.inside) st.setInside(null);
         return;
       }
+      if ((e.target as HTMLElement | null)?.closest("button, a, [role='button']")) return;
+      const experience = currentExperience();
+      if (experience === "comparison" || experience === "sky" || useStore.getState().xr.active) return;
       if (e.ctrlKey || e.metaKey || e.altKey || isTyping(e)) return;
       const st = useStore.getState();
       const eng = getEngine();
-      const locked = eng?.getMode() === "locked";
+      const locked = experience === "locked";
       switch (e.key) {
         case "/":
           e.preventDefault();
@@ -116,12 +146,32 @@ export function App() {
           break;
         case "d":
         case "D":
-          st.openDirections(st.panel === "place" ? st.selectedId : undefined);
+          directionsTo(st.panel === "place" ? st.selectedId : undefined);
           break;
-        case " ":
+        case " ": {
           e.preventDefault();
-          if (st.time.armed) st.pauseTime();
+          const travel = useTravel.getState().phase;
+          if (travel === "flying") pauseTravel();
+          else if (travel === "paused") resumeTravel();
+          else if (st.time.armed) st.pauseTime();
           else st.playTime();
+          break;
+        }
+        case ",":
+        case "<":
+          stepNearby(-1);
+          break;
+        case ".":
+        case ">":
+          stepNearby(1);
+          break;
+        case "v":
+        case "V":
+          describeCurrentView();
+          break;
+        case "m":
+        case "M":
+          useVoice.getState().toggle();
           break;
         default:
           return;
@@ -132,24 +182,33 @@ export function App() {
   }, []);
 
   return (
-    <div className={`app ${collapsed ? "sidebar-collapsed" : ""} sheet-${sheet}`}>
+    <div className={`app ${collapsed ? "sidebar-collapsed" : ""} ${presentation ? "presentation" : ""} ${skyOpen ? "sky-view" : ""} sheet-${sheet}`}>
+      <SkipLinks />
+      <LiveRegions />
       <ErrorBoundary label="The side panel">
-        <Sidebar />
+        <div className="sidebar-region" inert={skyOpen}><Sidebar /></div>
       </ErrorBoundary>
-      <main className="map-wrap">
+      <main className="map-wrap" inert={comparing}>
         {data ? (
           <ErrorBoundary label="The map">
             <MapView data={data} />
+            <MapSummary />
+            <CameraAnnouncements />
             <MapChrome />
+            <AudioNavBar />
+            <FinishingChrome />
+            <VoiceDock />
+            <EarthSkyView />
             <EngineSync />
           </ErrorBoundary>
         ) : (
           <div className="map-loading" role="status">
-            {loadError ? <p className="error">{loadError}</p> : <><span className="spinner" aria-hidden="true" /><p>Loading the universe…</p></>}
+            {loadError ? <div><p className="error">{loadError}</p><button type="button" className="btn" onClick={() => location.reload()}>Reload GalaxyMaps</button></div> : <><span className="spinner" aria-hidden="true" /><p>Loading the universe…</p></>}
           </div>
         )}
       </main>
       {aboutOpen && <AboutDialog />}
+      <AccessibilityDialog />
     </div>
   );
 }

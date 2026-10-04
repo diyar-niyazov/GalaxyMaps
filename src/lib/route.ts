@@ -148,10 +148,16 @@ export function computeRoute(stops: CatalogObject[], mode: TransportMode, ctx: P
     if (!p) return { ok: false, error: `${s.name} has no usable 3D position for this date.`, objectId: s.id };
     positions.push(p);
   }
+  const hostDepth = (o: CatalogObject) => o.position?.kind === "static" && o.position.depth === "host";
   for (let i = 1; i < stops.length; i++) {
     const a = stops[i - 1], b = stops[i];
-    if (a.parentId && a.parentId === b.parentId && a.position?.kind === "static" && a.position.depth === "host" && b.position?.kind === "static" && b.position.depth === "host") {
+    if (a.parentId && a.parentId === b.parentId && hostDepth(a) && hostDepth(b)) {
       return { ok: false, error: `${a.name} and ${b.name} are both placed at the distance of their host galaxy; their true separation along the line of sight is unknown, so no route is offered between them.`, objectId: b.id };
+    }
+    const child = b.parentId === a.id ? b : a.parentId === b.id ? a : null;
+    if (child && hostDepth(child)) {
+      const host = child === a ? b : a;
+      return { ok: false, error: `${child.name} is placed at the distance of ${host.name}; its depth inside ${host.name} is not measured, so no internal travel distance is offered.`, objectId: child.id };
     }
   }
   const it = computeItinerary(positions, mode.speedKmS);

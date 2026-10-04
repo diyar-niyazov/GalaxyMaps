@@ -4,16 +4,22 @@
   "private": true,
   "description": "GalaxyMaps: explore the universe through a familiar, interactive map.",
   "type": "module",
+  "engines": {
+    "node": ">=22",
+    "npm": "12.x"
+  },
   "scripts": {
     "dev": "concurrently -k -n web,api -c blue,green \"vite\" \"tsx watch server/index.ts\"",
     "dev:web": "vite",
     "dev:api": "tsx watch server/index.ts",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "build:vercel": "npm run build && tsx scripts/build-vercel.ts",
     "start": "NODE_ENV=production tsx server/index.ts",
     "preview": "npm run build && npm start",
     "test": "vitest run",
     "test:watch": "vitest",
     "smoke": "tsx scripts/smoke.ts",
+    "smoke:polish": "tsx scripts/polish-smoke.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "data:fetch": "tsx scripts/data/fetch-all.ts",
     "data:build": "tsx scripts/data/build-dataset.ts",
@@ -26,6 +32,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "three": "^0.186.1",
+    "tsx": "^4.23.15",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
@@ -36,7 +43,7 @@
     "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "^6.1.1",
     "concurrently": "^10.0.5",
-    "tsx": "^4.23.15",
+    "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
     "vitest": "^5.0.3"

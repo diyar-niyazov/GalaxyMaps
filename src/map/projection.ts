@@ -7,7 +7,7 @@
 import type { Vec3 } from "../lib/types";
 import { ICRF_TO_ECLIPTIC, ICRF_TO_GALACTIC } from "../lib/coords";
 import { PC_KM } from "../lib/units";
-import { type Mat3, mulMat, mulMatVec, rotZ, rotX, transpose, quatFromMat, matFromQuat, slerp, sub, add } from "../lib/vec";
+import { type Mat3, mulMat, mulMatVec, rotZ, rotX, transpose, quatFromMat, matFromQuat, slerp, sub, add, normalize, scale } from "../lib/vec";
 
 /** Galactic display: Galactic X (toward the Galactic Center) points up the screen. */
 const GALACTIC_DISPLAY: Mat3 = mulMat(rotZ(Math.PI / 2), ICRF_TO_GALACTIC);
@@ -76,6 +76,12 @@ export const centerOf = (vp: Viewport): [number, number] => [vp.cx ?? vp.width /
 /** Orientation that is rotated by heading/tilt; also used for the background sky. */
 export function viewMatrix(view: View): Mat3 {
   return mulMat(rotX(-view.tilt), mulMat(rotZ(view.heading), planeMatrix(view.widthKm)));
+}
+
+/** Orient a centered inspection camera toward an object's Sun-facing side. */
+export function sunFacingPose(position: Vec3, widthKm: number): Pick<View, "heading" | "tilt"> {
+  const direction = mulMatVec(planeMatrix(widthKm), scale(normalize(position), -1));
+  return { heading: Math.atan2(-direction[0], -direction[1]), tilt: Math.acos(Math.min(1, Math.max(-1, direction[2]))) };
 }
 
 export interface Projector {

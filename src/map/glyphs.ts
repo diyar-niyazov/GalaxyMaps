@@ -35,64 +35,129 @@ function toTexture(c: HTMLCanvasElement) {
   return t;
 }
 
+/** Galaxy sprites fill the screen when locked; match the display so small devices skip ~21 MB textures. */
+const GALAXY_SIZE = typeof window !== "undefined" && Math.max(window.screen?.width ?? 0, window.screen?.height ?? 0) * (window.devicePixelRatio || 1) >= 1600 ? 2048 : 1024;
+
 function drawGalaxy(kind: GalaxyKind): HTMLCanvasElement {
-  const N = 256, h = N / 2;
+  const N = GALAXY_SIZE, h = N / 2, S = N / 256;
   const { c, g } = canvas(N);
   const r = rng(kind.length * 7919);
-  g.globalCompositeOperation = "lighter";
-  const blob = (x: number, y: number, rad: number, color: string, a: number) => {
+  const gauss = () => (r() + r() + r() - 1.5) / 1.5;
+  const blob = (x: number, y: number, rad: number, color: string, a: number, falloff = 0) => {
     const grd = g.createRadialGradient(x, y, 0, x, y, rad);
     grd.addColorStop(0, color.replace("A", String(a)));
+    if (falloff) grd.addColorStop(falloff, color.replace("A", String(a * 0.35)));
     grd.addColorStop(1, color.replace("A", "0"));
     g.fillStyle = grd;
     g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
   };
+  const dot = (x: number, y: number, rad: number, color: string) => {
+    g.fillStyle = color;
+    g.beginPath(); g.arc(x, y, rad, 0, Math.PI * 2); g.fill();
+  };
+  /** Centrally concentrated light, approximating a Sérsic-like falloff with nested gradients. */
+  const bulge = (rad: number, color: string, peak: number, flatten = 1) => {
+    g.save(); g.translate(h, h); g.scale(1, flatten);
+    for (let i = 0; i < 7; i++) blob(0, 0, rad * Math.pow(0.62, i), color, peak * (0.16 + i * 0.05), 0.3);
+    g.restore();
+  };
+  const starField = (count: number, spreadX: number, spreadY: number, warm: boolean) => {
+    for (let i = 0; i < count; i++) {
+      const a = r() * Math.PI * 2, d = -Math.log(1 - r() * 0.98) * 0.32;
+      const x = h + Math.cos(a) * d * spreadX, y = h + Math.sin(a) * d * spreadY;
+      const tone = warm || r() < 0.6 ? `255,${225 + r() * 25},${190 + r() * 40}` : `${190 + r() * 40},${210 + r() * 30},255`;
+      dot(x, y, (0.3 + r() * 0.5) * S * 0.5, `rgba(${tone},${0.06 + r() * 0.2})`);
+    }
+  };
+  g.globalCompositeOperation = "lighter";
+
   if (kind === "elliptical" || kind === "lenticular") {
-    blob(h, h, h * 0.95, "rgba(255,226,190,A)", kind === "elliptical" ? 0.55 : 0.4);
-    blob(h, h, h * 0.45, "rgba(255,236,205,A)", 0.7);
+    bulge(h * 0.98, "rgba(255,222,184,A)", kind === "elliptical" ? 1.8 : 1.35);
     if (kind === "lenticular") {
-      g.save();
-      g.translate(h, h);
-      g.scale(1, 0.18);
-      blob(0, 0, h * 0.95, "rgba(230,225,215,A)", 0.45);
+      g.save(); g.translate(h, h); g.scale(1, 0.16);
+      blob(0, 0, h * 0.96, "rgba(232,224,212,A)", 0.42, 0.45);
+      blob(0, 0, h * 0.6, "rgba(245,236,220,A)", 0.3, 0.5);
       g.restore();
     }
-    blob(h, h, h * 0.14, "rgba(255,248,230,A)", 0.95);
-    return c;
-  }
-  if (kind === "irregular") {
-    for (let i = 0; i < 70; i++) {
-      const a = r() * Math.PI * 2, d = Math.sqrt(r()) * h * 0.75;
-      blob(h + Math.cos(a) * d * 1.1, h + Math.sin(a) * d * 0.8, 10 + r() * 26, r() < 0.25 ? "rgba(255,150,190,A)" : "rgba(175,200,255,A)", 0.12 + r() * 0.12);
+    starField(900, h * 0.9, h * (kind === "lenticular" ? 0.45 : 0.9), true);
+    for (let i = 0; i < 90; i++) {
+      const a = r() * Math.PI * 2, d = h * (0.25 + r() * 0.6);
+      dot(h + Math.cos(a) * d, h + Math.sin(a) * d, S * 0.4, "rgba(255,240,215,0.35)");
     }
+    blob(h, h, h * 0.1, "rgba(255,246,228,A)", 0.9);
+    blob(h, h, h * 0.03, "rgba(255,252,242,A)", 1);
     return c;
   }
-  // Spirals: bulge, disc and two logarithmic arms with knots.
-  blob(h, h, h * 0.92, "rgba(170,190,255,A)", 0.18);
+
+  if (kind === "irregular") {
+    for (let i = 0; i < 140; i++) {
+      const a = r() * Math.PI * 2, d = Math.sqrt(r()) * h * 0.72;
+      const x = h + Math.cos(a) * d * 1.15, y = h + Math.sin(a) * d * 0.78;
+      blob(x, y, (10 + r() * 28) * S, "rgba(170,196,255,A)", 0.06 + r() * 0.08, 0.4);
+    }
+    for (let i = 0; i < 70; i++) {
+      const a = r() * Math.PI * 2, d = Math.sqrt(r()) * h * 0.65;
+      blob(h + Math.cos(a) * d * 1.1, h + Math.sin(a) * d * 0.75, (2 + r() * 4) * S, "rgba(255,130,180,A)", 0.35 + r() * 0.3);
+    }
+    starField(2500, h * 1.0, h * 0.72, false);
+    return c;
+  }
+
+  // Spirals: exponential disc, bar, two logarithmic arms with dust lanes, H II knots and young stars.
+  blob(h, h, h * 0.92, "rgba(150,172,235,A)", 0.16, 0.3);
+  blob(h, h, h * 0.58, "rgba(200,205,235,A)", 0.16, 0.35);
   const k = Math.tan((14 * Math.PI) / 180);
   const barLen = kind === "barred" ? h * 0.32 : 0;
+  const armPoints: { x: number; y: number; t: number; th: number; rad: number }[] = [];
   for (let arm = 0; arm < 2; arm++) {
-    for (let i = 0; i < 420; i++) {
-      const t = i / 420;
+    for (let i = 0; i < 1400; i++) {
+      const t = i / 1400;
       const wind = t * Math.PI * 2.4;
       const th = arm * Math.PI + wind;
       const rad = (barLen || h * 0.12) * Math.exp(k * wind * 1.3);
-      if (rad > h * 0.95) break;
-      const jitter = (r() - 0.5) * 10;
-      const x = h + Math.cos(th) * (rad + jitter), y = h + Math.sin(th) * (rad + jitter);
-      blob(x, y, 9 + 12 * (1 - t), "rgba(190,210,255,A)", 0.085 * Math.min(1, rad / (h * 0.45)) ** 1.5);
-      if (r() < 0.06) blob(x, y, 4, "rgba(255,140,185,A)", 0.45);
+      if (rad > h * 0.86) break;
+      armPoints.push({ x: h + Math.cos(th) * rad, y: h + Math.sin(th) * rad, t, th, rad });
     }
   }
+  for (const p of armPoints) {
+    const fade = Math.min(1, p.rad / (h * 0.45)) ** 1.5;
+    const j = gauss() * 4 * S;
+    blob(p.x + Math.cos(p.th) * j, p.y + Math.sin(p.th) * j, (12 + 14 * (1 - p.t)) * S, "rgba(140,172,255,A)", 0.0065 * fade, 0.3);
+    blob(p.x + gauss() * 2.5 * S, p.y + gauss() * 2.5 * S, (3 + 3 * (1 - p.t)) * S, "rgba(200,218,255,A)", 0.011 * fade);
+    if (r() < 0.22) blob(p.x + gauss() * 6 * S, p.y + gauss() * 6 * S, (1.2 + r() * 2) * S, "rgba(215,228,255,A)", 0.12 * fade);
+  }
+  for (const p of armPoints) {
+    if (r() > 0.55) continue;
+    const spread = (7 + 6 * (1 - p.t)) * S;
+    const x = p.x + gauss() * spread, y = p.y + gauss() * spread;
+    dot(x, y, (0.3 + r() * 0.5) * S * 0.5, `rgba(${200 + r() * 40},${215 + r() * 35},255,${0.15 + r() * 0.3})`);
+  }
+  starField(2500, h * 0.85, h * 0.85, false);
+
+  // Dust lanes trail just inside each arm and are subtracted from the light.
+  g.globalCompositeOperation = "destination-out";
+  for (const p of armPoints) {
+    if (p.rad < h * 0.16) continue;
+    const inward = 6 * S * (1 - p.t * 0.4);
+    const x = p.x - Math.cos(p.th) * inward, y = p.y - Math.sin(p.th) * inward;
+    blob(x + gauss() * 1.5 * S, y + gauss() * 1.5 * S, (2.2 + r() * 2.2) * S, "rgba(0,0,0,A)", 0.05 + r() * 0.05);
+  }
+  g.globalCompositeOperation = "lighter";
+
+  for (const p of armPoints) {
+    if (r() > 0.03 || p.rad < h * 0.2) continue;
+    const x = p.x + gauss() * 3 * S, y = p.y + gauss() * 3 * S;
+    blob(x, y, (2 + r() * 3) * S, "rgba(255,120,175,A)", 0.25 + r() * 0.2);
+    dot(x, y, S * 0.35, "rgba(255,225,240,0.7)");
+  }
   if (barLen) {
-    g.save();
-    g.translate(h, h);
-    g.scale(1, 0.28);
-    blob(0, 0, barLen * 1.15, "rgba(255,225,185,A)", 0.55);
+    g.save(); g.translate(h, h); g.scale(1, 0.26);
+    blob(0, 0, barLen * 1.18, "rgba(255,222,182,A)", 0.5, 0.45);
     g.restore();
   }
-  blob(h, h, h * 0.22, "rgba(255,226,180,A)", 0.75);
-  blob(h, h, h * 0.07, "rgba(255,248,230,A)", 0.95);
+  bulge(h * 0.3, "rgba(255,222,176,A)", 0.95);
+  blob(h, h, h * 0.05, "rgba(255,246,226,A)", 0.95);
+  blob(h, h, h * 0.015, "rgba(255,252,242,A)", 1);
   return c;
 }
 
@@ -153,6 +218,7 @@ export function spriteTexture(o: CatalogObject): THREE.Texture | null {
   let t = cache.get(key);
   if (!t) {
     t = toTexture(make());
+    if (key.startsWith("g-")) t.anisotropy = 8;
     cache.set(key, t);
   }
   return t;
