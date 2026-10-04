@@ -95,12 +95,24 @@ export function beginTravel(): boolean {
   return true;
 }
 
+/** Move the shared Play-time clock to the transfer's next alignment so the date bar matches departure. */
+function snapClockToDeparture() {
+  const cur = currentRoute();
+  const jd = cur?.route.transfer?.departJd;
+  if (jd == null) return;
+  const st = useStore.getState();
+  if (Math.abs(st.jd - jd) < 1e-6) return;
+  st.setJd(jd);
+  getEngine()?.setJd(jd);
+}
+
 export function startTravel(): void {
   const t = useTravel.getState();
   if (!t.summary) return;
   rememberView();
   const st = useStore.getState();
   st.pauseTime();
+  snapClockToDeparture();
   if (reducedMotion()) {
     announce(`Reduced motion: skipping the travel animation.`);
     arrive();
