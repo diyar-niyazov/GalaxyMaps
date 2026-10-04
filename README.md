@@ -6,17 +6,9 @@ GalaxyMaps is a continuously zoomable 3D space atlas with a map-app interface. S
 
 Discover a destination with **Surprise me**, compare verified planet and star diameters, follow four mini-tours or the five-chapter **SpaceX Demo-2** story, and locate eligible objects in an **Earth-centered sky chart**. Save places locally, return to previous views, share the exact object/camera/date or chart, export a credited image card, and use **Quiet view** for a clean presentation.
 
-<<<<<<< HEAD
-<video src="https://github.com/diyar-niyazov/GalaxyMaps/raw/main/docs/demo.mp4" poster="https://github.com/diyar-niyazov/GalaxyMaps/raw/main/docs/demo-poster.png" controls muted playsinline width="100%">
-  <a href="https://github.com/diyar-niyazov/GalaxyMaps/blob/main/docs/demo.mp4">Watch the GalaxyMaps demo video</a>
-  
-</video>
-## Judges: start here (3 minutes)
-=======
 Built for BigRed//Hacks 2026 (theme: Navigation).
 
 Live site: [galaxy-maps.vercel.app](https://galaxy-maps.vercel.app)
->>>>>>> 2677c13 (Update README.md)
 
 ## Demo
 
