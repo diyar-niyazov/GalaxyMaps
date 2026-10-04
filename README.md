@@ -13,8 +13,6 @@ Mirror site: [galaxy-maps.vercel.app](https://galaxy-maps.vercel.app)
 
 ## Demo
 
-[![Watch the GalaxyMaps demo video](docs/demo-poster.png)](https://www.youtube.com/watch?v=vTDPDL1xQxg)
-
 [▶ Watch the demo video](https://www.youtube.com/watch?v=vTDPDL1xQxg)
 [![Home: locked on a textured Earth](docs/screenshots/desktop-home-earth.png)](docs/screenshots/desktop-home-earth.png)
 
