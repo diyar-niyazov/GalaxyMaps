@@ -8,8 +8,9 @@ import { declutter, type LabelCandidate } from "./labels";
 import { renderMilkyWay, HALF_SIZE_KPC, R0_KPC, armLabelAnchors, galactocentricToIcrf } from "./milkyWay";
 import { SkySphere } from "./sky";
 import { createEarthMaterials, type EarthMaterials } from "./earthMaterial";
-import { spriteTexture, galaxyKind, MAP_GLYPH } from "./glyphs";
-import { buildGalaxyParticles, galaxyParams, particleBlend, particleBudget, type GalaxyParams } from "./galaxyModel";
+import { spriteTexture, MAP_GLYPH } from "./glyphs";
+import { buildGalaxyParticles, galaxyParams, particleBlend, particleBudget, skyFrame, type GalaxyParams } from "./galaxyModel";
+import { GALAXY_DUST_FRAGMENT, GALAXY_LIGHT_FRAGMENT } from "./galaxyShaders";
 import { OBSERVABLE_RADIUS_LY, logRadius, DISTANCE_BANDS_LY, bandLabel, universeBlend } from "./universe";
 import { orbitPolyline } from "../lib/kepler";
 import { GALACTIC_TO_ICRF, ICRF_TO_ECLIPTIC, unitFromRaDec } from "../lib/coords";
@@ -107,26 +108,6 @@ const GALAXY_VERTEX = /* glsl */ `
     gl_PointSize = clamp(px, 1.0, 160.0);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }`;
-const GALAXY_LIGHT_FRAGMENT = /* glsl */ `
-  uniform float uOpacity;
-  varying vec3 vColor;
-  varying float vEnergy;
-  void main() {
-    vec2 d = gl_PointCoord - 0.5;
-    float r2 = dot(d, d) * 4.0;
-    if (r2 > 1.0) discard;
-    gl_FragColor = vec4(vColor * exp(-r2 * 4.0) * vEnergy * uOpacity, 1.0);
-  }`;
-const GALAXY_DUST_FRAGMENT = /* glsl */ `
-  uniform float uOpacity;
-  varying float vEnergy;
-  void main() {
-    vec2 d = gl_PointCoord - 0.5;
-    float r2 = dot(d, d) * 4.0;
-    if (r2 > 1.0) discard;
-    gl_FragColor = vec4(0.05, 0.03, 0.02, exp(-r2 * 3.0) * 0.32 * vEnergy * uOpacity);
-  }`;
-
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const wrapAngle = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
@@ -1678,21 +1659,8 @@ export class MapEngine {
    * which side is nearer is unknown). Other galaxies: major, minor and line-of-sight axes.
    */
   private galaxyFrame(o: CatalogObject, pos: Vec3, proj: Projector): { disc: boolean; axes: [Vec3, Vec3, Vec3] } {
-    const los = normalize(pos);
-    let east = cross([0, 0, 1], los);
-    if (length(east) < 1e-9) east = [1, 0, 0];
-    east = normalize(east);
-    const north = cross(los, east);
-    const pa = ((o.display.positionAngle ?? 0) * Math.PI) / 180;
-    const major = add(scale(north, Math.cos(pa)), scale(east, Math.sin(pa)));
-    const minor = cross(los, major);
-    const kind = galaxyKind(o);
-    if (o.type === "galaxy" && (kind === "spiral" || kind === "barred" || kind === "lenticular")) {
-      const cosI = clamp(o.display.axisRatio ?? 1, 0.12, 1);
-      const inPlane = add(scale(minor, cosI), scale(los, Math.sqrt(1 - cosI * cosI)));
-      return { disc: true, axes: [mulMatVec(proj.m, major), mulMatVec(proj.m, inPlane), mulMatVec(proj.m, normalize(cross(major, inPlane)))] };
-    }
-    return { disc: false, axes: [mulMatVec(proj.m, major), mulMatVec(proj.m, minor), mulMatVec(proj.m, los)] };
+    const { disc, axes } = skyFrame(o, pos);
+    return { disc, axes: [mulMatVec(proj.m, axes[0]), mulMatVec(proj.m, axes[1]), mulMatVec(proj.m, axes[2])] };
   }
 
   /** Particle galaxy in the same world-fixed frame as its sprite, with thickness along the normal. */

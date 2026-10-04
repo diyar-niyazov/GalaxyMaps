@@ -147,12 +147,12 @@ Floating search at the top, a bottom sheet with collapsed, half and full states,
 
 ### WebXR (immersive VR)
 
-- **Enter VR** appears only when `navigator.xr.isSessionSupported("immersive-vr")` resolves true, and the session starts from a user gesture. There are no other buttons in VR.
-- You stand near the object you were looking at. Every catalog object is drawn in its true direction with its true angular size (small ones get a minimum dot size); distances are compressed logarithmically so that far objects remain visible.
-- **Look around** with your head. **Pinch to zoom** where you are looking: spread two pinching hands apart to fly toward it, or pinch with one hand and push forward (pull back to retreat). A Quest controller's thumbstick does the same.
-- **Stare** at an object for about a second (a ring fills around the reticle) to show its details card beside it; a quick pinch on it does the same. Looking away closes the card.
-- Pages get head direction, not eye tracking, so "where you look" means the centre of your view. Leave VR with the system gesture or button.
-- **Headset validation pending**: the code paths are typechecked, the gaze/zoom math is unit tested, and the scene was rendered in a flat browser, but no physical headset was available.
+- **Enter VR** appears only when `navigator.xr.isSessionSupported("immersive-vr")` resolves true, and the session starts from a user gesture. There are no extra control bars in VR.
+- You stand in the same 3D map as the web view: nearby objects stay on a true linear scale; farther stars and galaxies keep their real directions and angular sizes, with log-compressed depth so Andromeda, Virgo and a distant quasar sit at different depths. Galaxies and nebulae are thick particle volumes (not camera-facing photos). Pinch something to fly there like a ship.
+- **Look** with your head (web pages do not get eye tracking). **Pinch** what you are looking at to fly there; pinch and drag to turn around it; spread two pinching hands or push one hand to zoom. A Quest thumbstick does the same. Names sit on the object; hitboxes are large enough for coarse head gaze.
+- **Hold your gaze** about half a second (a ring fills) to open details; a quick pinch does the same. Looking away closes the card.
+- **Grok Voice** starts with the session and stays in conversation: a panel below your view shows listening/speaking, and you can say “take me to Saturn” or “what am I looking at?”
+- Leave VR with the system gesture. **Headset validation pending**: math and session lifecycle are tested; a physical Vision Pro / Quest pass is still needed.
 
 **Testing on a headset.** WebXR requires a secure context:
 

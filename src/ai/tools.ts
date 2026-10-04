@@ -22,6 +22,7 @@ import { useAccessibility } from "../state/accessibility";
 import { currentViewDescription } from "../state/audioNav";
 import { useTravel, beginTravel, startTravel, pauseTravel, resumeTravel, skipTravel, cancelTravel, startJourney } from "../state/travel";
 import { getEngine } from "../map/engineRef";
+import { xrView } from "../xr/bridge";
 import { MODE_IDS, FEATURES, JOURNEY_IDS, TOUR_IDS, REGION_IDS, ZOOM_TARGETS, SIMULATION_ACTIONS, JOURNEY_ACTIONS, SURPRISE_INTENTS, PANELS, LAYERS, VIEW_SETTINGS, TIME_RATE_IDS, TOUR_ACTIONS, A11Y_SETTINGS } from "./toolDefs";
 import { TIME_RATES } from "../state/store";
 import { useFinishing } from "../state/finishing";
@@ -146,16 +147,17 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
       case "getSelectedObjectContext": {
         const d = data();
         const sel = s.selectedId ? d.byId.get(s.selectedId) : undefined;
+        const xr = xrView()?.describe() ?? null;
         return {
           selected: sel ? { ...brief(sel), facts: sel.facts.slice(0, 6).map((f) => `${f.label}: ${f.value}`) } : null,
-          camera: s.camera.mode,
+          camera: xr ? "immersive-vr" : s.camera.mode,
           lockedOn: s.camera.lockedId ? d.byId.get(s.camera.lockedId)?.name ?? null : null,
           panel: s.panel,
-          view: currentViewDescription(),
+          view: xr ?? currentViewDescription(),
         };
       }
       case "describeView":
-        return { description: currentViewDescription() };
+        return { description: xrView()?.describe() ?? currentViewDescription() };
       case "startJourney": {
         const j = oneOf(args.journeyId, JOURNEY_IDS, "journeyId");
         if (!startJourney(j)) return { ok: false, reason: "That journey's destinations are not available." };
@@ -203,9 +205,9 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
       }
       case "setZoomTarget": {
         const t = oneOf(args.target, ZOOM_TARGETS, "target");
-        const eng = getEngine();
-        if (t === "in") eng?.zoomBy(0.5);
-        else if (t === "out") eng?.zoomBy(2);
+        const eng = getEngine(), xr = xrView();
+        if (t === "in") xr ? xr.zoom(0.5) : eng?.zoomBy(0.5);
+        else if (t === "out") xr ? xr.zoom(2) : eng?.zoomBy(2);
         else if (t === "home") goHome();
         else if (t === "universe") goRegion("universe");
         else {
@@ -269,6 +271,7 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
       }
       case "resetView":
         getEngine()?.resetView();
+        xrView()?.home();
         return { ok: true };
       case "goBack":
         return useNavigation.getState().back() ? { ok: true } : { ok: false, reason: "There is no previous view." };

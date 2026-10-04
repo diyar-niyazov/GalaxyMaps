@@ -8,6 +8,7 @@ import { micErrorMessage, recordUtterance, setPreferredMic } from "../ai/audio";
 import { stopSpeaking } from "../lib/speech";
 import { useStore } from "./store";
 import { announce } from "./announcer";
+import { onXrContext } from "../xr/bridge";
 
 interface VoiceState {
   status: VoiceStatus;
@@ -28,6 +29,8 @@ interface VoiceState {
   interrupt(): void;
   replay(): boolean;
   sendText(text: string): boolean;
+  /** Have Grok speak without logging a user line (VR welcome). */
+  speakAsGuide(instructions: string): boolean;
   /** Ends the live session after the current answer finishes playing. */
   endAfterSpeaking(): void;
   chooseMic(id: string): Promise<void>;
@@ -107,6 +110,11 @@ export const useVoice = create<VoiceState>((set, get) => ({
     session.sendText(text);
     return true;
   },
+  speakAsGuide: (instructions) => {
+    if (!session || get().status !== "live") return false;
+    session.speakAsGuide(instructions);
+    return true;
+  },
   endAfterSpeaking: () => session?.endAfterSpeaking(),
 
   chooseMic: async (id) => {
@@ -151,3 +159,4 @@ export const useVoice = create<VoiceState>((set, get) => ({
 }));
 
 useStore.subscribe((s, prev) => { if (s.selectedId !== prev.selectedId) session?.refreshContext(); });
+onXrContext(() => session?.refreshContext());

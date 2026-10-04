@@ -4,6 +4,8 @@ import { getEngine } from "../map/engineRef";
 import { VrIcon } from "../ui/icons";
 import { captureView } from "../state/navigation";
 import { ImmersiveEntry, pauseForXr, returnFromXr } from "./lifecycle";
+import { useVoice } from "../state/voice";
+import { useSpeechPrefs } from "../lib/speech";
 
 /**
  * Progressive WebXR entry. The runtime request remains in the initiating user gesture.
@@ -44,14 +46,18 @@ export function XrButton() {
     entry.current = run;
     setStarting(true);
     try {
-      const acquisition = xr.requestSession("immersive-vr", { optionalFeatures: ["local-floor", "hand-tracking"] });
+      const acquisition = xr.requestSession("immersive-vr", { optionalFeatures: ["local-floor", "hand-tracking", "transient-pointer"] });
+      // Start Grok Voice in the same click: audio and microphone access need the user gesture,
+      // and inside VR the conversation is the main way to ask for things.
+      const voice = useVoice.getState();
+      if (useSpeechPrefs.getState().grokAvailable && voice.status !== "live" && voice.status !== "connecting") void voice.start();
       pauseForXr();
       st.setJd(previousView.jd);
       const start = st.camera.lockedId ?? st.selectedId ?? st.stops[st.stops.length - 1] ?? null;
       const ready = await run.start(acquisition, async (session) => {
         const { XrPresentation } = await import("./xrSession");
         return new XrPresentation(session, eng, st.data!, start, previousView.jd, {
-          onSelect: (id) => { selectedId = id; },
+          onSelect: (id) => { selectedId = id; useStore.getState().select(id); },
           // ImmersiveEntry handles both runtime exit and failures before construction.
           onEnd: () => {},
           onExit: () => { void run.end(); },
@@ -72,7 +78,7 @@ export function XrButton() {
   return (
     <>
       {(supported === true || active) && (
-        <button type="button" className={`ctrl xr-enter ${active ? "active" : ""}`} disabled={!active && starting} aria-label={label} title={active ? "Exit VR" : "Enter VR: look around, pinch to zoom toward what you look at, and hold your gaze on an object for details"} onClick={() => active ? void entry.current?.end() : void enter()}>
+        <button type="button" className={`ctrl xr-enter ${active ? "active" : ""}`} disabled={!active && starting} aria-label={label} title={active ? "Exit VR" : "Enter VR: look around, pinch what you're looking at to fly there, pinch and drag to turn, spread both hands to zoom. Grok talks with you the whole time."} onClick={() => active ? void entry.current?.end() : void enter()}>
           <VrIcon size={20} /><span className="xr-enter-text">{active ? "Exit VR" : "VR"}</span>
         </button>
       )}

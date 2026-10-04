@@ -56,6 +56,11 @@ describe("ephemeris", () => {
     expect(Math.hypot(...p!) / AU_KM).toBeCloseTo(1, 1);
     expect(ephemerisAccuracy(eph, eph.endJdTdb + 10)).toBe("approximate");
     expect(ephemerisAccuracy(eph, eph.startJdTdb + 1)).toBe("precise");
+    for (const id of ["oumuamua", "borisov", "3i-atlas"]) {
+      const p = ephemerisPosition(eph, id, eph.endJdTdb + 10);
+      expect(p, id).not.toBeNull();
+      expect(p!.every(Number.isFinite), id).toBe(true);
+    }
   });
 });
 

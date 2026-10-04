@@ -5,6 +5,7 @@ import { LY_KM } from "../lib/units";
 import { rememberView } from "./navigation";
 import { useLibrary } from "./library";
 import { useDiscoveryStore } from "./discovery";
+import { xrView } from "../xr/bridge";
 
 /** Select an object and enter its Locked object view (or the universe overview for redshift-only objects). */
 export function focusObject(id: string, guided = false) {
@@ -14,6 +15,7 @@ export function focusObject(id: string, guided = false) {
   if (st.selectedId !== id) rememberView();
   st.select(id);
   getEngine()?.focus(id);
+  xrView()?.flyTo(id);
   useLibrary.getState().remember(id);
 }
 
@@ -23,6 +25,7 @@ export function goHome() {
   rememberView();
   useStore.setState({ inside: null, selectedId: null, panel: "explore", playing: false, progress: 0 });
   getEngine()?.homeEarth();
+  xrView()?.home();
 }
 
 export function directionsTo(destinationId?: string | null, originId?: string | null) {
@@ -39,7 +42,9 @@ export function goRegion(presetId: string) {
   if (useDiscoveryStore.getState().activeTourId) useDiscoveryStore.getState().pauseTour();
   rememberView();
   st.setInside(p.insideId ?? null);
-  getEngine()?.exploreTo(p.target(st.data, st.jd));
+  const target = p.target(st.data, st.jd);
+  getEngine()?.exploreTo(target);
+  xrView()?.showRegion(target.center, target.widthKm);
 }
 
 /** Frame a galaxy or system so its catalogued children are visible, and list them in the sidebar. */

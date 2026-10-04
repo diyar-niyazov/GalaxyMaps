@@ -10,7 +10,7 @@ import { hohmann } from "./transfer";
 import { computeItinerary, evaluateDetour, isOnTheWay } from "./itinerary";
 import { formatDuration, formatDistance, durationContext } from "./format";
 import { LIGHT_MODE, travelModes } from "./transport";
-import { solveKepler, keplerPosition } from "./kepler";
+import { solveKepler, solveKeplerHyperbolic, keplerPosition } from "./kepler";
 import type { SpeedReference, Vec3 } from "./types";
 
 describe("units", () => {
@@ -183,5 +183,17 @@ describe("Kepler propagation", () => {
   it("a circular orbit keeps constant radius", () => {
     const el = { aKm: 1000, e: 0, iDeg: 30, omDeg: 40, wDeg: 50, maDeg: 0, nDegS: 0.01, epochJdTdb: 0 };
     for (const t of [0, 0.1, 0.37]) expect(Math.hypot(...keplerPosition(el, t))).toBeCloseTo(1000, 6);
+  });
+  it("propagates hyperbolic visitors without throwing (Play time outside Horizons)", () => {
+    const H = solveKeplerHyperbolic(1.2, 1.5);
+    expect(1.5 * Math.sinh(H) - H).toBeCloseTo(1.2, 8);
+    const oumuamua = { aKm: -1.905834006163303e8, e: 1.209076940705047, qKm: 39846594.35002366, iDeg: 143.44, omDeg: 36.23, wDeg: 258.80, maDeg: 2271.2, nDegS: 7.933e-6, epochJdTdb: 2461317.5 };
+    for (const jd of [2461317.5, 2461465.5 + 10, 2_415_020.5, 2_488_069.5]) {
+      const p = keplerPosition(oumuamua, jd);
+      expect(p.every(Number.isFinite)).toBe(true);
+      expect(Math.hypot(...p)).toBeGreaterThan(oumuamua.qKm * 0.99);
+    }
+    expect(() => solveKepler(1, 1.2)).not.toThrow();
+    expect(() => solveKepler(1, -0.1)).not.toThrow();
   });
 });

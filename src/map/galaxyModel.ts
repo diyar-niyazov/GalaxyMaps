@@ -4,8 +4,33 @@
  * the disc normal) so one buffer serves every display size. The shapes are generic for the
  * morphology class; they are not reconstructions of any individual galaxy.
  */
-import type { CatalogObject } from "../lib/types";
+import type { CatalogObject, Vec3 } from "../lib/types";
+import { add, cross, length, normalize, scale } from "../lib/vec";
 import { galaxyKind, type GalaxyKind } from "./glyphs";
+
+/**
+ * World-fixed axes of an extended object in ICRF. Disc galaxies: major axis along the observed
+ * position angle, inclined so that from the Sun the disc shows the catalogued axis ratio
+ * (cos i = b/a; which side is nearer is unknown); the third axis is the disc normal. Everything
+ * else: major axis, minor axis and line of sight.
+ */
+export function skyFrame(o: CatalogObject, pos: Vec3): { disc: boolean; axes: [Vec3, Vec3, Vec3] } {
+  const los = normalize(pos);
+  let east = cross([0, 0, 1], los);
+  if (length(east) < 1e-9) east = [1, 0, 0];
+  east = normalize(east);
+  const north = cross(los, east);
+  const pa = ((o.display.positionAngle ?? 0) * Math.PI) / 180;
+  const major = add(scale(north, Math.cos(pa)), scale(east, Math.sin(pa)));
+  const minor = cross(los, major);
+  const kind = galaxyKind(o);
+  if (o.type === "galaxy" && (kind === "spiral" || kind === "barred" || kind === "lenticular")) {
+    const cosI = Math.min(1, Math.max(0.12, o.display.axisRatio ?? 1));
+    const inPlane = add(scale(minor, cosI), scale(los, Math.sqrt(1 - cosI * cosI)));
+    return { disc: true, axes: [major, inPlane, normalize(cross(major, inPlane))] };
+  }
+  return { disc: false, axes: [major, minor, los] };
+}
 
 export interface GalaxyParams {
   kind: GalaxyKind;
@@ -40,7 +65,7 @@ export interface GalaxyParticles {
 
 const STAGES: Record<string, number> = { "0": 0, a: 1, ab: 1.5, b: 2, bc: 2.5, c: 3, cd: 3.5, d: 4, dm: 4.5, m: 5 };
 
-function hash(s: string) {
+export function hash(s: string) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
   return h >>> 0;
