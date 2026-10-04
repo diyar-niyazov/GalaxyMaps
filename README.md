@@ -6,10 +6,10 @@
 
 Mirror: [galaxy-maps.vercel.app](https://galaxy-maps.vercel.app) · Built for **BigRed//Hacks 2026** (theme: Navigation)
 
-<video src="docs/demo.mp4" poster="docs/demo-poster.png" controls muted playsinline width="100%">
-  <a href="docs/demo.mp4">Watch the GalaxyMaps demo video</a>
+<video src="https://github.com/diyar-niyazov/GalaxyMaps/raw/main/docs/demo.mp4" poster="https://github.com/diyar-niyazov/GalaxyMaps/raw/main/docs/demo-poster.png" controls muted playsinline width="100%">
+  <a href="https://github.com/diyar-niyazov/GalaxyMaps/blob/main/docs/demo.mp4">Watch the GalaxyMaps demo video</a>
+  
 </video>
-
 ## Judges: start here (3 minutes)
 
 Open **[www.galaxies.wiki](https://www.galaxies.wiki)**. No install, no account, no API key. Best on a desktop browser. The first four steps show the core idea.
