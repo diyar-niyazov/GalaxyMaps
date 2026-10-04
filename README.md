@@ -8,14 +8,14 @@ Discover a destination with **Surprise me**, compare verified planet and star di
 
 Built for BigRed//Hacks 2026 (theme: Navigation).
 
-Live site: [galaxy-maps.vercel.app](https://galaxy-maps.vercel.app)
+Live site: [galaxies.wiki](https://galaxies.wiki)
+Mirror site: [galaxy-maps.vercel.app](https://galaxy-maps.vercel.app)
 
 ## Demo
 
-[![Watch the GalaxyMaps demo video](docs/demo-poster.png)](docs/demo.mp4)
+[![Watch the GalaxyMaps demo video](docs/demo-poster.png)](https://www.youtube.com/watch?v=vTDPDL1xQxg)
 
-[▶ Watch the demo video](docs/demo.mp4)
-
+[▶ Watch the demo video](https://www.youtube.com/watch?v=vTDPDL1xQxg)
 [![Home: locked on a textured Earth](docs/screenshots/desktop-home-earth.png)](docs/screenshots/desktop-home-earth.png)
 
 ## Quick start
