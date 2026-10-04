@@ -5,7 +5,7 @@
  * gives true parallax and stereo depth. Galaxies are 3D particle discs, nebulae and clusters
  * volumetric particle clouds, planets and stars lit spheres. Look at something and pinch to fly
  * there; pinch and drag to turn the world around it; spread two pinching hands to zoom; hold your
- * gaze on an object for its details. Grok Voice is push-to-talk through a small HUD below the line of sight.
+ * gaze on an object for its details. Grok Voice is a look-and-pinch mic toggle on a HUD below the line of sight.
  * Head tracking is owned by the runtime; the scene never writes the viewer pose.
  */
 import * as THREE from "three";
@@ -339,10 +339,12 @@ export class XrPresentation {
   /** Pending voice-requested zoom, as a natural log of the factor still to apply. */
   private zoomLeft = 0;
   private lastTime = 0;
-  private welcomed = false;
-  private welcomeTries = 0;
   private pendingArrival: { id: string; name: string } | null = null;
   private lastJd = 0;
+  private lastLook = new THREE.Vector3(0, 0, -1);
+  private faceLook: THREE.Vector3 | null = null;
+  private hudAimed = false;
+  private lastPinch = new Map<XRInputSource, Pinch>();
 
   constructor(session: XRSession, engine: MapEngine, data: DataBundle, focusId: string | null, jd: number, cb: XrCallbacks) {
     this.session = session;
@@ -373,7 +375,8 @@ export class XrPresentation {
       if (this.disposed) return;
       this.refSpace = r.xr.getReferenceSpace();
       this.buildScene();
-      this.welcomeVoice();
+      this.lastJd = 0;
+      this.syncClock();
       this.session.addEventListener("selectstart", this.onSelectStart);
       this.session.addEventListener("selectend", this.onSelectEnd);
       this.session.addEventListener("select", this.onSelect);
@@ -405,7 +408,7 @@ export class XrPresentation {
     setXrView(null);
     setXrNav({ phase: "idle", id: null, name: null });
     useVoice.getState().setPushToTalk(false);
-    useVoice.getState().endTalk();
+    useVoice.getState().endTalk({ send: false });
     this.restoreRenderer();
     const all = [...this.disposables];
     for (const c of [...this.models.values(), ...this.labels.values()]) all.push(...c.res);
@@ -418,6 +421,7 @@ export class XrPresentation {
     this.labels.clear();
     this.card = null;
     this.pinches.clear();
+    this.lastPinch.clear();
     this.refSpace = null;
     this.scene.clear();
     if (this.prepared) this.engine.setPaused(false);
@@ -478,18 +482,6 @@ export class XrPresentation {
       ].filter(Boolean).join(" ");
     },
   };
-
-  private welcomeVoice() {
-    if (this.welcomed || this.disposed) return;
-    const v = useVoice.getState();
-    if (v.status === "live") {
-      this.welcomed = true;
-      const here = this.byId.get(this.focusId ?? "")?.obj.name;
-      v.speakAsGuide(`Welcome them in one short spoken sentence. They just entered VR${here ? ` looking at ${here}` : ""}. Tell them they can look at something and pinch to fly there, or pinch and hold the microphone below to ask you to take them somewhere.`);
-      return;
-    }
-    if ((v.status === "connecting" || v.status === "idle") && this.welcomeTries++ < 20) setTimeout(() => this.welcomeVoice(), 400);
-  }
 
   // ------------------------------------------------------------------ scene
 
@@ -686,6 +678,8 @@ export class XrPresentation {
         }
       } else {
         cached.node.scale.setScalar(b.drawR);
+        const spin = cached.node.userData.spin as THREE.Object3D | undefined;
+        if (spin) spin.rotation.y = primeMeridian(id, this.jd);
         const sunDir = cached.node.userData.sunDir as THREE.Vector3 | undefined;
         if (sunDir && sun) sunDir.copy(v3(toXr(normalize([sun.pos[0] - b.pos[0], sun.pos[1] - b.pos[1], sun.pos[2] - b.pos[2]])))).applyQuaternion(R);
       }
@@ -745,6 +739,7 @@ export class XrPresentation {
       holder.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z));
     }
     holder.add(sphere);
+    holder.userData.spin = sphere;
     if (obj.display.rings && obj.radiusKm) {
       const inner = obj.display.rings.innerKm / obj.radiusKm, outer = obj.display.rings.outerKm / obj.radiusKm;
       const ringGeo = this.track(new THREE.RingGeometry(inner, outer, 128), res);
@@ -907,14 +902,11 @@ export class XrPresentation {
 
   private startFlight(plan: Flight, dest?: { id: string; name: string }) {
     this.zoomLeft = 0;
+    this.faceLook = this.lastLook.clone();
+    this.faceTarget(plan.target, this.faceLook);
     if (dest) {
       this.pendingArrival = dest;
       setXrNav({ phase: "moving", id: dest.id, name: dest.name });
-      const v = useVoice.getState();
-      if (v.status === "live") {
-        v.interrupt();
-        v.speakAsGuide(`Say only that you are taking them to ${dest.name}. Do not say you have arrived.`);
-      }
     }
     if (reducedMotion()) {
       this.vantage = flightAt(plan, 1);
@@ -930,12 +922,22 @@ export class XrPresentation {
     this.flight = null;
     const dest = this.pendingArrival;
     this.pendingArrival = null;
-    if (dest && this.focusId === dest.id) {
-      setXrNav({ phase: "arrived", id: dest.id, name: dest.name });
-      const v = useVoice.getState();
-      if (v.status === "live") v.speakAsGuide(`They have arrived at ${dest.name}. Name it in one short sentence. Do not say you are still travelling.`);
+    if (this.faceLook) {
+      const pos = (this.focusId ? this.byId.get(this.focusId)?.pos : undefined) ?? (dest ? this.byId.get(dest.id)?.pos : undefined);
+      this.faceTarget(pos, this.faceLook);
     }
+    if (dest && this.focusId === dest.id) setXrNav({ phase: "arrived", id: dest.id, name: dest.name });
     xrContextChanged();
+  }
+
+  /** Rotate the space model so `target` sits along the look direction captured when travel started. */
+  private faceTarget(target: Vec3 | undefined, look: THREE.Vector3) {
+    if (!target || look.lengthSq() < 1e-8) return;
+    const off: Vec3 = [target[0] - this.vantage.p[0], target[1] - this.vantage.p[1], target[2] - this.vantage.p[2]];
+    const xr = v3(toXr(off));
+    if (xr.lengthSq() < 1e-12) return;
+    this.space.quaternion.setFromUnitVectors(xr.normalize(), look.clone().normalize());
+    this.dirty = true;
   }
 
   private cancelFlight() {
@@ -1024,29 +1026,37 @@ export class XrPresentation {
     if (this.disposed) return;
     const ray = this.rayFrom(e.inputSource.targetRaySpace, e.frame);
     if (!ray) return;
-    const hud = !!this.hud?.hit(ray.origin, ray.dir);
+    const hudHit = !!this.hud?.hit(ray.origin, ray.dir);
     const { icrf, target } = this.aim(ray.origin, ray.dir);
-    this.pinches.set(e.inputSource, { dir: icrf, target: hud ? null : target, hud, origin: null, last: null, start: performance.now(), moved: 0, mode: "undecided" });
+    // Look-at-HUD + pinch toggles, but a pinch on an object still flies there.
+    const onHud = hudHit || (this.hudAimed && !target);
+    const pinch: Pinch = { dir: icrf, target: onHud ? null : target, hud: onHud, origin: null, last: null, start: performance.now(), moved: 0, mode: "undecided" };
+    this.pinches.set(e.inputSource, pinch);
+    this.lastPinch.set(e.inputSource, pinch);
     this.prevSpan = null;
-    if (hud) this.hud?.press();
   };
 
   private onSelectEnd = (e: XRInputSourceEvent) => {
-    const pinch = this.pinches.get(e.inputSource);
     this.pinches.delete(e.inputSource);
     this.prevSpan = null;
-    if (pinch?.hud) this.hud?.release();
   };
 
-  /** A quick pinch on an object flies there. The voice HUD uses pinch-and-hold instead. */
+  /** A quick pinch on the mic toggles talk; on an object it flies there. */
   private onSelect = (e: XRInputSourceEvent) => {
     if (this.disposed || !this.refSpace) return;
-    const pinch = this.pinches.get(e.inputSource);
-    if (pinch?.hud) return;
+    const pinch = this.pinches.get(e.inputSource) ?? this.lastPinch.get(e.inputSource);
+    this.lastPinch.delete(e.inputSource);
+    if (pinch?.hud) {
+      useVoice.getState().toggleTalk();
+      return;
+    }
     if (pinch && (pinch.moved > TAP_MOVE_M || performance.now() - pinch.start > TAP_MS)) return;
     const ray = this.rayFrom(e.inputSource.targetRaySpace, e.frame);
     if (!ray) return;
-    if (this.hud?.hit(ray.origin, ray.dir)) return;
+    if (this.hud?.hit(ray.origin, ray.dir)) {
+      useVoice.getState().toggleTalk();
+      return;
+    }
     const target = pinch ? pinch.target : this.aim(ray.origin, ray.dir).target;
     if (target) {
       this.flyTo(target);
@@ -1119,11 +1129,13 @@ export class XrPresentation {
     const headQ = new THREE.Quaternion().setFromRotationMatrix(xrCam.matrixWorld);
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(headQ);
 
+    this.lastLook.copy(forward);
     this.syncClock();
     if (this.flight) {
       const t = (performance.now() - this.flight.start) / this.flight.plan.ms;
       this.vantage = flightAt(this.flight.plan, t);
       this.dirty = true;
+      if (this.faceLook) this.faceTarget(this.flight.plan.target, this.faceLook);
       if (t >= 1) this.finishFlight();
     } else if (Math.abs(this.zoomLeft) > 1e-3) {
       const step = Math.sign(this.zoomLeft) * Math.min(Math.abs(this.zoomLeft), dt * 1.8);
@@ -1139,8 +1151,10 @@ export class XrPresentation {
     for (const m of this.pointMats) m.uniforms.uPx.value = this.px;
     for (const c of this.models.values()) if (c.node.visible && c.particles) for (const m of c.particles.mats) m.uniforms.uPx.value = this.px;
 
-    // Gaze: the head direction (pages never receive continuous eye tracking) rests on one object.
-    const hudHover = !!this.hud?.hit(head, forward);
+    // Place the HUD first so it is hittable on the opening frame (before any pan).
+    this.hud?.follow(head, forward);
+    this.hudAimed = !!this.hud?.hit(head, forward);
+    const hudHover = this.hudAimed;
     const target = hudHover ? null : this.aim(head, forward, this.gazeId).target;
     if (target !== this.gazeId) { this.gazeId = target; this.gazeSince = time; }
     if (this.gazeId !== this.gazeReported && time - this.gazeSince > 400) {

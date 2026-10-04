@@ -21,7 +21,7 @@ interface VoiceState {
   speaking: boolean;
   partial: string;
   muted: boolean;
-  /** Push-to-talk is held (VR walkie-talkie). */
+  /** Push-to-talk is open (VR mic toggle is unmuted). */
   holding: boolean;
   /** One-shot dictation (Grok speech-to-text) in progress. */
   dictation: "idle" | "recording" | "transcribing";
@@ -31,7 +31,9 @@ interface VoiceState {
   toggleMute(): void;
   setPushToTalk(on: boolean): void;
   beginTalk(): void;
-  endTalk(): void;
+  endTalk(opts?: { send?: boolean }): void;
+  /** VR mic toggle: unmute to talk, unmute-again to send. */
+  toggleTalk(): void;
   interrupt(): void;
   replay(): boolean;
   sendText(text: string): boolean;
@@ -46,6 +48,8 @@ interface VoiceState {
 
 let session: GrokVoiceSession | null = null;
 let dictation: { stop(): void } | null = null;
+/** Pinch arrived while the voice socket was still connecting. */
+let wantTalk = false;
 
 const logTool = (name: string, args: unknown) =>
   useStore.getState().pushGuide({ role: "tool", text: `${name}(${args && Object.keys(args as object).length ? JSON.stringify(args) : ""})`, origin: "app" });
@@ -65,10 +69,15 @@ export const useVoice = create<VoiceState>((set, get) => ({
       onStatus: (status, detail) => {
         if (session !== s) return;
         set({ status, detail: detail ?? "" });
-        if (status === "live") announce("Grok voice is live. Speak to control GalaxyMaps, or type a message.");
-        else if (status === "error") announce(`Voice error: ${detail ?? "connection problem"}`, true);
-        else if (status === "idle") {
+        if (status === "live") {
+          announce("Grok voice is live. Speak to control GalaxyMaps, or type a message.");
+          if (wantTalk) { wantTalk = false; get().beginTalk(); }
+        } else if (status === "error") {
+          wantTalk = false;
+          announce(`Voice error: ${detail ?? "connection problem"}`, true);
+        } else if (status === "idle") {
           session = null;
+          wantTalk = false;
           set({ listening: false, speaking: false, partial: "", level: 0, holding: false });
         }
       },
@@ -90,6 +99,7 @@ export const useVoice = create<VoiceState>((set, get) => ({
       await s.connect(true, { pushToTalk: !!opts?.pushToTalk });
     } catch (e) {
       if (session === s) session = null;
+      wantTalk = false;
       s.close();
       set({ status: "error", detail: (e as Error).message });
     }
@@ -98,6 +108,7 @@ export const useVoice = create<VoiceState>((set, get) => ({
   stop: () => {
     const s = session;
     session = null;
+    wantTalk = false;
     s?.close();
     set({ status: "idle", listening: false, speaking: false, partial: "", level: 0, micLabel: "", holding: false });
     announce("Voice session ended.");
@@ -106,8 +117,18 @@ export const useVoice = create<VoiceState>((set, get) => ({
   toggle: () => (session ? get().stop() : void get().start()),
 
   setPushToTalk: (on) => { session?.setPushToTalk(on); if (on) set({ muted: true, holding: false }); },
-  beginTalk: () => { session?.beginTalk(); set({ holding: true, muted: false, listening: true }); },
-  endTalk: () => { session?.endTalk(); set({ holding: false, muted: true, listening: false }); },
+  beginTalk: () => { wantTalk = false; session?.beginTalk(); set({ holding: true, muted: false, listening: true }); },
+  endTalk: (opts) => { session?.endTalk(opts); set({ holding: false, muted: true, listening: false }); },
+  toggleTalk: () => {
+    if (get().holding) { wantTalk = false; get().endTalk(); return; }
+    if (get().status === "connecting" || get().status === "idle" || get().status === "error" || !session) {
+      wantTalk = true;
+      if (get().status !== "connecting") void get().start({ pushToTalk: true });
+      return;
+    }
+    get().interrupt();
+    get().beginTalk();
+  },
 
   toggleMute: () => {
     const muted = !get().muted;

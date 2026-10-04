@@ -1,7 +1,7 @@
 /**
- * Push-to-talk Mission Control in VR: a compact head-relative HUD at bottom-center.
- * Look at it, pinch and hold to talk, release to send. It follows yaw lazily so it
- * does not jitter with every head twitch.
+ * Mission Control mic in VR: a compact head-relative HUD at lower-center.
+ * Look at it and pinch to unmute or mute. It stays in view from the first frame
+ * and only damps when already in front, so it does not need a pan to become hittable.
  */
 import * as THREE from "three";
 import { useVoice } from "../state/voice";
@@ -9,10 +9,10 @@ import { useStore } from "../state/store";
 import { canvasFont } from "../lib/fonts";
 
 const W = 1024, H = 220;
-const SIZE_M: [number, number] = [0.42, 0.09];
-const DISTANCE_M = 0.92;
-const DROP_RAD = 0.48;
-const FOLLOW_RAD = 0.55;
+const SIZE_M: [number, number] = [0.48, 0.12];
+const DISTANCE_M = 0.82;
+const DROP_RAD = 0.22;
+const SNAP_RAD = 0.38;
 
 function wrap(g: CanvasRenderingContext2D, text: string, maxW: number, maxLines: number) {
   const words = text.split(/\s+/).filter(Boolean), lines: string[] = [];
@@ -26,6 +26,10 @@ function wrap(g: CanvasRenderingContext2D, text: string, maxW: number, maxLines:
   }
   if (line) lines.push(line);
   return lines.length > maxLines ? ["…" + lines.slice(-maxLines)[0], ...lines.slice(-maxLines + 1)] : lines;
+}
+
+function offsetDir(yaw: number) {
+  return new THREE.Vector3(Math.sin(yaw) * Math.cos(DROP_RAD), -Math.sin(DROP_RAD), -Math.cos(yaw) * Math.cos(DROP_RAD));
 }
 
 export class VoiceHud {
@@ -43,7 +47,7 @@ export class VoiceHud {
     this.canvas.height = H;
     this.texture = new THREE.CanvasTexture(this.canvas);
     this.texture.colorSpace = THREE.SRGBColorSpace;
-    const mat = new THREE.MeshBasicMaterial({ map: this.texture, transparent: true, depthTest: false, depthWrite: false });
+    const mat = new THREE.MeshBasicMaterial({ map: this.texture, transparent: true, depthTest: false, depthWrite: false, side: THREE.DoubleSide });
     this.node = new THREE.Mesh(new THREE.PlaneGeometry(...SIZE_M), mat);
     this.node.renderOrder = 30;
     const mark = () => { this.dirty = true; };
@@ -58,36 +62,40 @@ export class VoiceHud {
     this.texture.dispose();
   }
 
-  /** Pinch-and-hold: start a push-to-talk utterance. */
-  press() {
-    const v = useVoice.getState();
-    if (v.status === "idle" || v.status === "error") {
-      void v.start({ pushToTalk: true }).then(() => { if (useVoice.getState().status === "live") useVoice.getState().beginTalk(); });
-      return;
-    }
-    if (v.status === "connecting") return;
-    v.beginTalk();
+  /** Look + pinch toggles listening. Pinch again mutes and sends. */
+  toggle() {
+    useVoice.getState().toggleTalk();
   }
 
-  /** Release: stop the microphone and send. */
-  release() {
-    useVoice.getState().endTalk();
+  /**
+   * Place the panel under the current gaze. Snap if it is off-screen (including the first
+   * frames when the XR camera pose is still settling); damp only when already in view.
+   */
+  follow(head: THREE.Vector3, forward: THREE.Vector3) {
+    const yaw = Math.atan2(forward.x, -forward.z);
+    const placed = offsetDir(this.yaw ?? yaw);
+    if (this.yaw == null || forward.angleTo(placed) > SNAP_RAD) this.yaw = yaw;
+    else this.yaw += Math.atan2(Math.sin(yaw - this.yaw), Math.cos(yaw - this.yaw)) * 0.08;
+    const dir = offsetDir(this.yaw);
+    this.node.position.copy(head).addScaledVector(dir, DISTANCE_M);
+    this.node.lookAt(head);
+    this.node.updateWorldMatrix(true, false);
   }
 
   hit(origin: THREE.Vector3, dir: THREE.Vector3) {
     if (!this.node.visible) return false;
+    this.node.updateWorldMatrix(true, false);
     const to = this.node.position.clone().sub(origin);
-    const d = to.length();
-    return dir.angleTo(to) < Math.atan(Math.hypot(SIZE_M[0], SIZE_M[1]) / 2 / d) * 1.05;
+    const dist = to.dot(dir);
+    if (dist < 0.15) return false;
+    const local = this.node.worldToLocal(origin.clone().addScaledVector(dir, dist));
+    const hx = SIZE_M[0] / 2 * 1.5, hy = SIZE_M[1] / 2 * 2;
+    if (Math.abs(local.x) <= hx && Math.abs(local.y) <= hy) return true;
+    return dir.angleTo(to) < 0.22;
   }
 
   update(head: THREE.Vector3, forward: THREE.Vector3, time: number, hover: boolean) {
-    const yaw = Math.atan2(forward.x, -forward.z);
-    if (this.yaw == null || Math.abs(Math.atan2(Math.sin(yaw - this.yaw), Math.cos(yaw - this.yaw))) > FOLLOW_RAD) this.yaw = yaw;
-    else this.yaw += Math.atan2(Math.sin(yaw - this.yaw), Math.cos(yaw - this.yaw)) * 0.035;
-    const dir = new THREE.Vector3(Math.sin(this.yaw) * Math.cos(DROP_RAD), -Math.sin(DROP_RAD), -Math.cos(this.yaw) * Math.cos(DROP_RAD));
-    this.node.position.copy(head).addScaledVector(dir, DISTANCE_M);
-    this.node.lookAt(head);
+    this.follow(head, forward);
     if (hover !== this.hover) { this.hover = hover; this.dirty = true; }
     const v = useVoice.getState();
     const liveMeter = v.holding || v.speaking;
@@ -140,11 +148,11 @@ export class VoiceHud {
 
     const status = v.status === "connecting" ? "Connecting to Grok…"
       : v.status === "error" ? `Voice unavailable${v.detail ? `: ${v.detail}` : ""}`
-      : v.holding ? "Listening… release to send"
+      : v.holding ? "Listening… pinch to send"
       : v.speaking ? "Grok is speaking"
       : v.status === "live" && v.partial ? "Thinking…"
-      : !live ? "Look here · pinch and hold to talk"
-      : "Pinch and hold to talk";
+      : !live ? "Look here · pinch to talk"
+      : "Pinch to talk · pinch again to send";
     g.fillStyle = "#ffffff";
     g.font = canvasFont("600 38px");
     g.textBaseline = "alphabetic";

@@ -144,7 +144,6 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
         return {
           ok: true, shown: o.name, camera: flying ? "immersive-vr" : "locked", card: "open",
           navigation: flying ? "moving" : "arrived",
-          speak: flying ? `Say you are taking them to ${o.name}. Do not say you have arrived.` : undefined,
         };
       }
       case "unlockCamera":

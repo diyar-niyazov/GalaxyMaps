@@ -56,7 +56,7 @@ export function XrButton() {
       const start = st.camera.lockedId ?? st.selectedId ?? st.stops[st.stops.length - 1] ?? null;
       const ready = await run.start(acquisition, async (session) => {
         const { XrPresentation } = await import("./xrSession");
-        return new XrPresentation(session, eng, st.data!, start, previousView.jd, {
+        return new XrPresentation(session, eng, st.data!, start, useStore.getState().jd, {
           onSelect: (id) => { selectedId = id; useStore.getState().select(id); },
           // ImmersiveEntry handles both runtime exit and failures before construction.
           onEnd: () => {},
@@ -78,7 +78,7 @@ export function XrButton() {
   return (
     <>
       {(supported === true || active) && (
-        <button type="button" className={`ctrl xr-enter ${active ? "active" : ""}`} disabled={!active && starting} aria-label={label} title={active ? "Exit VR" : "Enter VR: look around, pinch what you're looking at to fly there, pinch and drag to turn, spread both hands to zoom. Pinch and hold the microphone at the bottom to talk to Grok."} onClick={() => active ? void entry.current?.end() : void enter()}>
+        <button type="button" className={`ctrl xr-enter ${active ? "active" : ""}`} disabled={!active && starting} aria-label={label} title={active ? "Exit VR" : "Enter VR: look around, pinch what you're looking at to fly there, pinch and drag to turn, spread both hands to zoom. Look at the microphone and pinch to talk or mute."} onClick={() => active ? void entry.current?.end() : void enter()}>
           <VrIcon size={20} /><span className="xr-enter-text">{active ? "Exit VR" : "VR"}</span>
         </button>
       )}

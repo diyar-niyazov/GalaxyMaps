@@ -135,6 +135,14 @@ export function flightAt(f: Flight, t: number): Vantage {
   return { p: [f.target[0] + f.u[0] * r, f.target[1] + f.u[1] * r, f.target[2] + f.u[2] * r], mPerKm: m };
 }
 
+/** XR offset after rotating space so an ICRF vector faces `lookXr` (headset forward at request time). */
+export function lookAlignedOffset(offsetIcrf: Vec3, lookXr: Vec3): Vec3 {
+  const r = len(toXr(offsetIcrf));
+  const L = len(lookXr);
+  if (r < 1e-12 || L < 1e-12) return toXr(offsetIcrf);
+  return [lookXr[0] / L * r, lookXr[1] / L * r, lookXr[2] / L * r];
+}
+
 export interface GazeCandidate {
   id: string;
   /** Unit direction from the eye or hand, in the same frame as the gaze. */

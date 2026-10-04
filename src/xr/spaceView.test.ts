@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Dwell, FAR_M, FOCUS_M, GAZE_TOLERANCE, LINEAR_M, compressDistance, displayDistance, displayRadius, flightAt, fromXr, objectZoomLimits, pickGaze, pinchFactor, planFlight, toXr, zoomVantage } from "./spaceView";
+import { Dwell, FAR_M, FOCUS_M, GAZE_TOLERANCE, LINEAR_M, compressDistance, displayDistance, displayRadius, flightAt, fromXr, lookAlignedOffset, objectZoomLimits, pickGaze, pinchFactor, planFlight, toXr, zoomVantage } from "./spaceView";
 import type { Vec3 } from "../lib/types";
 
 const n = (x: number, y: number, z: number): Vec3 => { const l = Math.hypot(x, y, z); return [x / l, y / l, z / l]; };
@@ -40,6 +40,14 @@ describe("immersive scale model", () => {
     const out = zoomVantage(at, [1e6, 0, 0], 1e4, 2);
     expect(out.p[0]).toBeCloseTo(-1e6);
     expect(out.mPerKm).toBeCloseTo(at.mPerKm / 2);
+  });
+
+  it("rotates a destination onto the look direction captured when travel starts", () => {
+    const out = lookAlignedOffset([1e6, 0, 0], [0, 0, -1]);
+    expect(out[2] / len3(out)).toBeCloseTo(-1);
+    expect(Math.abs(out[0])).toBeLessThan(1e-6);
+    expect(Math.abs(out[1])).toBeLessThan(1e-6);
+    expect(len3(out)).toBeCloseTo(len3(toXr([1e6, 0, 0])));
   });
 
   it("flies geometrically to the standoff and ends with the target at the focus distance", () => {

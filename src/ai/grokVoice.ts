@@ -38,11 +38,11 @@ const INSTRUCTIONS = `${MISSION_CONTROL_INSTRUCTIONS}
 - The user may control the whole app by voice. When they ask for anything the app can do (open a panel, change layer, play time, share, go back, quiet view, accessibility settings, tours, comparisons, the sky view), call the matching tool instead of describing how to do it.
 - If they say goodbye or ask you to stop listening, call endVoiceSession.`;
 
-const XR_INSTRUCTIONS = `The user is inside the immersive VR map, standing in a 3D model of space. They talk with push-to-talk (pinch and hold the microphone). Listen only to each finished utterance.
+const XR_INSTRUCTIONS = `The user is inside the immersive VR map. They unmute the microphone with a look-and-pinch toggle, speak, then pinch again to send. Reply only to that finished utterance.
+- One short spoken sentence. Do not narrate travel, announce arrival, or start a second turn after tools.
+- Do not greet, repeat, or speak unless they just sent an utterance.
 - selectObject flies them to that object; setRegion flies to a region; setZoomTarget in/out/home zooms; resetView returns to Earth.
 - "This", "that", "it" or "what am I looking at" means the object they are looking at, described below. Call describeView or getSelectedObjectContext if you need a fresh look.
-- If a tool says navigation is "moving", say you are taking them there. Never say arrived, here, or that you have already taken them there — the app announces arrival when the camera actually stops.
-- Keep replies to one or two spoken sentences.
 - Panels, sharing and layers only appear after they leave VR; say so if asked.`;
 
 const RATE = 24000;
@@ -88,6 +88,7 @@ export class GrokVoiceSession {
   private ptt = false;
   private holding = false;
   private pending: Float32Array[] = [];
+  private heard = 0;
 
   constructor(private cb: VoiceCallbacks) {}
 
@@ -173,21 +174,27 @@ export class GrokVoiceSession {
     if (this.closed) return;
     this.holding = true;
     this.pending = [];
+    this.heard = 0;
     this.send({ type: "input_audio_buffer.clear" });
     this.setMuted(false);
     this.cb.onListening?.(true);
   }
 
-  /** Push-to-talk: stop the microphone and finalize the utterance. */
-  endTalk() {
+  /** Push-to-talk: mute. `send` (default true) commits audio and asks for one reply. */
+  endTalk(opts?: { send?: boolean }) {
     if (!this.holding) return;
     this.holding = false;
     this.flushAudio();
+    const heard = this.heard;
+    this.heard = 0;
     this.setMuted(true);
     this.cb.onListening?.(false);
-    if (this.ptt) {
+    if (!this.ptt) return;
+    if (opts?.send !== false && heard >= RATE * 0.2) {
       this.send({ type: "input_audio_buffer.commit" });
       this.send({ type: "response.create" });
+    } else {
+      this.send({ type: "input_audio_buffer.clear" });
     }
   }
 
@@ -208,6 +215,7 @@ export class GrokVoiceSession {
       onSilent: (label) => this.cb.onMicError?.(`No sound is coming from "${label}". Check that it isn't muted, or choose another microphone in Voice settings.`),
       onChunk: (s) => {
         if (this.muted || this.closed) return;
+        this.heard += s.length;
         // Batch ~100 ms per message; the socket may still be connecting during the first chunks.
         this.pending.push(s);
         if (this.pending.reduce((n, c) => n + c.length, 0) < RATE / 10 || this.ws?.readyState !== WebSocket.OPEN) {
@@ -375,7 +383,9 @@ export class GrokVoiceSession {
         const calls = this.calls;
         this.calls = [];
         await Promise.all(calls);
-        // All results are in; let the current spoken turn finish before the follow-up response.
+        // Desktop VAD: one follow-up after tools. VR push-to-talk: that extra turn is how Grok
+        // repeats itself, so the original utterance is the only spoken reply.
+        if (this.ptt) break;
         setTimeout(() => this.send({ type: "response.create" }), this.remainingPlaybackMs());
         break;
       }
