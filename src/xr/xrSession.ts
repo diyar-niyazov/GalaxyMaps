@@ -131,11 +131,17 @@ const SKY_VERT = /* glsl */ `
   }
 `;
 /**
+ * Hidden points are dropped by placing them beyond the far plane. A gl_PointSize of 0 is undefined
+ * in GLSL: some GPUs still rasterise it with a NaN gl_PointCoord, which shows as flickering colour noise.
+ */
+const CULLED = /* glsl */ `const vec4 CULLED = vec4(0.0, 0.0, 2.0, 1.0);`;
+/**
  * Catalog stars on the GPU, on the same linear scale as everything else: position is parsecs from
  * a rebasing origin near the viewer (so float precision holds while flying past a star), and
  * brightness follows the true distance from the vantage.
  */
 const STAR_VERT = /* glsl */ `
+  ${CULLED}
   attribute float aMag;
   attribute float aCi;
   uniform vec3 uVantage;
@@ -158,12 +164,13 @@ const STAR_VERT = /* glsl */ `
     float warm = clamp((aCi + 0.3) / 2.0, 0.0, 1.0);
     vColor = vec3(0.75 + 0.25 * warm, 0.8 + 0.1 * (1.0 - abs(warm - 0.5)), 1.0 - 0.35 * warm) * bright;
     vec3 p = vec3(-v.y, v.z, -v.x) / d * compress(d * uMPerPc);
-    gl_PointSize = bright > 0.0 ? clamp((0.0012 + 0.0022 * bright) * 2.0 * uPx, 1.0, 48.0) : 0.0;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+    gl_PointSize = clamp((0.0012 + 0.0022 * bright) * 2.0 * uPx, 1.0, 48.0);
+    gl_Position = bright > 0.0 ? projectionMatrix * modelViewMatrix * vec4(p, 1.0) : CULLED;
   }
 `;
 /** Markers with a size in metres at the marker's distance. */
 const POINT_VERT = /* glsl */ `
+  ${CULLED}
   attribute float aSize;
   attribute vec3 color;
   uniform float uPx;
@@ -171,16 +178,17 @@ const POINT_VERT = /* glsl */ `
   void main() {
     vColor = color;
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = clamp(aSize * 2.0 * uPx / max(-mv.z, 0.01), 0.0, 64.0);
-    gl_Position = projectionMatrix * mv;
+    float px = aSize * 2.0 * uPx / max(-mv.z, 0.01);
+    gl_PointSize = clamp(px, 1.0, 64.0);
+    gl_Position = px > 0.0 ? projectionMatrix * mv : CULLED;
   }
 `;
 const POINT_FRAG = /* glsl */ `
   varying vec3 vColor;
   void main() {
     vec2 d = gl_PointCoord - 0.5;
-    float a = smoothstep(0.5, 0.15, length(d));
-    if (a < 0.02) discard;
+    float a = 1.0 - smoothstep(0.15, 0.5, length(d));
+    if (!(a >= 0.02)) discard;
     gl_FragColor = vec4(vColor * a, a);
   }
 `;
@@ -190,6 +198,7 @@ const POINT_FRAG = /* glsl */ `
  * model 1000 px across).
  */
 const PARTICLE_VERT = /* glsl */ `
+  ${CULLED}
   attribute float aSize;
   attribute vec3 color;
   uniform float uDiam;
@@ -204,8 +213,8 @@ const PARTICLE_VERT = /* glsl */ `
     float s = uDiam * uPx / z / 1000.0;
     float px = aSize * (aSize < 12.0 ? min(s, uStarCap) : min(s, 36.0));
     vEnergy = min(1.0, px * px);
-    gl_PointSize = -mv.z < 0.1 ? 0.0 : clamp(px, 1.0, 28.0);
-    gl_Position = projectionMatrix * mv;
+    gl_PointSize = clamp(px, 1.0, 28.0);
+    gl_Position = -mv.z < 0.1 ? CULLED : projectionMatrix * mv;
   }
 `;
 const LIT_VERT = /* glsl */ `
