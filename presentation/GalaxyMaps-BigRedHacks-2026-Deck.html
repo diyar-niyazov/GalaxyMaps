@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GalaxyMaps — BigRed//Hacks 2026</title>
+  <style>
+    @font-face {
+      font-family: "Inter Variable";
+      src: url("assets/inter-latin-wght.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    @page { size: 1920px 1080px; margin: 0; }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: #05070d;
+      color: #fff;
+      font-family: "Inter Variable", Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    body.present { overflow: hidden; height: 100vh; }
+    .deck { position: relative; }
+    .slide {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+      background: #05070d;
+    }
+    .slide:last-child { page-break-after: auto; break-after: auto; }
+    .slide.backup::after {
+      content: "Backup · Q&A";
+      position: absolute;
+      top: 36px;
+      right: 64px;
+      z-index: 5;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8ab4f8;
+    }
+    .kicker {
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8ab4f8;
+      margin: 0 0 18px;
+    }
+    h1 {
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+    }
+    .sub { margin: 18px 0 0; font-size: 28px; font-weight: 500; color: #e8eaed; line-height: 1.3; }
+    .muted { color: #9aa0a6; }
+    .foot {
+      position: absolute;
+      left: 72px;
+      right: 72px;
+      bottom: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      color: #9aa0a6;
+      z-index: 4;
+    }
+    .bleed { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; }
+    .veil {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(5,7,13,0.08) 36%, rgba(5,7,13,0.72) 78%, rgba(5,7,13,0.92) 100%);
+    }
+    .veil-side {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(90deg, #05070d 0%, #05070d 38%, rgba(5,7,13,0.72) 52%, rgba(5,7,13,0.2) 68%, rgba(5,7,13,0.08) 100%);
+    }
+    .universe { object-position: 100% 50%; }
+    .lockup {
+      position: absolute;
+      left: 88px;
+      bottom: 88px;
+      right: 88px;
+      z-index: 3;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+    .brand img { width: 72px; height: 72px; border-radius: 16px; background: #fff; }
+    .hero-title { font-size: 92px; }
+    .hero-sub { font-size: 40px; font-weight: 550; color: #fff; margin-top: 10px; }
+    .hero-line { font-size: 26px; color: #c4c7ce; margin-top: 16px; font-weight: 500; }
+    .pad { position: relative; z-index: 3; padding: 88px 88px 80px; height: 100%; display: flex; flex-direction: column; }
+    .why h1 { font-size: 64px; max-width: 920px; }
+    .why-grid {
+      margin-top: auto;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 56px;
+      align-items: end;
+    }
+    .points { display: grid; gap: 22px; max-width: 680px; }
+    .point {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .n {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #1a73e8;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .point p { margin: 6px 0 0; font-size: 26px; line-height: 1.25; font-weight: 550; }
+    .frame {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #2a3142;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      height: 620px;
+    }
+    .frame img { width: 100%; height: 100%; object-fit: cover; object-position: 78% 50%; }
+    .demo-head {
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 132px;
+      padding: 36px 72px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: linear-gradient(180deg, rgba(5,7,13,0.88), rgba(5,7,13,0));
+      z-index: 3;
+    }
+    .demo-head h1 { font-size: 52px; }
+    .live {
+      margin-top: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8ab4f8;
+    }
+    .shot-stage {
+      position: absolute;
+      left: 56px;
+      right: 56px;
+      top: 124px;
+      bottom: 168px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #2a3142;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.4);
+    }
+    .shot-stage img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+    .calls {
+      position: absolute;
+      left: 56px;
+      right: 56px;
+      bottom: 44px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      z-index: 3;
+    }
+    .call {
+      background: #101522;
+      border: 1px solid #2a3142;
+      border-radius: 10px;
+      padding: 16px 18px 14px;
+      min-height: 92px;
+    }
+    .call b { display: block; color: #8ab4f8; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+    .call span { font-size: 22px; font-weight: 600; line-height: 1.2; }
+    .arch h1 { font-size: 56px; max-width: 1400px; }
+    .flow {
+      margin: 72px 0 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+    .node {
+      background: #101522;
+      border: 1px solid #2a3142;
+      border-radius: 12px;
+      padding: 28px 26px 26px;
+      min-height: 250px;
+      position: relative;
+    }
+    .node .step { font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8ab4f8; margin-bottom: 14px; }
+    .node strong { display: block; font-size: 28px; line-height: 1.2; letter-spacing: -0.02em; }
+    .node p { margin: 14px 0 0; font-size: 20px; line-height: 1.4; color: #c4c7ce; }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      right: -18px;
+      width: 14px;
+      height: 14px;
+      border-right: 2px solid #5f6b86;
+      border-top: 2px solid #5f6b86;
+      transform: translateY(-50%) rotate(45deg);
+      z-index: 2;
+    }
+    .line {
+      margin-top: auto;
+      font-size: 36px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+    }
+    .diff h1 { font-size: 56px; }
+    .trio {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .card {
+      background: #101522;
+      border: 1px solid #2a3142;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card img { width: 100%; height: 400px; object-fit: cover; object-position: 50% 20%; }
+    .card .body { padding: 26px 26px 28px; }
+    .card h2 { margin: 0 0 12px; font-size: 28px; letter-spacing: -0.02em; }
+    .card p { margin: 0; font-size: 22px; line-height: 1.35; color: #dadce0; }
+    .close-copy {
+      position: absolute;
+      left: 88px;
+      right: 520px;
+      bottom: 92px;
+      z-index: 3;
+    }
+    .close-copy h1 { font-size: 56px; max-width: 1100px; }
+    .close-copy .end { margin-top: 22px; font-size: 34px; font-weight: 650; }
+    .qr-box {
+      position: absolute;
+      right: 88px;
+      bottom: 88px;
+      z-index: 3;
+      background: #fff;
+      color: #202124;
+      border-radius: 14px;
+      padding: 18px 18px 16px;
+      width: 280px;
+      text-align: center;
+    }
+    .qr-box img { width: 180px; height: 180px; }
+    .qr-box strong { display: block; margin-top: 8px; font-size: 16px; }
+    .qr-box span { display: block; font-size: 13px; color: #5f6368; margin-top: 4px; word-break: break-all; }
+    .src-grid, .stack {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .box {
+      background: #101522;
+      border: 1px solid #2a3142;
+      border-radius: 12px;
+      padding: 26px 28px;
+    }
+    .box h2 { margin: 0 0 12px; font-size: 26px; }
+    .box p, .box li { font-size: 22px; line-height: 1.4; color: #dadce0; }
+    .box ul { margin: 0; padding-left: 22px; }
+    .box li { margin: 8px 0; }
+    .deep .flow { grid-template-columns: repeat(3, 1fr); margin-top: 40px; }
+    .deep .node { min-height: 220px; }
+    .nav {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 20;
+      display: none;
+      gap: 8px;
+      align-items: center;
+      background: rgba(16,21,34,0.92);
+      border: 1px solid #2a3142;
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #e8eaed;
+      font-size: 14px;
+    }
+    body.present .nav { display: flex; }
+    body.present .slide { display: none; }
+    body.present .slide.on {
+      display: block;
+      position: fixed;
+      inset: 0;
+      margin: auto;
+      transform-origin: center center;
+    }
+    @media print {
+      body, body.present { overflow: visible; height: auto; background: #05070d; }
+      body.present .slide, .slide { display: block !important; position: relative !important; transform: none !important; inset: auto !important; }
+      .nav { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <section class="slide" id="s1" data-title="Hero">
+      <img class="bleed" src="assets/quiet-earth.png" alt="GalaxyMaps locked on a textured Earth" />
+      <div class="veil"></div>
+      <div class="lockup">
+        <div class="brand">
+          <img src="assets/logo.png" alt="" />
+          <h1 class="hero-title">GalaxyMaps</h1>
+        </div>
+        <p class="hero-sub">Google Maps for the universe.</p>
+        <p class="hero-line">Explore the universe through a familiar, interactive map.</p>
+      </div>
+      <div class="foot"><span>BigRed//Hacks 2026 · Navigation</span><span>1 / 6</span></div>
+    </section>
+
+    <section class="slide" id="s2" data-title="Why">
+      <img class="bleed universe" src="assets/universe.png" alt="Observable-universe overview in GalaxyMaps" />
+      <div class="veil-side"></div>
+      <div class="pad why">
+        <p class="kicker">The problem</p>
+        <h1>Space has coordinates.<br />It never had directions.</h1>
+        <div class="why-grid">
+          <div class="points">
+            <div class="point"><span class="n">1</span><p>Astronomy data is public — and still hard to feel.</p></div>
+            <div class="point"><span class="n">2</span><p>Scale is unintuitive. Polaris is 433 light-years away.</p></div>
+            <div class="point"><span class="n">3</span><p>Everyone already knows how to use a map.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span>Schematic overview · logarithmic distance</span><span>2 / 6</span></div>
+    </section>
+
+    <section class="slide" id="s3" data-title="Demo">
+      <div class="demo-head">
+        <h1>Pick anywhere. Get directions. Go.</h1>
+        <p class="live">Switch to live demo now</p>
+      </div>
+      <div class="shot-stage">
+        <img src="assets/route-earth-polaris-clean.png" alt="Earth to Polaris directions in GalaxyMaps" />
+      </div>
+      <div class="calls">
+        <div class="call"><b>01 Search</b><span>Any supported destination</span></div>
+        <div class="call"><b>02 Directions</b><span>Earth → Polaris, 433 years</span></div>
+        <div class="call"><b>03 Travel modes</b><span>Light speed or Voyager 1</span></div>
+        <div class="call"><b>04 Mission Control</b><span>Ask Grok. Tools, not guesses.</span></div>
+      </div>
+    </section>
+
+    <section class="slide" id="s4" data-title="Technical">
+      <div class="pad arch">
+        <p class="kicker">How it works</p>
+        <h1>Real space data in. A navigable universe out.</h1>
+        <div class="flow">
+          <div class="node">
+            <div class="step">Data</div>
+            <strong>Astronomy sources</strong>
+            <p>JPL Horizons, SIMBAD, HYG, NASA fact sheets, exoplanet archive.</p>
+            <span class="arrow"></span>
+          </div>
+          <div class="node">
+            <div class="step">Physics</div>
+            <strong>Catalog + math</strong>
+            <p>3D distances, Hohmann transfers, parallax rules, cited sources.</p>
+            <span class="arrow"></span>
+          </div>
+          <div class="node">
+            <div class="step">Map</div>
+            <strong>Three.js atlas</strong>
+            <p>One continuous map, routes, lock-on camera, Play time.</p>
+            <span class="arrow"></span>
+          </div>
+          <div class="node">
+            <div class="step">Control</div>
+            <strong>Grok + WebXR</strong>
+            <p>Voice tools, accessible UI, immersive VR on the same map.</p>
+          </div>
+        </div>
+        <p class="line" style="margin-top:56px">AI explains and controls. Code calculates.</p>
+        <div class="foot" style="position:static;margin-top:auto;padding:0"><span>React · Three.js · xAI Grok Voice · Cursor</span><span>4 / 6</span></div>
+      </div>
+    </section>
+
+    <section class="slide" id="s5" data-title="Differentiators">
+      <div class="pad diff">
+        <p class="kicker">Why it is different</p>
+        <h1>A map you can see, hear, and step inside.</h1>
+        <div class="trio">
+          <article class="card">
+            <img src="assets/mission-control-panel.png" alt="GalaxyMaps Mission Control with Talk to Grok" style="object-position:50% 0" />
+            <div class="body">
+              <h2>Conversational navigation</h2>
+              <p>Grok Mission Control talks and steers the map through validated tools only.</p>
+            </div>
+          </article>
+          <article class="card">
+            <img src="assets/a11y-dialog.png" alt="GalaxyMaps accessibility settings" />
+            <div class="body">
+              <h2>Accessible exploration</h2>
+              <p>Keyboard, screen reader, voice, and reduced-motion paths — built toward WCAG 2.2 AA.</p>
+            </div>
+          </article>
+          <article class="card">
+            <img src="assets/saturn-map.png" alt="Locked 3D view of Saturn" />
+            <div class="body">
+              <h2>Immersive navigation</h2>
+              <p>WebXR uses the same 3D map: gaze, pinch, and Grok Voice in VR.</p>
+            </div>
+          </article>
+        </div>
+        <div class="foot" style="position:static;margin-top:22px;padding:0"><span>Not affiliated with Google, NASA, SpaceX, or xAI</span><span>5 / 6</span></div>
+      </div>
+    </section>
+
+    <section class="slide" id="s6" data-title="Close">
+      <img class="bleed" src="assets/quiet-orion.png" alt="GalaxyMaps quiet view of the Orion Nebula" />
+      <div class="veil"></div>
+      <div class="close-copy">
+        <p class="kicker">GalaxyMaps</p>
+        <h1>The universe is hard to comprehend. It shouldn’t be hard to explore.</h1>
+        <p class="end">GalaxyMaps — Directions across the universe.</p>
+      </div>
+      <div class="qr-box">
+        <img src="assets/qr-github.svg" alt="QR code to the GalaxyMaps GitHub repository" />
+        <strong>Open the repo</strong>
+        <span>github.com/diyar-niyazov/GalaxyMaps</span>
+      </div>
+      <div class="foot"><span>BigRed//Hacks 2026 · Navigation</span><span>6 / 6</span></div>
+    </section>
+
+    <section class="slide backup" id="s7" data-title="Architecture">
+      <div class="pad deep">
+        <p class="kicker">Backup A</p>
+        <h1>Architecture, from the repository</h1>
+        <div class="flow">
+          <div class="node">
+            <div class="step">Bundle</div>
+            <strong>public/data</strong>
+            <p>919 catalog objects, 109,389 HYG stars, Horizons ephemeris. Offline after load.</p>
+          </div>
+          <div class="node">
+            <div class="step">Science</div>
+            <strong>src/lib</strong>
+            <p>Pure TypeScript: coords, routes, Hohmann, Kepler, parallax, itinerary.</p>
+          </div>
+          <div class="node">
+            <div class="step">Engine</div>
+            <strong>MapEngine</strong>
+            <p>Float64 ICRF km, camera-relative projection, Three.js, no React Three Fiber.</p>
+          </div>
+          <div class="node">
+            <div class="step">State</div>
+            <strong>Zustand + URL</strong>
+            <p>Shareable exact views. Home, lock, route, comparison, tours, sky chart.</p>
+          </div>
+          <div class="node">
+            <div class="step">AI</div>
+            <strong>Validated tools</strong>
+            <p>One tool layer for Grok Voice and the labeled offline guide. Numbers come from the app.</p>
+          </div>
+          <div class="node">
+            <div class="step">Server</div>
+            <strong>Express /api</strong>
+            <p>Key stays server-side. Ephemeral voice tokens, TTS, STT, chat, Imagine.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide backup" id="s8" data-title="Integrity">
+      <div class="pad">
+        <p class="kicker">Backup B</p>
+        <h1>Data and scientific integrity</h1>
+        <div class="src-grid">
+          <div class="box">
+            <h2>Where numbers come from</h2>
+            <ul>
+              <li>JPL Horizons DE441 — Solar System vectors</li>
+              <li>SIMBAD — featured stars and deep sky</li>
+              <li>HYG v4.4 — 109,389 star positions</li>
+              <li>NASA fact sheets + exoplanet archive</li>
+              <li>Cited literature for key distances</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h2>What we will not fake</h2>
+            <ul>
+              <li>Parallax inverted only if σ/ϖ ≤ 20%</li>
+              <li>No routes to cosmological-redshift objects</li>
+              <li>Images labeled observed / illustration / AI</li>
+              <li>Milky Way disk is a reconstruction</li>
+              <li>Hohmann is idealized, not a launch plan</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h2>Earth → Mars</h2>
+            <p>Idealized Hohmann transfer: about 259 days (8.5 months), with Δv, next window, and a separate straight-line benchmark.</p>
+          </div>
+          <div class="box">
+            <h2>Earth → Polaris</h2>
+            <p>True 3D separation ≈ 433 ly. 433 years at light speed; about 7.7 million years at Voyager 1’s measured speed.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide backup" id="s9" data-title="Access and XR">
+      <div class="pad">
+        <p class="kicker">Backup C</p>
+        <h1>Accessible paths and WebXR</h1>
+        <div class="src-grid">
+          <div class="box">
+            <h2>Built toward WCAG 2.2 AA</h2>
+            <ul>
+              <li>Keyboard map: / search, H home, D directions, M voice</li>
+              <li>Skip links, live regions, ARIA combobox search</li>
+              <li>High contrast, larger text, reduced motion</li>
+              <li>Describe current view + nearby-object stepping</li>
+              <li>We do not claim ADA certification</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h2>WebXR on the same map</h2>
+            <ul>
+              <li>Enter VR from a user gesture when supported</li>
+              <li>Nearby linear scale; far objects log-compressed</li>
+              <li>Head gaze, pinch to fly, dwell to open details</li>
+              <li>Grok Voice starts with the session</li>
+              <li>Physical Vision Pro / Quest pass still pending</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide backup" id="s10" data-title="Grok">
+      <div class="pad">
+        <p class="kicker">Backup D</p>
+        <h1>Grok controls the map. It does not invent the sky.</h1>
+        <div class="src-grid">
+          <div class="box">
+            <h2>What Grok actually does</h2>
+            <ul>
+              <li>Speech-to-speech over xAI realtime WebSocket</li>
+              <li>5-minute client secret; API key never in the browser</li>
+              <li>Can search, route, tour, zoom, play time, share</li>
+              <li>Must quote tool-formatted distances and times</li>
+              <li>If the API is down: labeled offline scripted guide</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h2>SpaceX challenge, honestly</h2>
+            <ul>
+              <li>Built with Cursor</li>
+              <li>Uses Grok Voice (and Imagine, labeled AI reconstruction)</li>
+              <li>Uses real space / mission catalog data</li>
+              <li>No endorsement by SpaceX, xAI, NASA, or Google</li>
+              <li>This laptop: Mission Control shows Grok connected</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="nav" id="nav" aria-hidden="true"><span id="pos">1 / 10</span></div>
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const params = new URLSearchParams(location.search);
+    const present = params.get("print") !== "1";
+    let i = Math.max(0, slides.findIndex((s) => s.id === location.hash.slice(1)));
+    if (i < 0) i = 0;
+    const fit = () => {
+      const s = slides[i];
+      if (!document.body.classList.contains("present") || !s) return;
+      const sx = window.innerWidth / 1920, sy = window.innerHeight / 1080;
+      s.style.transform = "scale(" + Math.min(sx, sy) + ")";
+    };
+    const show = () => {
+      slides.forEach((s, n) => s.classList.toggle("on", n === i));
+      history.replaceState(null, "", "#" + slides[i].id);
+      document.getElementById("pos").textContent = (i + 1) + " / " + slides.length;
+      fit();
+    };
+    if (present) {
+      document.body.classList.add("present");
+      show();
+      addEventListener("resize", fit);
+      addEventListener("keydown", (e) => {
+        if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); i = Math.min(slides.length - 1, i + 1); show(); }
+        if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); i = Math.max(0, i - 1); show(); }
+        if (e.key === "Home") { i = 0; show(); }
+        if (e.key === "End") { i = slides.length - 1; show(); }
+      });
+    }
+    addEventListener("beforeprint", () => document.body.classList.remove("present"));
+    addEventListener("afterprint", () => { if (present) { document.body.classList.add("present"); show(); } });
+  </script>
+</body>
+</html>
