@@ -2,9 +2,29 @@
 
 **Directions across the universe, on a map that feels familiar.**
 
-[**Live demo**](https://galaxy-maps.vercel.app) · [Demo video](docs/demo.mp4) · Built for **BigRed//Hacks 2026** (theme: Navigation)
+### [**www.galaxies.wiki**](https://www.galaxies.wiki)
 
-[![Watch the GalaxyMaps demo](docs/demo-poster.png)](docs/demo.mp4)
+Mirror: [galaxy-maps.vercel.app](https://galaxy-maps.vercel.app) · Built for **BigRed//Hacks 2026** (theme: Navigation)
+
+<video src="docs/demo.mp4" poster="docs/demo-poster.png" controls muted playsinline width="100%">
+  <a href="docs/demo.mp4">Watch the GalaxyMaps demo video</a>
+</video>
+
+## Judges: start here (3 minutes)
+
+Open **[www.galaxies.wiki](https://www.galaxies.wiki)**. No install, no account, no API key. Best on a desktop browser. The first four steps show the core idea.
+
+1. **Land on Earth.** The app opens locked on a textured Earth. Drag to orbit. This is the "locked camera" that makes space feel like a map.
+2. **Get directions to Mars.** Press `/`, search **Mars**, open its card, and press **Directions** from Earth. You get an idealized Hohmann transfer (about 259 days), the next launch window, Δv, and the arc drawn on the map. Switch **Travel mode** between Light speed and Voyager 1.
+3. **Watch it move.** Press `Space` to play time. Planets move and spin on real NASA/JPL Horizons data.
+4. **Go far.** Search **M31**, open Andromeda, and press **Explore inside** (21 features). Then try **Surprise me** for a random destination.
+5. **Compare sizes.** On the Sun's card, press **Compare sizes** and pick the **Sun / Sirius A** preset.
+6. **Take a tour.** Start **Black holes & extremes**, or the five-chapter **SpaceX Demo-2** story.
+7. **See it from home.** On a card that offers **View from Earth** (for example Andromeda), press it to open the Earth sky chart.
+8. **Present it.** Use **Quiet view** (full-screen icon, right edge) for a clean screen, or **Share this view** for an exact link.
+9. **Try VR.** On a WebXR headset (we filmed on Apple Vision Pro), press **Enter VR**, look at an object, and pinch to fly there.
+
+**Why it's trustworthy:** every distance comes from a cited catalog, and every model assumption is shown in the UI. Where the physics is idealized, the app says so. Details: [Scientific model](#scientific-model-and-assumptions).
 
 GalaxyMaps is a continuously zoomable 3D space atlas with a map-app interface. Search for a planet, star, nebula, or galaxy, open an image-led destination card, lock the camera onto it and orbit it, then ask for directions.
 
@@ -84,7 +104,7 @@ Without a key, the Guide panel gives clearly labeled **scripted explanations and
 
 The site is not static: `/api/*` runs as a Node server.
 
-**Vercel** (current deployment): `npm run build:vercel` produces Build Output API output, with the Vite build as static files and the Express app bundled into one function at `/api`. `vercel.json` already points at that command.
+**Vercel** (mirror at galaxy-maps.vercel.app; the primary domain is [www.galaxies.wiki](https://www.galaxies.wiki)): `npm run build:vercel` produces Build Output API output, with the Vite build as static files and the Express app bundled into one function at `/api`. `vercel.json` already points at that command.
 
 ```bash
 npm i -g vercel
@@ -139,7 +159,7 @@ Explore inside Andromeda lists 21 features. There are 10 SpaceX and human-spacef
 
 ## WebXR (immersive VR)
 
-**Enter VR** appears only when the browser reports `immersive-vr` support.
+**Enter VR** appears only when the browser reports `immersive-vr` support. The demo video was filmed on an **Apple Vision Pro**.
 
 - **Look** with your head, **pinch** what you are looking at to fly there, pinch and drag to turn around it, spread two pinching hands to zoom. A Quest thumbstick does the same.
 - **Hold your gaze** for about half a second to open details.
@@ -149,7 +169,7 @@ Explore inside Andromeda lists 21 features. There are 10 SpaceX and human-spacef
 Testing on a headset requires a secure context:
 
 - **Quest over USB:** `npm run build && npm start`, then `adb reverse tcp:8787 tcp:8787` and open `http://localhost:8787` in the Quest browser.
-- **Any headset on the network:** use the live deployment, or put the production server behind an HTTPS tunnel or reverse proxy.
+- **Any headset on the network:** open [www.galaxies.wiki](https://www.galaxies.wiki), or put the production server behind an HTTPS tunnel or reverse proxy.
 
 Current status and checklist: [docs/polish/xr-status.md](docs/polish/xr-status.md).
 
@@ -172,7 +192,7 @@ Current status and checklist: [docs/polish/xr-status.md](docs/polish/xr-status.m
 
 ## Limitations
 
-- **Headset validation pending.** The WebXR math and session lifecycle are tested, but a full physical-headset pass is still needed.
+- **Headsets.** Demoed on Apple Vision Pro. Meta Quest has not been tested, and GPU performance has not been profiled.
 - **Live Grok untested in development.** The integrations follow the xAI docs, but no key was configured during development.
 - **Ephemeris window.** Precise positions cover 2026-09-01 to 2027-03-01 only.
 - **Images.** Gallery images come from each object's Wikipedia page. Images that don't mention the object are filtered out at build time.
