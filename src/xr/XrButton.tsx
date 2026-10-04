@@ -50,7 +50,7 @@ export function XrButton() {
       // Start Grok Voice in the same click: audio and microphone access need the user gesture,
       // and inside VR the conversation is the main way to ask for things.
       const voice = useVoice.getState();
-      if (useSpeechPrefs.getState().grokAvailable && voice.status !== "live" && voice.status !== "connecting") void voice.start();
+      if (useSpeechPrefs.getState().grokAvailable && voice.status !== "live" && voice.status !== "connecting") void voice.start({ pushToTalk: true });
       pauseForXr();
       st.setJd(previousView.jd);
       const start = st.camera.lockedId ?? st.selectedId ?? st.stops[st.stops.length - 1] ?? null;
@@ -78,7 +78,7 @@ export function XrButton() {
   return (
     <>
       {(supported === true || active) && (
-        <button type="button" className={`ctrl xr-enter ${active ? "active" : ""}`} disabled={!active && starting} aria-label={label} title={active ? "Exit VR" : "Enter VR: look around, pinch what you're looking at to fly there, pinch and drag to turn, spread both hands to zoom. Grok talks with you the whole time."} onClick={() => active ? void entry.current?.end() : void enter()}>
+        <button type="button" className={`ctrl xr-enter ${active ? "active" : ""}`} disabled={!active && starting} aria-label={label} title={active ? "Exit VR" : "Enter VR: look around, pinch what you're looking at to fly there, pinch and drag to turn, spread both hands to zoom. Pinch and hold the microphone at the bottom to talk to Grok."} onClick={() => active ? void entry.current?.end() : void enter()}>
           <VrIcon size={20} /><span className="xr-enter-text">{active ? "Exit VR" : "VR"}</span>
         </button>
       )}

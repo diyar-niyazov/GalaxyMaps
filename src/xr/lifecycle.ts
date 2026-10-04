@@ -1,4 +1,5 @@
 import { useStore } from "../state/store";
+import { getEngine } from "../map/engineRef";
 import { restoreView, type ViewSnapshot } from "../state/navigation";
 import { focusObject } from "../state/actions";
 
@@ -54,17 +55,19 @@ export class ImmersiveEntry {
   };
 }
 
-/** Keep the catalog epoch and flat scene still while the runtime owns the viewer pose. */
+/** Pause route-preview and auto-orbit. Play time (the shared simulation clock) keeps running. */
 export function pauseForXr() {
   const app = useStore.getState();
-  app.pauseTime();
   app.setPlaying(false);
   app.setOrbitCamera(false);
 }
 
 /** A new, intentional spatial selection survives exit; otherwise restore the exact preceding view. */
 export function returnFromXr(view: ViewSnapshot, selectedId: string | null) {
+  const { jd, time } = useStore.getState();
   restoreView(view);
+  useStore.setState({ jd, time });
+  getEngine()?.setJd(jd);
   if (selectedId && selectedId !== view.selectedId && useStore.getState().data?.byId.has(selectedId)) {
     focusObject(selectedId);
     useStore.getState().setPanel("place");

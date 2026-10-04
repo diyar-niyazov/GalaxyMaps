@@ -62,16 +62,35 @@ export function displayRadius(radiusKm: number, rKm: number, mPerKm: number) {
 }
 
 /**
- * Zoom toward (factor < 1) or away from (factor > 1) a pivot point. Zooming in flies toward the
- * pivot (never closer than `standoffKm`): while it is far it also rushes in faster than the world
+ * Closest / arrival / farthest camera distances for an object. Arrival matches the current
+ * comfortable inspection distance; min is the desktop-equivalent close look (galaxies: 3% of
+ * arrival, like lock-framing). VR must not stop at arrival.
+ */
+export function objectZoomLimits(kind: "sphere" | "galaxy" | "cloud" | "point", sizeKm: number) {
+  if (kind === "sphere") {
+    const arriveKm = Math.max(sizeKm * 3.4, 1e-3);
+    return { arriveKm, minKm: Math.max(sizeKm * 1.12, arriveKm * 0.28), maxKm: arriveKm * 8 };
+  }
+  if (kind === "point") {
+    const arriveKm = Math.max(sizeKm * 8, 5e7);
+    return { arriveKm, minKm: Math.max(sizeKm * 2, arriveKm * 0.04), maxKm: arriveKm * 40 };
+  }
+  const arriveKm = Math.max(sizeKm * 1.5, 1);
+  return { arriveKm, minKm: arriveKm * 0.03, maxKm: arriveKm * 40 };
+}
+
+/**
+ * Zoom toward (factor < 1) or away from (factor > 1) a pivot. Zooming in flies toward the
+ * pivot (never closer than `minKm`): while it is far it also rushes in faster than the world
  * scale, then it holds at its display distance and the world grows around it. Zooming out shrinks
  * the world around the pivot.
  */
-export function zoomVantage(v: Vantage, pivot: Vec3, standoffKm: number, factor: number): Vantage {
+export function zoomVantage(v: Vantage, pivot: Vec3, minKm: number, factor: number, maxKm = Infinity): Vantage {
   const off: Vec3 = [v.p[0] - pivot[0], v.p[1] - pivot[1], v.p[2] - pivot[2]];
   const r = Math.max(len(off), 1e-9);
   let r2 = r * factor;
-  if (factor < 1) r2 = Math.max(r2, Math.min(r, standoffKm));
+  if (factor < 1) r2 = Math.max(r2, Math.min(r, minKm));
+  else if (Number.isFinite(maxKm)) r2 = Math.min(r2, Math.max(r, maxKm));
   const d = r * v.mPerKm;
   const d2 = factor < 1 && d > FOCUS_M ? Math.max(FOCUS_M, d * factor ** 3) : d;
   const k = r2 / r;
@@ -103,7 +122,8 @@ export function planFlight(v: Vantage, target: Vec3, standoffKm: number, endM = 
   const u: Vec3 = r0 > 1e-6 ? [off[0] / r0, off[1] / r0, off[2] / r0] : [1, 0, 0];
   const r1 = Math.max(standoffKm, 1e-6);
   const decades = Math.abs(Math.log10(r0 / r1)) + Math.abs(Math.log10((r1 * v.mPerKm) / endM)) * 0.3;
-  return { target, u, r0, r1, m0: v.mPerKm, m1: clamp(endM / r1, MIN_M_PER_KM, MAX_M_PER_KM), ms: clamp(1200 + decades * 220, 1200, 4200) };
+  // Visual trip is a few seconds even when the physical journey is years — log-space, not metres.
+  return { target, u, r0, r1, m0: v.mPerKm, m1: clamp(endM / r1, MIN_M_PER_KM, MAX_M_PER_KM), ms: clamp(1400 + decades * 180, 1400, 3800) };
 }
 
 export const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
@@ -174,8 +194,8 @@ export class Dwell {
  * zoom in). One hand: pushing toward the scene zooms in, pulling back zooms out.
  */
 export function pinchFactor(prevSpan: number | null, span: number | null, pushM: number) {
-  if (prevSpan && span) return clamp(prevSpan / span, 0.5, 2) ** 2.2;
-  return clamp(Math.exp(-pushM * 9), 0.5, 2);
+  if (prevSpan && span) return clamp(prevSpan / span, 0.82, 1.22) ** 1.35;
+  return clamp(Math.exp(-pushM * 5.2), 0.82, 1.22);
 }
 
 /** Orbit angles (yaw, pitch in radians) for a one-hand drag: grab the world and turn it. */

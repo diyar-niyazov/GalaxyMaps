@@ -38,10 +38,11 @@ const INSTRUCTIONS = `${MISSION_CONTROL_INSTRUCTIONS}
 - The user may control the whole app by voice. When they ask for anything the app can do (open a panel, change layer, play time, share, go back, quiet view, accessibility settings, tours, comparisons, the sky view), call the matching tool instead of describing how to do it.
 - If they say goodbye or ask you to stop listening, call endVoiceSession.`;
 
-const XR_INSTRUCTIONS = `The user is inside the immersive VR map, standing in a 3D model of space. There are no screen buttons, so this conversation is how they ask for things. Stay in the conversation: listen, answer, and fly them around.
-- selectObject flies them to that object and opens its details; setRegion flies to a region; setZoomTarget in/out/home zooms; resetView returns to Earth.
+const XR_INSTRUCTIONS = `The user is inside the immersive VR map, standing in a 3D model of space. They talk with push-to-talk (pinch and hold the microphone). Listen only to each finished utterance.
+- selectObject flies them to that object; setRegion flies to a region; setZoomTarget in/out/home zooms; resetView returns to Earth.
 - "This", "that", "it" or "what am I looking at" means the object they are looking at, described below. Call describeView or getSelectedObjectContext if you need a fresh look.
-- Keep replies to one or two spoken sentences. After a flight, briefly name where they arrived.
+- If a tool says navigation is "moving", say you are taking them there. Never say arrived, here, or that you have already taken them there — the app announces arrival when the camera actually stops.
+- Keep replies to one or two spoken sentences.
 - Panels, sharing and layers only appear after they leave VR; say so if asked.`;
 
 const RATE = 24000;
@@ -84,11 +85,19 @@ export class GrokVoiceSession {
   /** Audio of the most recent spoken answer, for Replay. */
   private lastAudio: Float32Array[] = [];
   private responseAudio: Float32Array[] = [];
+  private ptt = false;
+  private holding = false;
+  private pending: Float32Array[] = [];
 
   constructor(private cb: VoiceCallbacks) {}
 
+  get pushToTalk() {
+    return this.ptt;
+  }
+
   /** Call from a click or key handler: the audio context must be created inside the gesture. */
-  async connect(withMic: boolean) {
+  async connect(withMic: boolean, opts?: { pushToTalk?: boolean }) {
+    this.ptt = !!opts?.pushToTalk;
     this.ctx = primeAudio();
     if (!this.ctx) throw new Error("Web Audio is not supported in this browser");
     this.cb.onStatus("connecting");
@@ -123,7 +132,7 @@ export class GrokVoiceSession {
       session: {
         voice: body.voice,
         instructions: this.instructions(),
-        turn_detection: { type: "server_vad" },
+        turn_detection: this.ptt ? null : { type: "server_vad" },
         tools: TOOL_DEFS,
         audio: {
           input: { format: { type: "audio/pcm", rate: RATE }, transcription: { keyterms: names } },
@@ -132,6 +141,7 @@ export class GrokVoiceSession {
       },
     });
     this.cb.onStatus("live");
+    if (this.ptt) this.setMuted(true);
     const micError = await micReady;
     if (micError) this.cb.onMicError?.(micErrorMessage(micError));
   }
@@ -152,9 +162,46 @@ export class GrokVoiceSession {
     this.send({ type: "session.update", session: { instructions: this.instructions() } });
   }
 
+  setPushToTalk(on: boolean) {
+    this.ptt = on;
+    this.send({ type: "session.update", session: { turn_detection: on ? null : { type: "server_vad" }, instructions: this.instructions() } });
+    if (on && !this.holding) this.setMuted(true);
+  }
+
+  /** Push-to-talk: start sending microphone audio. */
+  beginTalk() {
+    if (this.closed) return;
+    this.holding = true;
+    this.pending = [];
+    this.send({ type: "input_audio_buffer.clear" });
+    this.setMuted(false);
+    this.cb.onListening?.(true);
+  }
+
+  /** Push-to-talk: stop the microphone and finalize the utterance. */
+  endTalk() {
+    if (!this.holding) return;
+    this.holding = false;
+    this.flushAudio();
+    this.setMuted(true);
+    this.cb.onListening?.(false);
+    if (this.ptt) {
+      this.send({ type: "input_audio_buffer.commit" });
+      this.send({ type: "response.create" });
+    }
+  }
+
+  private flushAudio() {
+    if (!this.pending.length || this.ws?.readyState !== WebSocket.OPEN) { this.pending = []; return; }
+    const merged = new Float32Array(this.pending.reduce((n, c) => n + c.length, 0));
+    let o = 0;
+    for (const c of this.pending) { merged.set(c, o); o += c.length; }
+    this.pending = [];
+    if (merged.length) this.send({ type: "input_audio_buffer.append", audio: floatToPcm16Base64(merged) });
+  }
+
   async startMic() {
     if (this.mic) return;
-    let pending: Float32Array[] = [];
     const mic = await MicCapture.open({
       rate: RATE,
       onLevel: (l) => this.cb.onLevel?.(this.muted ? 0 : l),
@@ -162,16 +209,12 @@ export class GrokVoiceSession {
       onChunk: (s) => {
         if (this.muted || this.closed) return;
         // Batch ~100 ms per message; the socket may still be connecting during the first chunks.
-        pending.push(s);
-        if (pending.reduce((n, c) => n + c.length, 0) < RATE / 10 || this.ws?.readyState !== WebSocket.OPEN) {
-          if (pending.length > 100) pending = pending.slice(-50);
+        this.pending.push(s);
+        if (this.pending.reduce((n, c) => n + c.length, 0) < RATE / 10 || this.ws?.readyState !== WebSocket.OPEN) {
+          if (this.pending.length > 100) this.pending = this.pending.slice(-50);
           return;
         }
-        const merged = new Float32Array(pending.reduce((n, c) => n + c.length, 0));
-        let o = 0;
-        for (const c of pending) { merged.set(c, o); o += c.length; }
-        pending = [];
-        this.send({ type: "input_audio_buffer.append", audio: floatToPcm16Base64(merged) });
+        this.flushAudio();
       },
     });
     if (this.closed) { mic.close(); return; }

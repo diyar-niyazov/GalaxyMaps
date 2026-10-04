@@ -5,7 +5,7 @@
  * gives true parallax and stereo depth. Galaxies are 3D particle discs, nebulae and clusters
  * volumetric particle clouds, planets and stars lit spheres. Look at something and pinch to fly
  * there; pinch and drag to turn the world around it; spread two pinching hands to zoom; hold your
- * gaze on an object for its details. Grok Voice runs alongside, with a panel below the line of sight.
+ * gaze on an object for its details. Grok Voice is push-to-talk through a small HUD below the line of sight.
  * Head tracking is owned by the runtime; the scene never writes the viewer pose.
  */
 import * as THREE from "three";
@@ -24,11 +24,13 @@ import { TYPE_LABEL } from "../lib/search";
 import { PC_KM } from "../lib/units";
 import { canvasFont } from "../lib/fonts";
 import { buildCloudParticles, cloudKind, type CloudKind } from "./cloudModel";
-import { setXrView, xrContextChanged, type XrView } from "./bridge";
+import { setXrNav, setXrView, xrContextChanged, type XrView } from "./bridge";
 import { VoiceHud } from "./voiceHud";
 import { useVoice } from "../state/voice";
+import { useStore } from "../state/store";
+import { reducedMotion } from "../lib/motion";
 import {
-  Dwell, FAR_M, FOCUS_M, LINEAR_M, LOG_MAX, LOG_REF_M, MIN_ANGLE, ORBIT_RAD_PER_M, displayDistance, displayRadius, flightAt, fromXr, pickGaze, pinchFactor,
+  Dwell, FAR_M, FOCUS_M, LINEAR_M, LOG_MAX, LOG_REF_M, MIN_ANGLE, ORBIT_RAD_PER_M, displayDistance, displayRadius, flightAt, fromXr, objectZoomLimits, pickGaze, pinchFactor,
   planFlight, toXr, zoomVantage, type Flight, type GazeCandidate, type Vantage,
 } from "./spaceView";
 
@@ -66,8 +68,11 @@ interface Body {
   cloud: CloudKind | null;
   /** Physical radius, or half the catalog extent for extended objects. */
   radiusKm: number;
-  /** Where a flight to this body ends. */
+  /** Where a flight to this body ends (comfortable inspection). */
   standoffKm: number;
+  /** Closest useful zoom, matching desktop lock-framing. */
+  minKm: number;
+  maxKm: number;
   /** Orientation of particle models in the space frame. */
   frame: THREE.Quaternion | null;
   // Layout, refreshed whenever the vantage or the world rotation changes.
@@ -188,10 +193,11 @@ const PARTICLE_VERT = /* glsl */ `
   void main() {
     vColor = color;
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
-    float s = uDiam * uPx / max(-mv.z, 0.05) / 1000.0;
-    float px = aSize * (aSize < 12.0 ? min(s, uStarCap) : s);
+    float z = max(-mv.z, 0.14);
+    float s = uDiam * uPx / z / 1000.0;
+    float px = aSize * (aSize < 12.0 ? min(s, uStarCap) : min(s, 36.0));
     vEnergy = min(1.0, px * px);
-    gl_PointSize = clamp(px, 1.0, 220.0);
+    gl_PointSize = -mv.z < 0.1 ? 0.0 : clamp(px, 1.0, 48.0);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -335,6 +341,8 @@ export class XrPresentation {
   private lastTime = 0;
   private welcomed = false;
   private welcomeTries = 0;
+  private pendingArrival: { id: string; name: string } | null = null;
+  private lastJd = 0;
 
   constructor(session: XRSession, engine: MapEngine, data: DataBundle, focusId: string | null, jd: number, cb: XrCallbacks) {
     this.session = session;
@@ -342,6 +350,7 @@ export class XrPresentation {
     this.data = data;
     this.focusId = focusId;
     this.jd = jd;
+    this.lastJd = jd;
     this.cb = cb;
     this.renderer = engine.getRenderer();
   }
@@ -358,7 +367,7 @@ export class XrPresentation {
     r.autoClear = true;
     r.xr.enabled = true;
     r.xr.setReferenceSpaceType("local");
-    r.xr.setFramebufferScaleFactor(1);
+    r.xr.setFramebufferScaleFactor(0.9);
     try {
       await r.xr.setSession(this.session);
       if (this.disposed) return;
@@ -369,6 +378,7 @@ export class XrPresentation {
       this.session.addEventListener("selectend", this.onSelectEnd);
       this.session.addEventListener("select", this.onSelect);
       setXrView(this.view);
+      useVoice.getState().setPushToTalk(true);
       r.setAnimationLoop(this.frame);
     } catch (error) {
       this.dispose();
@@ -393,6 +403,9 @@ export class XrPresentation {
     this.session.removeEventListener("select", this.onSelect);
     this.session.removeEventListener("end", this.onEnd);
     setXrView(null);
+    setXrNav({ phase: "idle", id: null, name: null });
+    useVoice.getState().setPushToTalk(false);
+    useVoice.getState().endTalk();
     this.restoreRenderer();
     const all = [...this.disposables];
     for (const c of [...this.models.values(), ...this.labels.values()]) all.push(...c.res);
@@ -472,7 +485,7 @@ export class XrPresentation {
     if (v.status === "live") {
       this.welcomed = true;
       const here = this.byId.get(this.focusId ?? "")?.obj.name;
-      v.speakAsGuide(`Welcome them in one short spoken sentence. They just entered VR${here ? ` looking at ${here}` : ""}. Tell them they can look at something and pinch to fly there, or just ask you to take them somewhere. Then wait for them to speak.`);
+      v.speakAsGuide(`Welcome them in one short spoken sentence. They just entered VR${here ? ` looking at ${here}` : ""}. Tell them they can look at something and pinch to fly there, or pinch and hold the microphone below to ask you to take them somewhere.`);
       return;
     }
     if ((v.status === "connecting" || v.status === "idle") && this.welcomeTries++ < 20) setTimeout(() => this.welcomeVoice(), 400);
@@ -494,10 +507,11 @@ export class XrPresentation {
         : (obj.type === "galaxy" || obj.type === "quasar") && half ? "galaxy"
         : cloud && half ? "cloud" : "point";
       const size = kind === "sphere" ? radius : kind === "point" ? radius : half;
+      const lim = objectZoomLimits(kind, size);
       const frame = kind === "galaxy" || kind === "cloud" ? frameQuaternion(milkyWay ? milkyWayFrame() : skyFrame(obj, pos).axes) : null;
       const b: Body = {
         obj, pos, kind, cloud, radiusKm: size, frame,
-        standoffKm: kind === "sphere" ? size * 3.4 : kind === "point" ? Math.max(size * 8, 5e7) : size * 1.5,
+        standoffKm: lim.arriveKm, minKm: lim.minKm, maxKm: lim.maxKm,
         local: new THREE.Vector3(), world: new THREE.Vector3(), rKm: 1, d: 1, drawR: 0, shownR: 0, angle: 0, promoted: false, hidden: false,
       };
       this.bodies.push(b);
@@ -657,9 +671,14 @@ export class XrPresentation {
         const thick = Math.max(face * 0.28, Math.min(0.7, face * 0.55));
         cached.node.scale.set(face, face, thick);
         const extPx = (face * this.px) / Math.max(b.d, 0.05);
-        const n = particleBudget(extPx, cached.particles.max);
+        let n = particleBudget(extPx, cached.particles.max);
         const fadeIn = Math.min(1, (b.angle - 0.004) / 0.004);
-        const opacity = fadeIn * (b.obj.id === "milky-way" ? this.milkyWayFade : 1);
+        let opacity = fadeIn * (b.obj.id === "milky-way" ? this.milkyWayFade : 1);
+        // Inside the volume, huge additive sprites become TV-static — keep a quieter core.
+        if (b.d < b.drawR * 0.5) {
+          n = Math.max(80, Math.floor(n * 0.28));
+          opacity *= 0.4;
+        }
         cached.particles.light.geometry.setDrawRange(0, n);
         for (const mat of cached.particles.mats) {
           mat.uniforms.uDiam.value = b.drawR * 2;
@@ -673,7 +692,24 @@ export class XrPresentation {
     }
     this.evict(this.models, MODEL_CACHE);
     this.placeStars();
+    if (this.stars) {
+      const focus = this.focusId ? this.byId.get(this.focusId) : undefined;
+      this.stars.visible = !focus || focus.drawR < 7;
+    }
     this.dirty = false;
+  }
+
+  /** Shared Play-time clock: XR reads the same jd the desktop store advances. */
+  private syncClock() {
+    const jd = useStore.getState().jd;
+    if (jd === this.lastJd) return;
+    this.lastJd = jd;
+    this.jd = jd;
+    for (const b of this.bodies) {
+      const pos = positionAt(this.data, b.obj, jd);
+      if (pos) b.pos = pos;
+    }
+    this.dirty = true;
   }
 
   private sphereModel(b: Body): Cached {
@@ -869,17 +905,53 @@ export class XrPresentation {
 
   // ------------------------------------------------------------------ movement
 
-  private startFlight(plan: Flight) {
-    this.flight = { plan, start: performance.now() };
+  private startFlight(plan: Flight, dest?: { id: string; name: string }) {
     this.zoomLeft = 0;
+    if (dest) {
+      this.pendingArrival = dest;
+      setXrNav({ phase: "moving", id: dest.id, name: dest.name });
+      const v = useVoice.getState();
+      if (v.status === "live") {
+        v.interrupt();
+        v.speakAsGuide(`Say only that you are taking them to ${dest.name}. Do not say you have arrived.`);
+      }
+    }
+    if (reducedMotion()) {
+      this.vantage = flightAt(plan, 1);
+      this.dirty = true;
+      this.finishFlight();
+      return;
+    }
+    this.flight = { plan, start: performance.now() };
     xrContextChanged();
+  }
+
+  private finishFlight() {
+    this.flight = null;
+    const dest = this.pendingArrival;
+    this.pendingArrival = null;
+    if (dest && this.focusId === dest.id) {
+      setXrNav({ phase: "arrived", id: dest.id, name: dest.name });
+      const v = useVoice.getState();
+      if (v.status === "live") v.speakAsGuide(`They have arrived at ${dest.name}. Name it in one short sentence. Do not say you are still travelling.`);
+    }
+    xrContextChanged();
+  }
+
+  private cancelFlight() {
+    if (!this.flight && !this.pendingArrival) { this.flight = null; return; }
+    this.flight = null;
+    if (this.pendingArrival) {
+      setXrNav({ phase: "cancelled", id: this.pendingArrival.id, name: this.pendingArrival.name });
+      this.pendingArrival = null;
+    }
   }
 
   private flyTo(id: string) {
     const b = this.byId.get(id);
     if (!b) return;
     this.focusId = id;
-    this.startFlight(planFlight(this.vantage, b.pos, b.standoffKm));
+    this.startFlight(planFlight(this.vantage, b.pos, b.standoffKm), { id, name: b.obj.name });
   }
 
   /** Zoom around a body (or a point ahead along `dir` when there is none). */
@@ -888,7 +960,7 @@ export class XrPresentation {
     const b = target ? this.byId.get(target) : undefined;
     const ahead = (FOCUS_M * 2) / this.vantage.mPerKm;
     const pivot: Vec3 = b ? b.pos : [this.vantage.p[0] + dir[0] * ahead, this.vantage.p[1] + dir[1] * ahead, this.vantage.p[2] + dir[2] * ahead];
-    this.vantage = zoomVantage(this.vantage, pivot, b?.standoffKm ?? 0, factor);
+    this.vantage = zoomVantage(this.vantage, pivot, b?.minKm ?? 0, factor, b?.maxKm);
     this.dirty = true;
   }
 
@@ -956,21 +1028,25 @@ export class XrPresentation {
     const { icrf, target } = this.aim(ray.origin, ray.dir);
     this.pinches.set(e.inputSource, { dir: icrf, target: hud ? null : target, hud, origin: null, last: null, start: performance.now(), moved: 0, mode: "undecided" });
     this.prevSpan = null;
+    if (hud) this.hud?.press();
   };
 
   private onSelectEnd = (e: XRInputSourceEvent) => {
+    const pinch = this.pinches.get(e.inputSource);
     this.pinches.delete(e.inputSource);
     this.prevSpan = null;
+    if (pinch?.hud) this.hud?.release();
   };
 
-  /** A quick pinch: on the voice panel it talks or mutes; on an object it flies there and shows details. */
+  /** A quick pinch on an object flies there. The voice HUD uses pinch-and-hold instead. */
   private onSelect = (e: XRInputSourceEvent) => {
     if (this.disposed || !this.refSpace) return;
     const pinch = this.pinches.get(e.inputSource);
+    if (pinch?.hud) return;
     if (pinch && (pinch.moved > TAP_MOVE_M || performance.now() - pinch.start > TAP_MS)) return;
     const ray = this.rayFrom(e.inputSource.targetRaySpace, e.frame);
     if (!ray) return;
-    if (pinch?.hud ?? this.hud?.hit(ray.origin, ray.dir)) { this.hud?.activate(); return; }
+    if (this.hud?.hit(ray.origin, ray.dir)) return;
     const target = pinch ? pinch.target : this.aim(ray.origin, ray.dir).target;
     if (target) {
       this.flyTo(target);
@@ -990,7 +1066,7 @@ export class XrPresentation {
       const p = pose.transform.position;
       hands.push({ pinch, pos: new THREE.Vector3(p.x, p.y, p.z), dir: ray.dir });
     }
-    if (hands.length) this.flight = null;
+    if (hands.length) this.cancelFlight();
     if (hands.length >= 2) {
       // Two hands: spread to zoom in toward what the first hand pinched, close to zoom out.
       const span = hands[0].pos.distanceTo(hands[1].pos);
@@ -1024,10 +1100,10 @@ export class XrPresentation {
       if (Math.abs(x) < 0.2 && Math.abs(y) < 0.2) continue;
       const ray = this.rayFrom(source.targetRaySpace, frame);
       if (!ray) continue;
-      this.flight = null;
+      this.cancelFlight();
       const { icrf, target } = this.aim(ray.origin, ray.dir);
-      if (Math.abs(y) >= 0.2) this.zoomAt(target, icrf, Math.exp(y * dt * 1.6));
-      if (Math.abs(x) >= 0.2) this.orbit(null, -x * dt * 1.4, 0, head, right);
+      if (Math.abs(y) >= 0.2) this.zoomAt(target, icrf, Math.exp(y * dt * 1.15));
+      if (Math.abs(x) >= 0.2) this.orbit(null, -x * dt * 1.2, 0, head, right);
     }
   }
 
@@ -1043,11 +1119,12 @@ export class XrPresentation {
     const headQ = new THREE.Quaternion().setFromRotationMatrix(xrCam.matrixWorld);
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(headQ);
 
+    this.syncClock();
     if (this.flight) {
       const t = (performance.now() - this.flight.start) / this.flight.plan.ms;
       this.vantage = flightAt(this.flight.plan, t);
       this.dirty = true;
-      if (t >= 1) this.flight = null;
+      if (t >= 1) this.finishFlight();
     } else if (Math.abs(this.zoomLeft) > 1e-3) {
       const step = Math.sign(this.zoomLeft) * Math.min(Math.abs(this.zoomLeft), dt * 1.8);
       this.zoomLeft -= step;

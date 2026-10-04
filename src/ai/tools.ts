@@ -22,7 +22,7 @@ import { useAccessibility } from "../state/accessibility";
 import { currentViewDescription } from "../state/audioNav";
 import { useTravel, beginTravel, startTravel, pauseTravel, resumeTravel, skipTravel, cancelTravel, startJourney } from "../state/travel";
 import { getEngine } from "../map/engineRef";
-import { xrView } from "../xr/bridge";
+import { xrNav, xrView } from "../xr/bridge";
 import { MODE_IDS, FEATURES, JOURNEY_IDS, TOUR_IDS, REGION_IDS, ZOOM_TARGETS, SIMULATION_ACTIONS, JOURNEY_ACTIONS, SURPRISE_INTENTS, PANELS, LAYERS, VIEW_SETTINGS, TIME_RATE_IDS, TOUR_ACTIONS, A11Y_SETTINGS } from "./toolDefs";
 import { TIME_RATES } from "../state/store";
 import { useFinishing } from "../state/finishing";
@@ -140,7 +140,12 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
         const o = lookup(args.id);
         focusObject(o.id);
         if (s.panel !== "guide") useStore.getState().setPanel("place");
-        return { ok: true, shown: o.name, camera: "locked", card: "open" };
+        const flying = !!xrView();
+        return {
+          ok: true, shown: o.name, camera: flying ? "immersive-vr" : "locked", card: "open",
+          navigation: flying ? "moving" : "arrived",
+          speak: flying ? `Say you are taking them to ${o.name}. Do not say you have arrived.` : undefined,
+        };
       }
       case "unlockCamera":
         return { ok: escapeCamera(), camera: "explore" };
@@ -154,6 +159,7 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
           lockedOn: s.camera.lockedId ? d.byId.get(s.camera.lockedId)?.name ?? null : null,
           panel: s.panel,
           view: xr ?? currentViewDescription(),
+          navigation: xrNav(),
         };
       }
       case "describeView":
@@ -192,7 +198,7 @@ export async function runTool(name: string, args: Args = {}): Promise<Result> {
       case "setRegion": {
         const r = oneOf(args.region, REGION_IDS, "region");
         goRegion(r);
-        return { ok: true, region: r };
+        return { ok: true, region: r, navigation: xrView() ? "moving" : "arrived" };
       }
       case "setCategory": {
         const c = str(args.categoryId, "categoryId", 40);

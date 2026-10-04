@@ -131,7 +131,10 @@ export function EngineSync() {
 
   // Hidden page: suspend the clock; resume when visible again if still armed.
   useEffect(() => {
-    const onVis = () => useStore.getState().suspendTime(document.hidden);
+    const onVis = () => {
+      if (useStore.getState().xr.active) return;
+      useStore.getState().suspendTime(document.hidden);
+    };
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);

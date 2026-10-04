@@ -151,7 +151,7 @@ Floating search at the top, a bottom sheet with collapsed, half and full states,
 - You stand in the same 3D map as the web view: nearby objects stay on a true linear scale; farther stars and galaxies keep their real directions and angular sizes, with log-compressed depth so Andromeda, Virgo and a distant quasar sit at different depths. Galaxies and nebulae are thick particle volumes (not camera-facing photos). Pinch something to fly there like a ship.
 - **Look** with your head (web pages do not get eye tracking). **Pinch** what you are looking at to fly there; pinch and drag to turn around it; spread two pinching hands or push one hand to zoom. A Quest thumbstick does the same. Names sit on the object; hitboxes are large enough for coarse head gaze.
 - **Hold your gaze** about half a second (a ring fills) to open details; a quick pinch does the same. Looking away closes the card.
-- **Grok Voice** starts with the session and stays in conversation: a panel below your view shows listening/speaking, and you can say “take me to Saturn” or “what am I looking at?”
+- **Grok Voice** is push-to-talk: look at the small microphone HUD at the bottom of the view, pinch and hold to speak, release to send. Say “take me to Saturn” or “what am I looking at?” The flight starts as soon as the destination is known; Grok only announces arrival when the camera has stopped.
 - Leave VR with the system gesture. **Headset validation pending**: math and session lifecycle are tested; a physical Vision Pro / Quest pass is still needed.
 
 **Testing on a headset.** WebXR requires a secure context:

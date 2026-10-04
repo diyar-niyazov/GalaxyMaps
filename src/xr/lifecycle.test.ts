@@ -92,23 +92,24 @@ describe("immersive session acquisition and cleanup", () => {
 });
 
 describe("flat-view return from immersion", () => {
-  it("pauses all application motion while keeping the route and catalog date", () => {
+  it("pauses route preview and orbit but keeps Play time running at the same date", () => {
     const before = captureView(); pauseForXr();
     expect(useStore.getState().playing).toBe(false);
     expect(useStore.getState().orbitCamera).toBe(false);
-    expect(useStore.getState().time.running).toBe(false);
+    expect(useStore.getState().time.running).toBe(true);
     expect(useStore.getState().jd).toBe(before.jd);
     expect(useStore.getState().stops).toEqual(before.stops);
     expect(useStore.getState().progress).toBe(before.progress);
   });
 
-  it("returns the exact preceding pose, panel, route and epoch without refocusing", () => {
+  it("returns the exact preceding pose, panel and route, keeping Play-advanced time", () => {
     const before = captureView(); pauseForXr();
     useStore.setState({ selectedId: "earth", panel: "place", jd: before.jd + 10, stops: [null, null], progress: 0 });
     returnFromXr(before, null);
     expect(useStore.getState().selectedId).toBe("saturn");
     expect(useStore.getState().panel).toBe("directions");
-    expect(useStore.getState().jd).toBe(before.jd);
+    expect(useStore.getState().jd).toBe(before.jd + 10);
+    expect(useStore.getState().time.running).toBe(true);
     expect(useStore.getState().stops).toEqual(["earth", "saturn"]);
     expect(useStore.getState().progress).toBe(0.62);
     expect(engine.restoreView).toHaveBeenCalledWith(before.view, "locked", "saturn");

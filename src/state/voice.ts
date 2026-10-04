@@ -1,6 +1,7 @@
 /**
- * App-wide voice control. The live Grok voice session lives here rather than in a panel, so it keeps
- * listening while you move around the app, and any surface can start, mute or end it.
+ * App-wide voice control. The live Grok voice session lives here rather than in a panel, so desktop
+ * can keep listening while you move around, VR can switch to push-to-talk, and any surface can
+ * start, mute or end it.
  */
 import { create } from "zustand";
 import { GrokVoiceSession, type VoiceStatus } from "../ai/grokVoice";
@@ -20,12 +21,17 @@ interface VoiceState {
   speaking: boolean;
   partial: string;
   muted: boolean;
+  /** Push-to-talk is held (VR walkie-talkie). */
+  holding: boolean;
   /** One-shot dictation (Grok speech-to-text) in progress. */
   dictation: "idle" | "recording" | "transcribing";
-  start(): Promise<void>;
+  start(opts?: { pushToTalk?: boolean }): Promise<void>;
   stop(): void;
   toggle(): void;
   toggleMute(): void;
+  setPushToTalk(on: boolean): void;
+  beginTalk(): void;
+  endTalk(): void;
   interrupt(): void;
   replay(): boolean;
   sendText(text: string): boolean;
@@ -45,13 +51,16 @@ const logTool = (name: string, args: unknown) =>
   useStore.getState().pushGuide({ role: "tool", text: `${name}(${args && Object.keys(args as object).length ? JSON.stringify(args) : ""})`, origin: "app" });
 
 export const useVoice = create<VoiceState>((set, get) => ({
-  status: "idle", detail: "", micNote: "", micLabel: "", level: 0, listening: false, speaking: false, partial: "", muted: false, dictation: "idle",
+  status: "idle", detail: "", micNote: "", micLabel: "", level: 0, listening: false, speaking: false, partial: "", muted: false, holding: false, dictation: "idle",
 
-  start: async () => {
-    if (session) return;
+  start: async (opts) => {
+    if (session) {
+      if (opts?.pushToTalk) session.setPushToTalk(true);
+      return;
+    }
     stopSpeaking();
     get().stopDictation();
-    set({ micNote: "", detail: "", muted: false, partial: "" });
+    set({ micNote: "", detail: "", muted: !!opts?.pushToTalk, partial: "", holding: false });
     const s = new GrokVoiceSession({
       onStatus: (status, detail) => {
         if (session !== s) return;
@@ -60,7 +69,7 @@ export const useVoice = create<VoiceState>((set, get) => ({
         else if (status === "error") announce(`Voice error: ${detail ?? "connection problem"}`, true);
         else if (status === "idle") {
           session = null;
-          set({ listening: false, speaking: false, partial: "", level: 0 });
+          set({ listening: false, speaking: false, partial: "", level: 0, holding: false });
         }
       },
       onUserText: (t) => useStore.getState().pushGuide({ role: "user", text: t }),
@@ -78,7 +87,7 @@ export const useVoice = create<VoiceState>((set, get) => ({
     });
     session = s;
     try {
-      await s.connect(true);
+      await s.connect(true, { pushToTalk: !!opts?.pushToTalk });
     } catch (e) {
       if (session === s) session = null;
       s.close();
@@ -90,11 +99,15 @@ export const useVoice = create<VoiceState>((set, get) => ({
     const s = session;
     session = null;
     s?.close();
-    set({ status: "idle", listening: false, speaking: false, partial: "", level: 0, micLabel: "" });
+    set({ status: "idle", listening: false, speaking: false, partial: "", level: 0, micLabel: "", holding: false });
     announce("Voice session ended.");
   },
 
   toggle: () => (session ? get().stop() : void get().start()),
+
+  setPushToTalk: (on) => { session?.setPushToTalk(on); if (on) set({ muted: true, holding: false }); },
+  beginTalk: () => { session?.beginTalk(); set({ holding: true, muted: false, listening: true }); },
+  endTalk: () => { session?.endTalk(); set({ holding: false, muted: true, listening: false }); },
 
   toggleMute: () => {
     const muted = !get().muted;

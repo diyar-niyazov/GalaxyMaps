@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { Dwell, FAR_M, FOCUS_M, GAZE_TOLERANCE, LINEAR_M, compressDistance, displayDistance, displayRadius, flightAt, fromXr, pickGaze, pinchFactor, planFlight, toXr, zoomVantage } from "./spaceView";
+import { Dwell, FAR_M, FOCUS_M, GAZE_TOLERANCE, LINEAR_M, compressDistance, displayDistance, displayRadius, flightAt, fromXr, objectZoomLimits, pickGaze, pinchFactor, planFlight, toXr, zoomVantage } from "./spaceView";
 import type { Vec3 } from "../lib/types";
 
 const n = (x: number, y: number, z: number): Vec3 => { const l = Math.hypot(x, y, z); return [x / l, y / l, z / l]; };
+const len3 = (v: Vec3) => Math.hypot(v[0], v[1], v[2]);
 
 describe("immersive scale model", () => {
   it("is linear nearby, then log-compresses depth so far objects still separate", () => {
@@ -49,7 +50,21 @@ describe("immersive scale model", () => {
     expect(1e15 - end.p[0]).toBeCloseTo(1e6, -1);
     expect((1e15 - end.p[0]) * end.mPerKm).toBeCloseTo(FOCUS_M);
     expect(f.ms).toBeGreaterThan(1200);
-    expect(f.ms).toBeLessThanOrEqual(4200);
+    expect(f.ms).toBeLessThanOrEqual(3800);
+  });
+
+  it("lets VR zoom into a galaxy the way desktop lock-framing does, past the arrival standoff", () => {
+    const size = 3e17; // NGC 55-class half-extent
+    const lim = objectZoomLimits("galaxy", size);
+    expect(lim.minKm).toBeLessThan(lim.arriveKm * 0.05);
+    expect(lim.maxKm).toBeGreaterThan(lim.arriveKm * 10);
+    const atArrive = { p: [lim.arriveKm, 0, 0] as Vec3, mPerKm: FOCUS_M / lim.arriveKm };
+    const closer = zoomVantage(atArrive, [0, 0, 0], lim.minKm, 0.1, lim.maxKm);
+    expect(len3(closer.p)).toBeLessThan(lim.arriveKm * 0.2);
+    expect(len3(closer.p)).toBeGreaterThanOrEqual(lim.minKm * 0.99);
+    const planet = objectZoomLimits("sphere", 6371);
+    expect(planet.minKm).toBeGreaterThan(6371);
+    expect(planet.minKm).toBeLessThan(planet.arriveKm);
   });
 
   it("gives small objects a generous hitbox and prefers the most centred", () => {

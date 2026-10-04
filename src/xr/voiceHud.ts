@@ -1,19 +1,18 @@
 /**
- * Grok Voice inside VR: a small panel that rests below the line of sight and follows the body
- * lazily, showing whether Grok is listening or speaking and a live caption. Look at it and pinch
- * to start the conversation, or to mute and unmute.
+ * Push-to-talk Mission Control in VR: a compact head-relative HUD at bottom-center.
+ * Look at it, pinch and hold to talk, release to send. It follows yaw lazily so it
+ * does not jitter with every head twitch.
  */
 import * as THREE from "three";
 import { useVoice } from "../state/voice";
 import { useStore } from "../state/store";
 import { canvasFont } from "../lib/fonts";
 
-const W = 1024, H = 236;
-const SIZE_M: [number, number] = [0.46, 0.106];
-const DISTANCE_M = 0.95;
-const DROP_RAD = 0.42;
-/** The panel re-centres once the head has turned this far away from it. */
-const FOLLOW_RAD = 0.5;
+const W = 1024, H = 220;
+const SIZE_M: [number, number] = [0.42, 0.09];
+const DISTANCE_M = 0.92;
+const DROP_RAD = 0.48;
+const FOLLOW_RAD = 0.55;
 
 function wrap(g: CanvasRenderingContext2D, text: string, maxW: number, maxLines: number) {
   const words = text.split(/\s+/).filter(Boolean), lines: string[] = [];
@@ -26,7 +25,6 @@ function wrap(g: CanvasRenderingContext2D, text: string, maxW: number, maxLines:
     } else line = test;
   }
   if (line) lines.push(line);
-  // Keep the newest words: captions grow at the end.
   return lines.length > maxLines ? ["…" + lines.slice(-maxLines)[0], ...lines.slice(-maxLines + 1)] : lines;
 }
 
@@ -60,32 +58,40 @@ export class VoiceHud {
     this.texture.dispose();
   }
 
-  /** Look at the panel and pinch: start the conversation, or mute/unmute a live one. */
-  activate() {
+  /** Pinch-and-hold: start a push-to-talk utterance. */
+  press() {
     const v = useVoice.getState();
-    if (v.status === "live") v.toggleMute();
-    else if (v.status !== "connecting") void v.start();
+    if (v.status === "idle" || v.status === "error") {
+      void v.start({ pushToTalk: true }).then(() => { if (useVoice.getState().status === "live") useVoice.getState().beginTalk(); });
+      return;
+    }
+    if (v.status === "connecting") return;
+    v.beginTalk();
   }
 
-  /** Is the ray from `origin` along `dir` on the panel? */
+  /** Release: stop the microphone and send. */
+  release() {
+    useVoice.getState().endTalk();
+  }
+
   hit(origin: THREE.Vector3, dir: THREE.Vector3) {
     if (!this.node.visible) return false;
     const to = this.node.position.clone().sub(origin);
     const d = to.length();
-    return dir.angleTo(to) < Math.atan(Math.hypot(SIZE_M[0], SIZE_M[1]) / 2 / d) * 0.9;
+    return dir.angleTo(to) < Math.atan(Math.hypot(SIZE_M[0], SIZE_M[1]) / 2 / d) * 1.05;
   }
 
   update(head: THREE.Vector3, forward: THREE.Vector3, time: number, hover: boolean) {
     const yaw = Math.atan2(forward.x, -forward.z);
     if (this.yaw == null || Math.abs(Math.atan2(Math.sin(yaw - this.yaw), Math.cos(yaw - this.yaw))) > FOLLOW_RAD) this.yaw = yaw;
-    else this.yaw += Math.atan2(Math.sin(yaw - this.yaw), Math.cos(yaw - this.yaw)) * 0.02;
+    else this.yaw += Math.atan2(Math.sin(yaw - this.yaw), Math.cos(yaw - this.yaw)) * 0.035;
     const dir = new THREE.Vector3(Math.sin(this.yaw) * Math.cos(DROP_RAD), -Math.sin(DROP_RAD), -Math.cos(this.yaw) * Math.cos(DROP_RAD));
     this.node.position.copy(head).addScaledVector(dir, DISTANCE_M);
     this.node.lookAt(head);
     if (hover !== this.hover) { this.hover = hover; this.dirty = true; }
     const v = useVoice.getState();
-    // The level meter animates while live; otherwise redraw only on change.
-    if ((this.dirty || (v.status === "live" && !v.muted)) && time - this.lastDraw > 80) {
+    const liveMeter = v.holding || v.speaking;
+    if ((this.dirty || liveMeter) && time - this.lastDraw > 90) {
       this.draw();
       this.lastDraw = time;
       this.dirty = false;
@@ -96,26 +102,30 @@ export class VoiceHud {
     const g = this.canvas.getContext("2d")!;
     const v = useVoice.getState();
     g.clearRect(0, 0, W, H);
-    g.fillStyle = this.hover ? "rgba(26,40,70,0.9)" : "rgba(10,16,30,0.78)";
+    g.fillStyle = this.hover ? "rgba(26,40,70,0.92)" : "rgba(10,16,30,0.72)";
     g.beginPath();
     g.roundRect(4, 4, W - 8, H - 8, 48);
     g.fill();
     if (this.hover) { g.strokeStyle = "rgba(138,182,248,0.9)"; g.lineWidth = 4; g.stroke(); }
 
     const live = v.status === "live";
-    const color = v.status === "error" ? "#ff7a7a" : !live ? "#c9d4ea" : v.muted ? "#7d8aa3" : v.speaking ? "#8ab6f8" : "#6fe3a1";
+    const color = v.status === "error" ? "#ff7a7a"
+      : v.status === "connecting" ? "#c9d4ea"
+      : v.holding ? "#6fe3a1"
+      : v.speaking ? "#8ab6f8"
+      : !live ? "#c9d4ea"
+      : "#7d8aa3";
     const cx = 118, cy = H / 2;
-    if (live && !v.muted) {
+    if (v.holding) {
       g.fillStyle = `${color}33`;
       g.beginPath();
-      g.arc(cx, cy, 52 + Math.min(1, v.level * 3) * 30, 0, Math.PI * 2);
+      g.arc(cx, cy, 52 + Math.min(1, v.level * 3) * 28, 0, Math.PI * 2);
       g.fill();
     }
     g.fillStyle = color;
     g.beginPath();
     g.arc(cx, cy, 48, 0, Math.PI * 2);
     g.fill();
-    // Microphone glyph
     g.fillStyle = "#0a101e";
     g.beginPath();
     g.roundRect(cx - 13, cy - 30, 26, 42, 13);
@@ -127,28 +137,28 @@ export class VoiceHud {
     g.moveTo(cx, cy + 20);
     g.lineTo(cx, cy + 32);
     g.stroke();
-    if (v.muted) {
-      g.beginPath();
-      g.moveTo(cx - 30, cy - 30);
-      g.lineTo(cx + 30, cy + 30);
-      g.stroke();
-    }
 
     const status = v.status === "connecting" ? "Connecting to Grok…"
       : v.status === "error" ? `Voice unavailable${v.detail ? `: ${v.detail}` : ""}`
-      : !live ? "Look here and pinch — Grok will talk with you"
-      : v.muted ? "Muted · pinch here to unmute"
-      : v.speaking ? "Grok is speaking" : v.listening ? "Listening…" : "Grok is with you · just talk";
+      : v.holding ? "Listening… release to send"
+      : v.speaking ? "Grok is speaking"
+      : v.status === "live" && v.partial ? "Thinking…"
+      : !live ? "Look here · pinch and hold to talk"
+      : "Pinch and hold to talk";
     g.fillStyle = "#ffffff";
-    g.font = canvasFont("600 40px");
+    g.font = canvasFont("600 38px");
     g.textBaseline = "alphabetic";
-    g.fillText(status, 200, 84, W - 240);
+    g.fillText(status, 200, 80, W - 240);
 
     const last = [...useStore.getState().guide].reverse().find((m) => m.role === "user" || m.role === "assistant");
-    const caption = v.partial || (live ? last?.text ?? "" : v.micNote) || (live ? "“Take me to Saturn.” “What am I looking at?”" : "Voice stays on for the whole flight.");
+    const caption = (v.partial || last?.text || "").slice(0, 180);
     g.fillStyle = last?.role === "user" && !v.partial ? "#a9b6cc" : "#e8eefc";
-    g.font = canvasFont("400 32px");
-    wrap(g, caption, W - 240, 3).forEach((l, i) => g.fillText(l, 200, 132 + i * 38, W - 240));
+    g.font = canvasFont("400 30px");
+    if (caption) wrap(g, caption, W - 240, 2).forEach((l, i) => g.fillText(l, 200, 128 + i * 36, W - 240));
+    else {
+      g.fillStyle = "#8b95a8";
+      g.fillText("“Take me to Saturn.”", 200, 128, W - 240);
+    }
     this.texture.needsUpdate = true;
   }
 }

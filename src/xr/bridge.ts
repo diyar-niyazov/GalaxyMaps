@@ -14,6 +14,16 @@ export interface XrView {
   describe(): string;
 }
 
+/** App-owned travel truth. Grok describes this; it does not decide it. */
+export type XrNavPhase = "idle" | "moving" | "arrived" | "cancelled";
+export interface XrNav { phase: XrNavPhase; id: string | null; name: string | null }
+
+let nav: XrNav = { phase: "idle", id: null, name: null };
+export const xrNav = () => nav;
+export function setXrNav(next: XrNav) {
+  nav = next;
+}
+
 let active: XrView | null = null;
 const listeners = new Set<() => void>();
 
