@@ -10,6 +10,21 @@ data/raw/hyg_v44.csv.gz
 data/raw/textures-src/
 data/raw/media-src/
 
-# Large texture sources (see README "Textures")
+# Large texture sources
 data/raw/sky/
 data/raw/earth/
+
+# Local presentation preparation files
+/GalaxyMaps-Cursor-Package.zip
+/GalaxyMaps-Cursor-Package/
+/Screenshot 2026-10-04 at 00-20-03 GalaxyMaps.png
+
+# Environment files
+.env.*
+!.env.example
+
+# Generated development files
+coverage/
+*.tsbuildinfo
+__pycache__/
+*.pyc

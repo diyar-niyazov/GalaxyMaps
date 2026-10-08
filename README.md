@@ -1,24 +1,40 @@
 # GalaxyMaps
 
-**Explore the universe like a map.**
+Explore space on an interactive 3D map.
 
-GalaxyMaps is an interactive 3D atlas for exploring planets, stars, nebulae, and galaxies. Search for a place, fly there, orbit it, and see how long a journey would take. Distances come from cited astronomy catalogs; the app labels its estimates and assumptions.
+- **Catalog:** 919 objects (374 featured), plus 109,389 HYG stars.
+- **Explore:** pan, zoom, and orbit in Realistic or Atlas view.
+- **Search:** names, aliases, IDs, and types; browse categories or random destinations.
+- **Cards:** sourced facts and related objects.
+- **Directions:** idealized planetary transfers, light-speed or Voyager 1 travel times, and up to 5 stops.
+- **Time:** change dates and animate orbits at 1 hour–1 year per second.
+- **Compare:** object sizes, Earth-centered sky positions, and light-travel delays.
+- **Tours:** 4 guided tours and a 5-chapter SpaceX/NASA Demo-2 story.
+- **Save and share:** bookmarks, history, view and route links, and credited image exports. No account needed.
+- **Grok:** chat, voice control, dictation, read-aloud, and labeled AI images. Requires an xAI key.
+- **Controls:** touch, keyboard, reduced motion, and Quiet view.
+- **VR:** experimental WebXR with hands or controllers; headset testing pending.
 
-[Open GalaxyMaps](https://galaxies.wiki) · [Vercel mirror](https://galaxy-maps.vercel.app)
+Built for BigRed//Hacks 2026.
 
-[![Watch the GalaxyMaps demo](https://img.youtube.com/vi/vTDPDL1xQxg/hqdefault.jpg)](https://www.youtube.com/watch?v=vTDPDL1xQxg)
+**Website:** [https://galaxies.wiki](https://galaxies.wiki)  
+**Alternate website:** [https://galaxy-maps.vercel.app](https://galaxy-maps.vercel.app)
 
-## Take a look around
+## Screenshot
 
-- Search or browse destinations across the Solar System, Milky Way, and nearby galaxies.
-- Follow guided tours, or explore the five-part SpaceX Demo-2 story.
-- Get directions between objects. Planet-to-planet trips use an idealized Hohmann transfer; other trips are simple cruise-time estimates, not mission plans.
-- Compare object sizes, inspect the Earth-centered sky chart, and save or share a view.
-- Try immersive VR on a supported headset.
+![GalaxyMaps showing Earth](docs/screenshots/desktop-home-earth.png)
 
-## Run it locally
+## Video demo
 
-You’ll need Node.js 22 or newer and npm.
+[![Watch the GalaxyMaps demo on YouTube](https://img.youtube.com/vi/vTDPDL1xQxg/hqdefault.jpg)](https://www.youtube.com/watch?v=vTDPDL1xQxg)
+
+[Watch the demo on YouTube](https://www.youtube.com/watch?v=vTDPDL1xQxg)
+
+65 source records, including NASA/JPL Horizons, HYG, and SIMBAD. Travel estimates use simplified models.
+
+## Run locally
+
+Requires Node.js 22+ and npm.
 
 ```sh
 git clone https://github.com/diyar-niyazov/GalaxyMaps.git
@@ -27,33 +43,16 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173). The app includes its catalog, so the map works without API keys or a data download.
+Open [http://localhost:5173](http://localhost:5173). Catalog included; no API key needed for the map.
 
-Useful commands:
-
-| Command | Purpose |
-| --- | --- |
-| `npm test` | Run the unit tests |
-| `npm run build` | Typecheck and build the app |
-| `npm start` | Serve the production build and API |
-| `npm run smoke` | Run browser checks against a running dev server |
-| `npm run data` | Download sources and rebuild the catalog |
-
-## Optional: Grok features
-
-The map and core features work without credentials. To enable Grok chat, voice, speech, and generated images, add an xAI key to a local `.env` file:
+For Grok, copy `.env.example` to `.env`, set `XAI_API_KEY`, and restart the server.
 
 ```sh
-cp .env.example .env
+npm test        # Run unit tests
+npm run build   # Create a production build
+npm start       # Serve the production build
 ```
 
-Set `XAI_API_KEY` in `.env`, then restart the dev server. Keep the key private; don’t commit `.env`.
+Built with React, TypeScript, Three.js, and Express.
 
-## More detail
-
-- [Data sources and rebuilding the catalog](docs/DATA.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Demo runbook](docs/DEMO.md)
-- [Project notes and limitations](docs/COMPLETION-REPORT.md)
-
-Built for BigRed//Hacks 2026 (Navigation).
+[Architecture](docs/ARCHITECTURE.md) · [Data sources](docs/DATA.md)
