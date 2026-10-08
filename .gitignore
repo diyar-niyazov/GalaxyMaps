@@ -1,30 +1,58 @@
+# Dependencies and build output
 node_modules/
 dist/
 .vercel/
-.env
-.env.local
-*.log
-.DS_Store
-# Large raw downloads are reproducible with `npm run data:fetch`.
-data/raw/hyg_v44.csv.gz
-data/raw/textures-src/
-data/raw/media-src/
+coverage/
+.nyc_output/
+*.tsbuildinfo
 
-# Large texture sources
-data/raw/sky/
-data/raw/earth/
+# Local caches and test output
+.npm/
+.cache/
+.vite/
+test-results/
+playwright-report/
+blob-report/
+/docs/screenshots/polish-*.png
+/docs/screenshots/polish-*.json
+
+# Environment files (keep the setup template)
+.env
+.env.*
+!.env.example
+
+# Local editor, OS, and temporary files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+*.swp
+*.swo
+*~
+/tmp/
+/temp/
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Re-downloadable large data sources
+/data/raw/hyg_v44.csv.gz
+/data/raw/textures-src/
+/data/raw/media-src/
+/data/raw/sky/
+/data/raw/earth/
 
 # Local presentation preparation files
 /GalaxyMaps-Cursor-Package.zip
 /GalaxyMaps-Cursor-Package/
 /Screenshot 2026-10-04 at 00-20-03 GalaxyMaps.png
 
-# Environment files
-.env.*
-!.env.example
-
-# Generated development files
-coverage/
-*.tsbuildinfo
-__pycache__/
-*.pyc
+# Requested self-ignore; this file remains tracked to share these rules
+/.gitignore

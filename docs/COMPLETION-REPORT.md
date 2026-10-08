@@ -1,5 +1,7 @@
 # GalaxyMaps final polish: implementation and verification
 
+> Historical report: generated browser screenshots and JSON reports are no longer tracked. [View the original evidence](https://github.com/diyar-niyazov/GalaxyMaps/tree/8a0e967f5423d9164f958f5b47f6eec3b6b307a7/docs/screenshots). Running `npm run smoke:polish` creates fresh ignored files in `docs/screenshots/`.
+
 Implemented the selected scope in `GalaxyMaps-Final-Polish-Cursor-Prompt.md` in the existing React/TypeScript/Three.js app. Work proceeded through three phases with delegated file ownership and independent review. The original branding, light navigation panel, astronomical calculations and continuous map remain in use.
 
 No public deployment or HTTPS headset URL exists in this workspace. Verification uses the built app at **http://localhost:8788** and development app at **http://localhost:5174** (5173 was occupied). Normal production startup defaults to 8787.
@@ -11,8 +13,8 @@ No public deployment or HTTPS headset URL exists in this workspace. Verification
 | Unit tests | **165/165 passed** in 20 files, including rejected spatial Exit, renderer restoration and galaxy viewing geometry |
 | Typecheck and production build | Passed; main JS 1,071.13 kB / 304.82 kB gzip, CSS 72.91 kB / 15.38 kB gzip, lazy XR 11.20 kB / 4.55 kB gzip |
 | Foundation development browser suite | **17/17 passed** |
-| Phase B public-UI browser gate | **16/16 passed**; `docs/screenshots/polish-results-phase-b.json` |
-| Final built-app public-UI browser gate | **25/25 checks resolved** across the full run and clean focused rerun; original reports and run provenance are retained in `docs/screenshots/polish-results.json` |
+| Phase B public-UI browser gate | **16/16 passed**; [polish-results-phase-b.json](https://github.com/diyar-niyazov/GalaxyMaps/blob/8a0e967f5423d9164f958f5b47f6eec3b6b307a7/docs/screenshots/polish-results-phase-b.json) |
+| Final built-app public-UI browser gate | **25/25 checks resolved** across the full run and clean focused rerun; original reports and run provenance are retained in [polish-results.json](https://github.com/diyar-niyazov/GalaxyMaps/blob/8a0e967f5423d9164f958f5b47f6eec3b6b307a7/docs/screenshots/polish-results.json) |
 | Dataset build from cached raw data | Passed, without new network downloads |
 | Whitespace check | Clean |
 
@@ -20,7 +22,7 @@ Browser evidence uses Chromium with SwiftShader software rendering at 1440×900 
 
 The first production run passed 23/25 checks. Two sky-chart pixel-identity checks differed through canvas rasterization while numerical view state matched. A clean 9/9 focused run verified exact public target/center/field/date, perceptual chart agreement and actual controls; the original 23/25 and focused reports remain available. Final visual review also caught an unsuitable spherical nebula proxy; matching projected observations and explicit illustration labels now distinguish extended objects from spherical bodies.
 
-Affected imagery checks then passed 9/9 and final scene/label checks passed 3/3, with both reports retained. A final production Chromium check on `index-Vu8OcNyo.js` verified wrapped Time controls have a 12 px gap from Back/Share/Quiet (`finishBottom=760`, `timeTop=772`) and the source popover's final Plane text is painted above other controls. Evidence: `docs/screenshots/polish-wrapped-map-controls.png`. The final source/layout change does not alter astronomy, sharing or tour state.
+Affected imagery checks then passed 9/9 and final scene/label checks passed 3/3, with both reports retained. A final production Chromium check on `index-Vu8OcNyo.js` verified wrapped Time controls have a 12 px gap from Back/Share/Quiet (`finishBottom=760`, `timeTop=772`) and the source popover's final Plane text is painted above other controls. Evidence: [polish-wrapped-map-controls.png](https://github.com/diyar-niyazov/GalaxyMaps/blob/8a0e967f5423d9164f958f5b47f6eec3b6b307a7/docs/screenshots/polish-wrapped-map-controls.png). The final source/layout change does not alter astronomy, sharing or tour state.
 
 Galaxy finishing preserves morphology: only spiral/barred/lenticular reconstructions use inclined discs; elliptical/irregular sprites remain camera-facing. Initial galaxy inspection uses the Sun-facing direction so catalog axis ratios are legible. An independent review and the geometry regression test verify the camera rotation; explicit shared-view orientation remains authoritative.
 

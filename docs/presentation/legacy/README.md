@@ -1,9 +1,9 @@
 # Presentation deck outline
 
-The PDF is `docs/GalaxyMaps-deck.pdf`, generated from `docs/deck/deck.html`. Regenerate it after editing:
+The PDF is `docs/presentation/legacy/GalaxyMaps-deck.pdf`, generated from `docs/presentation/legacy/deck.html`. Regenerate it after editing:
 
 ```bash
-chromium --headless=new --no-sandbox --no-pdf-header-footer --print-to-pdf=docs/GalaxyMaps-deck.pdf docs/deck/deck.html
+chromium --headless=new --no-sandbox --no-pdf-header-footer --print-to-pdf=docs/presentation/legacy/GalaxyMaps-deck.pdf docs/presentation/legacy/deck.html
 ```
 
 Then upload the PDF to Google Drive (link sharing: anyone with the link can view) for the Devpost submission.

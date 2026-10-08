@@ -1,6 +1,6 @@
 # GalaxyMaps speaker notes
 
-Deck files (all under `presentation/`):
+Deck files (all under `docs/presentation/`):
 
 - `GalaxyMaps-BigRedHacks-2026-Deck.html` — present this (arrow keys). Add `?print=1` to show every slide.
 - `GalaxyMaps-BigRedHacks-2026-Deck.pdf` — Devpost / Drive upload
@@ -9,9 +9,9 @@ Deck files (all under `presentation/`):
 Regenerate the PDF after HTML edits:
 
 ```bash
-python3 -m http.server 8765 --directory presentation
+python3 -m http.server 8765 --directory docs/presentation
 chromium --headless=new --no-sandbox --no-pdf-header-footer \
-  --print-to-pdf=presentation/GalaxyMaps-BigRedHacks-2026-Deck.pdf \
+  --print-to-pdf=docs/presentation/GalaxyMaps-BigRedHacks-2026-Deck.pdf \
   "http://127.0.0.1:8765/GalaxyMaps-BigRedHacks-2026-Deck.html?print=1"
 ```
 

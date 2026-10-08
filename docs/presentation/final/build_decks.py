@@ -1,6 +1,6 @@
 """Build the GalaxyMaps round-one and finalist decks (editable PPTX) from real captures.
 
-Run with the python-pptx venv:  /tmp/pptx-venv/bin/python presentation/final/build_decks.py
+Run with the python-pptx venv:  /tmp/pptx-venv/bin/python docs/presentation/final/build_decks.py
 """
 from pathlib import Path
 
@@ -12,11 +12,10 @@ from pptx.dml.color import RGBColor
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Emu, Inches, Pt
 
-ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "presentation" / "final"
+OUT = Path(__file__).resolve().parent
+PRESENTATION = OUT.parent
 CAP = OUT / "captures"
 ASSETS = OUT / "assets"
-PKG = ROOT / "GalaxyMaps-Cursor-Package" / "assets"
 ASSETS.mkdir(parents=True, exist_ok=True)
 
 BG = RGBColor(0x05, 0x07, 0x0D)
@@ -78,7 +77,7 @@ def prep_images():
     for name, (src, box) in tiles.items():
         Image.open(CAP / src).convert("RGB").crop(box).resize((1280, 720), Image.LANCZOS).save(ASSETS / f"tile-{name}.jpg", quality=90)
 
-    logo = Image.open(ROOT / "presentation" / "assets" / "logo.png").convert("RGBA")
+    logo = Image.open(PRESENTATION / "assets" / "logo.png").convert("RGBA")
     px = logo.load()
     for y in range(logo.height):
         for x in range(logo.width):
@@ -88,7 +87,7 @@ def prep_images():
                 px[x, y] = (r, g, b, max(0, int(255 * (255 - m) / 20)))
     logo.crop(logo.getbbox()).save(ASSETS / "logo.png")
 
-    src = ROOT / "presentation" / "final" / "assets" / "overview-home.jpg"
+    src = ASSETS / "overview-home.jpg"
     if src.exists():
         Image.open(src).convert("RGB").save(ASSETS / "overview-home.jpg", quality=92)
 
@@ -272,7 +271,7 @@ def saturn_vr(prs, slot, script):
         "Ask why Mars is red, how the Sun produces energy, or why light can’t escape a black hole.",
         "With immersive visuals and Grok beside them, students can move through space, examine worlds up close, and connect each explanation to what they see.",
     ], size=16, color=WHITE, space_after=11, spacing=1.14)
-    picture(s, PKG / "02_VisionPro_Immersive_Saturn_Grok.jpeg", 5.3, 0.85, w=7.55)
+    picture(s, ASSETS / "02_VisionPro_Immersive_Saturn_Grok.jpeg", 5.3, 0.85, w=7.55)
     text(s, 5.3, 5.52, 7.55, 0.35, ["Apple Vision Pro · immersive view with the Grok mic HUD"], size=13, color=MUTED)
     notes(s, f"""{slot}
 
@@ -285,7 +284,7 @@ Grok can act through validated app tools and may use outside knowledge to explai
 
 def classroom(prs, slot, script):
     s = blank(prs)
-    picture(s, PKG / "01_VisionPro_Earth_Hand.jpeg", 0.6, 1.15, w=8.3)
+    picture(s, ASSETS / "01_VisionPro_Earth_Hand.jpeg", 0.6, 1.15, w=8.3)
     text(s, 0.6, 5.95, 8.3, 0.35, ["Apple Vision Pro demo · GalaxyMaps in the spatial browser"], size=13, color=MUTED)
     text(s, 9.15, 0.65, 3.85, 1.4, ["Bring the universe", "into the classroom."], size=28, bold=True, spacing=1.0)
     text(s, 9.17, 2.25, 3.8, 0.85, ["Explore in a browser, or step into the stars with any WebXR-compatible VR headset."], size=15, color=WHITE, spacing=1.12)
