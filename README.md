@@ -13,7 +13,7 @@ Explore space on an interactive 3D map.
 - **Save and share:** bookmarks, history, view and route links, and credited image exports. No account needed.
 - **Grok:** chat, voice control, dictation, read-aloud, and labeled AI images. Requires an xAI key.
 - **Controls:** touch, keyboard, reduced motion, and Quiet view.
-- **VR:** experimental WebXR with hands or controllers; headset testing pending.
+- **VR:** experimental WebXR with hands or controllers; tested on Apple Vision Pro.
 
 Built for BigRed//Hacks 2026.
 
@@ -30,7 +30,7 @@ Built for BigRed//Hacks 2026.
 
 [Watch the demo on YouTube](https://www.youtube.com/watch?v=vTDPDL1xQxg)
 
-65 source records, including NASA/JPL Horizons, HYG, and SIMBAD. Travel estimates use simplified models.
+Travel estimates use simplified models.
 
 ## Run locally
 
@@ -56,3 +56,18 @@ npm start       # Serve the production build
 Built with React, TypeScript, Three.js, and Express.
 
 [Architecture](docs/ARCHITECTURE.md) · [Data sources](docs/DATA.md)
+
+## Sources and credits
+
+65 source records, including:
+
+- **NASA/JPL Horizons and SBDB:** Solar System positions, spacecraft speeds, and small-body data.
+- **NASA Planetary Fact Sheets:** planet facts.
+- **HYG v4.4 (Astronexus):** star positions. CC BY-SA 4.0.
+- **SIMBAD (CDS Strasbourg):** parallaxes, identifiers, and object classifications.
+- **NASA Exoplanet Archive:** exoplanet data.
+- **Published research:** distances cited per object, including GRAVITY Collaboration (2019) and Pietrzyński et al. (2019).
+- **Solar System Scope and NASA SVS:** planet textures (CC BY 4.0) and the Deep Star Maps sky panorama.
+- **Wikipedia and Wikimedia Commons:** summaries (CC BY-SA 4.0) and images, with credits and licenses shown per image.
+
+Full details: [Data sources](docs/DATA.md).
