@@ -13,3 +13,9 @@ data/raw/media-src/
 # Large texture sources (see README "Textures")
 data/raw/sky/
 data/raw/earth/
+*Prompt.md
+prompts/
+GalaxyMaps-Cursor-Package/
+GalaxyMaps-Cursor-Package.zip
+presentation/
+Screenshot *.png
